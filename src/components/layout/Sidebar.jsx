@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
-// Added Newspaper for the new module
+import React from 'react';
+// UPDATED: Changed the icons to reflect the new module separation
 import {
-    BarChart as BarChartIcon, FileText, Database, Book, Shield, Award, Settings, Newspaper, X
+    BarChart as BarChartIcon,
+    FileText,
+    Database,
+    Book,
+    Shield,
+    Award,
+    Newspaper,
+    Settings,
+    Cpu, // New icon for the Manage module
+    X
 } from 'lucide-react';
 
 const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) => {
+    // UPDATED: The navigation items now reflect the new module structure
     const navItems = [
         { name: 'Dashboard', icon: BarChartIcon },
         { name: 'Compliance Reporting', icon: FileText },
@@ -12,9 +22,9 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) =
         { name: 'Library', icon: Book },
         { name: 'Risk Assessment', icon: Shield },
         { name: 'Licensing', icon: Award },
-        // --- NEW: Added the Regulatory Updates module ---
         { name: 'Regulatory Updates', icon: Newspaper },
-        { name: 'Manage', icon: Settings },
+        { name: 'Manage', icon: Cpu }, // The strategic core
+        { name: 'Settings', icon: Settings }, // User management, etc.
     ];
 
     return (

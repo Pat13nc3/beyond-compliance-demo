@@ -8,7 +8,9 @@ import Library from './pages/Library.jsx';
 import RiskAssessment from './pages/RiskAssessment.jsx';
 import Licensing from './pages/Licensing.jsx';
 import RegulatoryUpdates from './pages/RegulatoryUpdates.jsx';
+// UPDATED: Importing the separated Manage and Settings pages
 import Manage from './pages/Manage.jsx';
+import Settings from './pages/Settings.jsx';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -32,13 +34,7 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'Dashboard':
-        // UPDATED: Pass the userMode state down to the Dashboard
-        return <ActionOrientedDashboard 
-                  userMode={userMode}
-                  setActiveTab={setActiveTab} 
-                  onPrepareReport={handlePrepareReport} 
-                  onViewUpdate={(update) => handleNavigate('Regulatory Updates', { selectedUpdateId: update.id })} 
-               />;
+        return <ActionOrientedDashboard userMode={userMode} setActiveTab={setActiveTab} onPrepareReport={handlePrepareReport} onViewUpdate={(update) => handleNavigate('Regulatory Updates', { selectedUpdateId: update.id })} />;
       case 'Compliance Reporting':
         return <ComplianceReporting initialParams={initialReportParams} onClearParams={clearInitialParams} userMode={userMode}/>;
       case 'Data Management': 
@@ -51,8 +47,11 @@ export default function App() {
         return <Licensing onNavigate={handleNavigate} userMode={userMode}/>;
       case 'Regulatory Updates':
         return <RegulatoryUpdates context={navigationContext} onClearContext={clearNavigationContext} userMode={userMode}/>;
+      // --- UPDATED: Routing for the new module structure ---
       case 'Manage': 
         return <Manage userMode={userMode}/>;
+      case 'Settings':
+        return <Settings userMode={userMode}/>;
       default:
         return <ActionOrientedDashboard userMode={userMode} setActiveTab={setActiveTab} onPrepareReport={handlePrepareReport} onViewUpdate={(update) => handleNavigate('Regulatory Updates', { selectedUpdateId: update.id })}/>;
     }
