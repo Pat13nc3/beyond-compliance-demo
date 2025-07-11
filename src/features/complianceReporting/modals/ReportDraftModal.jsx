@@ -1,39 +1,55 @@
-import React, { useState } from 'react';
-import { X, Save, Send } from 'lucide-react';
+// src/features/complianceReporting/modals/ReportDraftModal.jsx
 
-const ReportDraftModal = ({ report, onClose, onSave, onFile }) => {
-    const [content, setContent] = useState(report.name + " - Draft Content...");
+import React from 'react';
+import { X, FileText, Send, Save } from 'lucide-react';
 
-    const handleSave = () => {
-        onSave({ ...report, content });
-    };
+// The onFile prop is now onReadyForSubmission
+const ReportDraftModal = ({ report, onClose, onReadyForSubmission }) => {
+  if (!report) return null;
 
-    const handleFile = () => {
-        // This now correctly calls the onFile handler from the parent page
-        onFile(report);
-    };
-
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-4xl text-gray-800 flex flex-col h-[90vh]">
-                <div className="flex justify-between items-center mb-4 border-b pb-4">
-                    <h2 className="text-2xl font-bold">Edit Draft: {report.name}</h2>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-500 hover:bg-gray-200"><X size={24} /></button>
-                </div>
-                <div className="flex-grow overflow-y-auto">
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="w-full h-full p-4 border rounded-md resize-none"
-                    />
-                </div>
-                <div className="flex justify-end items-center pt-6 mt-6 border-t">
-                    <button onClick={handleSave} className="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 mr-3"><Save size={16} className="mr-2"/> Save Draft</button>
-                    <button onClick={handleFile} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500"><Send size={16} className="mr-2"/> File Report</button>
-                </div>
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 animate-fade-in">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl h-5/6 flex flex-col">
+        <div className="flex justify-between items-center p-4 border-b">
+          <div className="flex items-center">
+            <div className="bg-blue-100 p-2 rounded-md mr-3">
+              <FileText size={20} className="text-blue-600" />
             </div>
+            <div>
+                <h2 className="text-xl font-bold text-gray-800">{report.name}</h2>
+                <p className="text-sm text-gray-500">Status: <span className="font-semibold text-yellow-600">{report.status}</span></p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200">
+            <X size={20} className="text-gray-600" />
+          </button>
         </div>
-    );
+
+        <div className="p-6 overflow-y-auto flex-grow">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">AI-Generated Draft Content</h3>
+          <textarea
+            defaultValue={report.content || "No content available for this draft."}
+            className="w-full h-full min-h-[400px] p-3 border border-gray-300 rounded-md text-gray-800 bg-gray-50"
+          />
+        </div>
+
+        <div className="flex justify-end p-4 bg-gray-50 border-t rounded-b-xl">
+            <button onClick={onClose} className="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 mr-2 flex items-center">
+                <Save size={16} className="mr-2" />
+                Save Draft
+            </button>
+            {/* --- UPDATED: This button now marks the report as ready for submission --- */}
+            <button 
+                onClick={() => onReadyForSubmission(report)} 
+                className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-500 flex items-center"
+            >
+                <Send size={16} className="mr-2" />
+                Ready for Submission
+            </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ReportDraftModal;

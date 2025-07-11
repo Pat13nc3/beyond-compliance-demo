@@ -1,85 +1,111 @@
+// src/features/complianceReporting/modals/FilingModal.jsx
+
 import React, { useState } from 'react';
-import { X, ShieldCheck, Mail, Send, Check } from 'lucide-react';
+import { X, ShieldCheck, LoaderCircle, Send, Mail, Server, Zap } from 'lucide-react';
 
-// --- UPDATED: The modal now receives an onFileReport handler ---
-const FilingModal = ({ report, onClose, onFileReport }) => {
-    const [selectedChannel, setSelectedChannel] = useState(null);
-    const [isValidating, setIsValidating] = useState(false);
-    const [validationPassed, setValidationPassed] = useState(false);
+// --- UPDATED: The component now receives an 'onFile' prop ---
+const FilingModal = ({ report, onClose, onFile }) => {
+  if (!report) return null;
 
-    const handleValidate = () => {
-        setIsValidating(true);
-        // Simulate a validation check
-        setTimeout(() => {
-            setValidationPassed(true);
-            setIsValidating(false);
-        }, 1500);
-    };
+  const [isValidating, setIsValidating] = useState(false);
+  const [isValidated, setIsValidated] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState(null);
 
-    const handleFile = () => {
-        if (!validationPassed || !selectedChannel) return;
-        onFileReport({ reportId: report.id, channel: selectedChannel });
-        onClose();
-    };
+  const handleValidate = () => {
+    setIsValidating(true);
+    setTimeout(() => {
+      setIsValidating(false);
+      setIsValidated(true);
+    }, 1500);
+  };
 
-    const filingChannels = [
-        { id: 'email', name: 'Direct Email to Regulator', icon: Mail },
-        { id: 'suptech', name: 'Regulator Suptech Platform', icon: Send },
-        { id: 'beyond', name: 'Beyond Supervision API', icon: ShieldCheck },
-    ];
+  // --- UPDATED: This function now calls the onFile prop ---
+  const handleFileReport = () => {
+    // This passes the report back up to the main component to be marked as "Filed"
+    onFile(report);
+  };
 
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl text-gray-800">
-                <div className="flex justify-between items-center mb-4 border-b pb-4">
-                    <h2 className="text-2xl font-bold">File Report: {report.name}</h2>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-500 hover:bg-gray-200"><X size={24} /></button>
-                </div>
+  const channels = [
+    { id: 'email', name: 'Direct Email to Regulator', icon: Mail },
+    { id: 'suptech', name: 'Regulator Suptech Platform', icon: Server },
+    { id: 'api', name: 'Beyond Supervision API', icon: Zap },
+  ];
 
-                <div className="space-y-6 mt-6">
-                    {/* Step 1: Validation */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">1. Pre-Filing Validation</h3>
-                        <div className={`p-4 rounded-lg flex items-center justify-between ${validationPassed ? 'bg-green-50' : 'bg-blue-50'}`}>
-                            <div className="flex items-center">
-                                <ShieldCheck className={`mr-3 ${validationPassed ? 'text-green-600' : 'text-blue-600'}`} />
-                                <div>
-                                    <p className="font-semibold">{validationPassed ? 'Validation Successful' : isValidating ? 'Validating...' : 'Ready to Validate'}</p>
-                                    <p className="text-sm text-gray-600">{validationPassed ? 'Report aligns with all regulatory rules.' : 'Verify content against the rules engine.'}</p>
-                                </div>
-                            </div>
-                            {!validationPassed && (
-                                <button onClick={handleValidate} disabled={isValidating} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-blue-500 disabled:bg-gray-400">
-                                    {isValidating ? 'Validating...' : 'Validate Now'}
-                                </button>
-                            )}
-                            {validationPassed && <Check size={24} className="text-green-600" />}
-                        </div>
-                    </div>
-
-                    {/* Step 2: Channel Selection */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">2. Select Filing Channel</h3>
-                        <div className="space-y-2">
-                            {filingChannels.map(channel => (
-                                <div key={channel.id} onClick={() => setSelectedChannel(channel.id)} className={`p-4 border rounded-lg flex items-center cursor-pointer transition-all ${selectedChannel === channel.id ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-500' : 'border-gray-300 hover:border-gray-400'}`}>
-                                    <channel.icon className="mr-4 text-gray-600" />
-                                    <p className="font-medium">{channel.name}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex justify-end items-center pt-6 mt-6 border-t">
-                    <button onClick={onClose} className="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 mr-3">Cancel</button>
-                    <button onClick={handleFile} className="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled={!validationPassed || !selectedChannel}>
-                        File Report
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 animate-fade-in">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-bold text-gray-800">File Report: {report.name}</h2>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200">
+            <X size={20} className="text-gray-600" />
+          </button>
         </div>
-    );
+
+        <div className="p-6 space-y-6">
+          <div className="space-y-2">
+            <h3 className="font-semibold text-gray-700">1. Select Filing Channel</h3>
+            {channels.map(channel => (
+              <button
+                key={channel.id}
+                onClick={() => setSelectedChannel(channel.id)}
+                className={`w-full text-left flex items-center p-3 border rounded-lg transition-all
+                  ${selectedChannel === channel.id
+                    ? 'bg-blue-100 border-blue-500 ring-2 ring-blue-300'
+                    : 'bg-white border-gray-300 hover:bg-blue-50 hover:border-blue-400'}`
+                }
+              >
+                <channel.icon size={18} className="mr-3 text-gray-600" />
+                <span className="font-semibold text-gray-800">{channel.name}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className={`space-y-2 ${!selectedChannel ? 'opacity-50' : ''}`}>
+            <h3 className="font-semibold text-gray-700 mb-2">2. Pre-Filing Validation</h3>
+            <div className={`flex items-center justify-between p-4 rounded-lg
+              ${isValidated ? 'bg-green-50 border border-green-300' : 'bg-blue-50 border border-blue-300'}`
+            }>
+              <div className="flex items-center">
+                <div className={`p-2 rounded-md mr-3 ${isValidated ? 'bg-green-100' : 'bg-blue-100'}`}>
+                  <ShieldCheck size={20} className={isValidated ? 'text-green-600' : 'text-blue-600'} />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800">Ready to Validate</p>
+                  <p className="text-sm text-gray-500">Verify content against the rules engine.</p>
+                </div>
+              </div>
+              {isValidated ? (
+                 <span className="font-semibold text-green-600">Validated</span>
+              ) : (
+                <button
+                  onClick={handleValidate}
+                  disabled={!selectedChannel || isValidating}
+                  className="bg-blue-600 text-white font-bold py-2 px-3 rounded-md hover:bg-blue-500 flex items-center text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {isValidating ? <LoaderCircle size={16} className="animate-spin mr-2"/> : null}
+                  {isValidating ? 'Validating...' : 'Validate Now'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end p-4 bg-gray-50 border-t rounded-b-xl">
+            <button onClick={onClose} className="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 mr-2">
+                Cancel
+            </button>
+            <button 
+                onClick={handleFileReport}
+                disabled={!isValidated || !selectedChannel}
+                className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
+            >
+                <Send size={16} className="mr-2" />
+                File Report
+            </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default FilingModal;

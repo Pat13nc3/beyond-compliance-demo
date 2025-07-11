@@ -1,134 +1,145 @@
-import React from 'react';
-import { X, Library, Database, CheckCircle } from 'lucide-react';
+// src/features/complianceReporting/modals/GenerateReportModal.jsx
 
-const GenerateReportModal = ({
-    step,
-    onNavigateStep,
-    onBrowse,
-    selectedTemplate,
-    selectedSources,
-    onSourceToggle,
-    onClose,
-    onGenerate,
-    dataSources // We will pass this in from the parent
-}) => {
+import React, { useState, useEffect } from 'react';
+import { X, FileText, Sparkles, Info, LoaderCircle } from 'lucide-react';
+import { mockTemplates } from '../../../data/mockData';
 
-    const handleGenerate = () => {
-        onGenerate({ template: selectedTemplate, sources: selectedSources });
-        onClose();
-    };
+const GenerateReportModal = ({ onClose, onProcessReport }) => {
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [reportName, setReportName] = useState('');
+  const [regulator, setRegulator] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessed, setIsProcessed] = useState(false);
 
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl text-gray-800">
-                <div className="flex justify-between items-center mb-4 border-b pb-4">
-                    <h2 className="text-2xl font-bold">Generate Compliance Report</h2>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-500 hover:bg-gray-200"><X size={24} /></button>
-                </div>
+  // This effect simulates the AI processing the template selection
+  useEffect(() => {
+    if (selectedTemplate && !isProcessed) {
+      setIsProcessing(true);
+      // Simulate AI analysis delay
+      const timer = setTimeout(() => {
+        // AI "suggests" data based on the template
+        setReportName(`${selectedTemplate.name} - ${new Date().toLocaleDateString()}`);
+        // A real AI would determine this from context, we'll simulate it
+        setRegulator('CBN'); 
+        setIsProcessing(false);
+        setIsProcessed(true);
+      }, 1500); // 1.5-second delay
 
-                <div className="p-4 min-h-[300px]">
-                    {/* Step 1: Select Template */}
-                    {step === 1 && (
-                        <div className="text-center flex flex-col items-center justify-center h-full">
-                            <Library size={48} className="text-blue-500 mb-4" />
-                            <h3 className="text-xl font-semibold mb-2">Step 1: Select a Report Template</h3>
-                            <p className="text-gray-500 mb-6">Choose a template from your library to begin.</p>
-                            <button onClick={onBrowse} className="bg-blue-600 text-white font-bold py-2 px-6 rounded-md hover:bg-blue-500">
-                                Browse Template Library
-                            </button>
-                        </div>
-                    )}
+      return () => clearTimeout(timer);
+    }
+  }, [selectedTemplate, isProcessed]);
 
-                    {/* Step 2: Select Data Sources */}
-                    {step === 2 && (
-                        <div>
-                            <div className="flex items-center text-lg font-semibold mb-4">
-                               <Database size={24} className="text-blue-500 mr-3" />
-                               <h3>Step 2: Select Data Sources</h3>
-                            </div>
-                            {selectedTemplate && (
-                                <div className="bg-gray-100 p-3 rounded-lg mb-4 flex items-center">
-                                    <CheckCircle size={20} className="text-green-500 mr-3" />
-                                    <div>
-                                        <p className="text-gray-600 text-sm">Template Selected:</p>
-                                        <p className="font-bold text-gray-800">{selectedTemplate.name}</p>
-                                    </div>
-                                </div>
-                            )}
-                            <p className="text-gray-600 mb-4">Choose the relevant data sources to populate the report.</p>
-                            <div className="space-y-2 max-h-48 overflow-y-auto border p-3 rounded-lg">
-                                {dataSources.map(source => (
-                                    <label key={source.id} className="flex items-center bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-200">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedSources.includes(source.id)}
-                                            onChange={() => onSourceToggle(source.id)}
-                                            className="form-checkbox h-5 w-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                                        />
-                                        <span className="ml-3 text-gray-800 font-medium">{source.name}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+  const handleSelectTemplate = (template) => {
+    setSelectedTemplate(template);
+    setIsProcessed(false); // Reset processing state if a new template is chosen
+  };
 
-                    {/* Step 3: Confirm & Generate */}
-                    {step === 3 && (
-                         <div>
-                            <div className="flex items-center text-lg font-semibold mb-4">
-                                <CheckCircle size={24} className="text-blue-500 mr-3" />
-                                <h3>Step 3: Confirm and Generate</h3>
-                            </div>
-                            <p className="text-gray-500 mb-4">Review your selections before generating the report draft.</p>
-                            <div className="bg-gray-100 p-4 rounded-lg space-y-3">
-                                <div>
-                                    <p className="font-bold">Template:</p>
-                                    <p className="text-gray-700">{selectedTemplate?.name || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="font-bold">Data Sources:</p>
-                                    <ul className="list-disc list-inside pl-5 text-gray-700">
-                                        {selectedSources.length > 0
-                                            ? selectedSources.map(id => (
-                                                <li key={id}>{dataSources.find(ds => ds.id === id)?.name}</li>
-                                            ))
-                                            : <li>No data sources selected.</li>
-                                        }
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
+  const handleConfirm = () => {
+    onProcessReport({
+      name: reportName,
+      template: selectedTemplate,
+      regulator: regulator,
+      status: 'Draft',
+    });
+  };
 
-                {/* Modal Footer with Navigation */}
-                <div className="flex justify-between items-center pt-6 mt-6 border-t">
-                    <div>
-                        {step > 1 && (
-                            <button onClick={() => onNavigateStep(step - 1)} className="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-300">
-                                Back
-                            </button>
-                        )}
+  const isFormInvalid = !selectedTemplate || !reportName || !regulator;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 animate-fade-in">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-bold text-gray-800">AI-Powered Report Generation</h2>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200">
+            <X size={20} className="text-gray-600" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          {/* Step 1: Template Selection */}
+          <div>
+            <h3 className="font-semibold text-gray-700 mb-2">Select a Template</h3>
+            <div className="space-y-2">
+                {mockTemplates.map((template) => (
+                <button
+                    key={template.id}
+                    onClick={() => handleSelectTemplate(template)}
+                    disabled={isProcessing}
+                    className={`w-full text-left flex items-start p-3 border rounded-lg transition-all disabled:cursor-wait
+                    ${selectedTemplate?.id === template.id 
+                        ? 'bg-blue-100 border-blue-500 ring-2 ring-blue-300' 
+                        : 'bg-white border-gray-300 hover:bg-blue-50 hover:border-blue-400'}`
+                    }
+                >
+                    <div className="bg-blue-100 p-2 rounded-md mr-3">
+                        <FileText size={20} className="text-blue-600" />
                     </div>
                     <div>
-                        {step === 2 ? (
-                            <button
-                                onClick={() => onNavigateStep(step + 1)}
-                                className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500"
-                                disabled={selectedSources.length === 0}
-                            >
-                                Next
-                            </button>
-                        ) : step === 3 ? (
-                            <button onClick={handleGenerate} className="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-500">
-                                Confirm & Generate Draft
-                            </button>
-                        ) : null}
+                        <p className="font-bold text-gray-800">{template.name}</p>
+                        <p className="text-sm text-gray-500">{template.description}</p>
                     </div>
+                </button>
+                ))}
+            </div>
+          </div>
+
+          {/* Step 2: AI Processing & Confirmation Form */}
+          {isProcessing ? (
+            <div className="flex flex-col items-center justify-center text-center p-4 h-36">
+                <LoaderCircle className="w-10 h-10 mb-3 text-blue-500 animate-spin" />
+                <p className="text-sm text-gray-600 font-semibold">AI is preparing your draft...</p>
+            </div>
+          ) : isProcessed && (
+            <div className="space-y-4 animate-fade-in">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+                    <p className="text-sm text-blue-700">
+                        The AI has prepared the following draft. Please verify and confirm.
+                    </p>
+                </div>
+                <div>
+                    <label htmlFor="generate-reportName-ai" className="block text-sm font-medium text-gray-700 mb-1">Report Name</label>
+                    <input
+                        type="text"
+                        id="generate-reportName-ai"
+                        value={reportName}
+                        onChange={(e) => setReportName(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                    />
+                </div>
+                <div>
+                    <label htmlFor="generate-regulator-ai" className="block text-sm font-medium text-gray-700 mb-1">Regulator</label>
+                    <select
+                        id="generate-regulator-ai"
+                        value={regulator}
+                        onChange={(e) => setRegulator(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                    >
+                        <option value="CBN">Central Bank of Nigeria (CBN)</option>
+                        <option value="CMA">Capital Markets Authority (CMA)</option>
+                        <option value="NDIC">Nigeria Deposit Insurance Corporation (NDIC)</option>
+                        <option value="SARB">South African Reserve Bank (SARB)</option>
+                    </select>
                 </div>
             </div>
+          )}
         </div>
-    );
+
+        <div className="flex justify-end p-4 bg-gray-50 border-t rounded-b-xl">
+            <button onClick={onClose} className="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 mr-2">
+                Cancel
+            </button>
+            <button 
+                onClick={handleConfirm} 
+                disabled={isFormInvalid || isProcessing}
+                className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
+            >
+                <Sparkles size={16} className="mr-2" />
+                Confirm and Create Draft
+            </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default GenerateReportModal;
