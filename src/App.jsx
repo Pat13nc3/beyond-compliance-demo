@@ -1,8 +1,10 @@
+// src/App.jsx
+
 import React, { useState } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 
-// --- THIS IS THE FIX: All page components must be imported ---
+// --- (No Change) ---
 import ActionOrientedDashboard from './features/dashboard';
 import ComplianceReporting from './features/complianceReporting';
 import DataManagement from './features/dataManagement';
@@ -18,10 +20,9 @@ const App = () => {
     const [userMode, setUserMode] = useState('Pro');
     const [pageContext, setPageContext] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-    // State for managing the active jurisdiction
     const [activeJurisdiction, setActiveJurisdiction] = useState('Global');
 
+    // --- UPDATED: The handleNavigate function is now more robust ---
     const handleNavigate = (tab, context = null) => {
         setActiveTab(tab);
         setPageContext(context);
@@ -32,25 +33,35 @@ const App = () => {
     };
 
     const renderContent = () => {
+        // --- UPDATED: We've simplified pageProps ---
         const pageProps = {
             onNavigate: handleNavigate,
             context: pageContext,
             onCleanContext: handleCleanContext,
-            // Pass the active jurisdiction to every page
             jurisdiction: activeJurisdiction,
         };
 
         switch (activeTab) {
-            case 'Dashboard': return <ActionOrientedDashboard {...pageProps} />;
-            case 'ComplianceReporting': return <ComplianceReporting {...pageProps} />;
-            case 'DataManagement': return <DataManagement {...pageProps} />;
-            case 'Library': return <Library {...pageProps} />;
-            case 'RiskAssessment': return <RiskAssessment {...pageProps} />;
-            case 'Licensing': return <Licensing {...pageProps} />;
-            case 'RegulatoryUpdates': return <RegulatoryUpdates {...pageProps} />;
-            case 'Manage': return <Manage {...pageProps} />;
-            case 'Settings': return <Settings {...pageProps} />;
-            default: return <ActionOrientedDashboard {...pageProps} />;
+           case 'Dashboard':
+                return <ActionOrientedDashboard {...pageProps} onPrepareReport={(reportContext) => handleNavigate('ComplianceReporting', reportContext)} />; 
+            case 'ComplianceReporting':
+                return <ComplianceReporting {...pageProps} />;
+            case 'DataManagement':
+                return <DataManagement {...pageProps} />;
+            case 'Library':
+                return <Library {...pageProps} />;
+            case 'RiskAssessment':
+                return <RiskAssessment {...pageProps} />;
+            case 'Licensing':
+                return <Licensing {...pageProps} />;
+            case 'RegulatoryUpdates':
+                return <RegulatoryUpdates {...pageProps} />;
+            case 'Manage':
+                return <Manage {...pageProps} />;
+            case 'Settings':
+                return <Settings {...pageProps} />;
+            default:
+                return <ActionOrientedDashboard {...pageProps} onPrepareReport={() => handleNavigate('ComplianceReporting')} />;
         }
     };
 

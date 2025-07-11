@@ -1,4 +1,22 @@
-// /src/data/mockData.js
+// src/data/mockData.js
+
+// --- Data for New Revamped Dashboard ---
+
+export const currentUser = {
+  name: "Kene Gold",
+  role: "Chief Compliance Officer",
+  companyName: "Innovate Inc.",
+  avatarUrl: "https://placehold.co/100x100/E2E8F0/E2E8F0?text=+" 
+};
+
+export const companyStructure = {
+  parent: { id: 'parent-01', name: "Innovate Inc. (Headquarters)", location: "New York, USA", status: "Active" },
+  subsidiaries: [
+    { id: 'sub-01', name: "Innovate Kenya Ltd.", location: "Nairobi, Kenya", status: "Active" },
+    { id: 'sub-02', name: "Innovate UK Services", location: "London, UK", status: "Active" },
+    { id: 'sub-03', name: "Innovate Brazil Tech", location: "São Paulo, Brazil", status: "In Review" },
+  ],
+};
 
 // --- Data for Dashboard & Core UI ---
 
@@ -87,9 +105,9 @@ export const mockTemplates = [
 ];
 
 export const mockReports = [
-    { id: 'rep1', name: 'SAR-2023-04-12', status: 'Submitted', type: 'SAR', regulator: 'CBN' },
-    { id: 'rep2', name: 'CTR-2023-04-11', status: 'In Review', type: 'CTR', regulator: 'NDIC' },
-    { id: 'rep3', name: 'ACR-2022-Q4', status: 'Draft', type: 'Annual Review', regulator: 'CBN' },
+    { id: 'rep1', name: 'SAR-2023-04-12 (NG)', status: 'Filed', type: 'SAR', regulator: 'CBN', jurisdiction: 'Nigeria' },
+    { id: 'rep2', name: 'CTR-2023-04-11 (NG)', status: 'Filed', type: 'CTR', regulator: 'NDIC', jurisdiction: 'Nigeria' },
+    { id: 'rep3', name: 'ACR-2022-Q4 (KE)', status: 'Draft', type: 'Annual Review', regulator: 'CMA', jurisdiction: 'Kenya' },
 ];
 
 
@@ -128,10 +146,11 @@ export const kpiAndKriData = [
 // --- Data for Calendar ---
 
 export const reportingEvents = [
-    { date: '2025-07-15', title: 'File Q2 SAR Summary', type: 'Filing', urgency: 'high' },
-    { date: '2025-07-20', title: 'Internal Audit Committee Meeting', type: 'Meeting' },
-    { date: '2025-07-28', title: 'Review Draft of new AML Policy', type: 'Report' },
-    { date: '2025-08-01', title: 'Begin Q3 Internal Audit', type: 'Audit', urgency: 'high' },
+    { date: '2025-07-15', title: 'File Q2 SAR Summary (NG)', type: 'Filing', urgency: 'high', jurisdiction: 'Nigeria' },
+    { date: '2025-07-15', title: 'Submit VASP License Attestation (KE)', type: 'Filing', urgency: 'high', jurisdiction: 'Kenya' },
+    { date: '2025-07-20', title: 'Internal Audit Committee Meeting', type: 'Meeting', jurisdiction: 'Global' },
+    { date: '2025-07-22', title: 'File K-CMA Monthly Report', type: 'Filing', urgency: 'high', jurisdiction: 'Kenya' },
+    { date: '2025-07-28', title: 'Review Draft of new AML Policy', type: 'Report', jurisdiction: 'Global' },
 ];
 export const mockIntegrations = [
   { id: 'int-01', name: 'Slack Notifications', type: 'Messaging', status: 'Active' },
