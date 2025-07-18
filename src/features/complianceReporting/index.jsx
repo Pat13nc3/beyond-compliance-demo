@@ -1,8 +1,7 @@
-// src/features/complianceReporting/index.jsx
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { LayoutGrid, CalendarDays, Upload, FilePlus2, Sparkles, CheckCircle } from 'lucide-react';
-import { mockReports, reportingEvents } from '../../data/mockData';
+// 1. ADD 'monthlySubmissionsData' to the import from mockData
+import { mockReports, reportingEvents, monthlySubmissionsData } from '../../data/mockData';
 
 // Component Imports
 import ReportingOverview from './components/ReportingOverview';
@@ -16,7 +15,6 @@ import ReportDraftModal from './modals/ReportDraftModal';
 import FilingModal from './modals/FilingModal';
 import ActionChoiceModal from './modals/ActionChoiceModal';
 
-// --- UPDATED: The component now accepts the global 'jurisdiction' prop ---
 const ComplianceReporting = ({ jurisdiction }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [reports, setReports] = useState(mockReports);
@@ -25,25 +23,45 @@ const ComplianceReporting = ({ jurisdiction }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  // --- NEW: Filter reports based on the selected jurisdiction ---
+  // Your existing filteredReports logic is perfect. No changes needed.
   const filteredReports = useMemo(() => {
     if (!jurisdiction || jurisdiction === 'Global') {
       return reports;
     }
-    // Assumes reports have a 'jurisdiction' property. We'll add it when creating new ones.
-    // For now, let's filter the mock data that has it.
-    return reports.filter(report => report.jurisdiction === jurisdiction || !report.jurisdiction);
+    return reports.filter(report => report.jurisdiction === jurisdiction);
   }, [reports, jurisdiction]);
 
-  // --- NEW: Filter calendar events based on jurisdiction ---
-   const filteredEvents = useMemo(() => {
+  // Your existing filteredEvents logic is also perfect. No changes needed.
+  const filteredEvents = useMemo(() => {
     if (!jurisdiction || jurisdiction === 'Global') {
       return reportingEvents;
     }
-    return reportingEvents.filter(event => event.jurisdiction === jurisdiction || !event.jurisdiction);
+    return reportingEvents.filter(event => event.jurisdiction === jurisdiction);
   }, [jurisdiction]);
 
 
+  // 2. ADD the logic to calculate dynamic chart data.
+  // This uses your 'filteredReports' to derive the data for the donut chart.
+  const dynamicReportStatusData = useMemo(() => {
+    const counts = { Submitted: 0, 'In Review': 0, Draft: 0, Overdue: 0, Filed: 0, 'Pending Submission': 0 };
+
+    filteredReports.forEach((report) => {
+      if (counts[report.status] !== undefined) {
+        counts[report.status]++;
+      }
+    });
+
+    // We combine 'Filed', 'Submitted', and 'Pending Submission' for the chart's "Submitted" category.
+    return [
+      { name: 'Submitted', value: counts.Submitted + counts.Filed + counts['Pending Submission'], fill: '#22c55e' },
+      { name: 'In Review', value: counts['In Review'], fill: '#3b82f6' },
+      { name: 'Draft', value: counts.Draft, fill: '#f97316' },
+      { name: 'Overdue', value: counts.Overdue, fill: '#ef4444' },
+    ];
+  }, [filteredReports]);
+
+
+  // --- All your handler functions below this remain unchanged ---
   useEffect(() => {
     if (toastMessage) {
       const timer = setTimeout(() => setToastMessage(''), 3000);
@@ -58,8 +76,7 @@ const ComplianceReporting = ({ jurisdiction }) => {
       status: 'Draft',
       type: newReportData.template?.type || 'Uploaded',
       regulator: newReportData.regulator,
-      // --- NEW: Tag the new report with the current jurisdiction ---
-      jurisdiction: jurisdiction === 'Global' ? 'Global' : jurisdiction,
+      jurisdiction: jurisdiction === 'Global' ? 'Global' : jurisdiction, // This is correct
       content: `This is an AI-generated draft for "${newReportData.name}". Please review and edit.`
     };
     setReports(prevReports => [newReport, ...prevReports]);
@@ -109,24 +126,31 @@ const ComplianceReporting = ({ jurisdiction }) => {
     setActiveModal('filing');
   };
 
+
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <ReportingOverview 
-                  reports={filteredReports} 
-                  onGenerateReport={() => setActiveModal('generate')} 
-                  onUploadReport={() => setActiveModal('upload')}
-                  onViewDraft={handleOpenDraftModal}
-               />;
+        // 3. UPDATE the props being passed to ReportingOverview
+        return <ReportingOverview
+          reportStatusData={dynamicReportStatusData}
+          monthlySubmissionsData={monthlySubmissionsData}
+          // The other props your component had are no longer needed since the child doesn't use them
+          // We keep it clean by only passing what's necessary for the charts.
+        />;
       case 'calendar':
         return <ReportingCalendar events={filteredEvents} onEventClick={handleCalendarEventClick} />;
       case 'smartFiling':
         return <SmartFiling reports={filteredReports} onFileNow={handleOpenFileModal} />;
       default:
-        return <ReportingOverview reports={filteredReports} />;
+        // Fallback case
+        return <ReportingOverview
+          reportStatusData={dynamicReportStatusData}
+          monthlySubmissionsData={monthlySubmissionsData}
+        />;
     }
   };
 
+  // --- All the JSX for rendering the component below this remains unchanged ---
   return (
     <div className="p-6 space-y-6 animate-fade-in relative">
       <div className="flex justify-between items-start">

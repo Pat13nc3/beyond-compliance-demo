@@ -1,12 +1,10 @@
-// src/data/mockData.js
-
 // --- Data for New Revamped Dashboard ---
 
 export const currentUser = {
   name: "Kene Gold",
   role: "Chief Compliance Officer",
   companyName: "Innovate Inc.",
-  avatarUrl: "https://placehold.co/100x100/E2E8F0/E2E8F0?text=+" 
+  avatarUrl: "https://placehold.co/100x100/E2E8F0/E2E8F0?text=+"
 };
 
 export const companyStructure = {
@@ -38,7 +36,6 @@ export const kpiData = [
     { title: 'On-Time Reporting', value: 98, color: '#4ade80', icon: 'CheckCheck' },
 ];
 
-
 // --- Data for Analytics & Charts ---
 
 export const controlHotspotData = [
@@ -57,13 +54,12 @@ export const fraudData = [
     { name: 'Sun', transactions: 3490, flagged: 43 },
 ];
 
-export const kycData = [
+export const kycChartData = [ // Renamed from kycData to avoid conflict
     { name: 'Verified', value: 400, fill: 'url(#greenGradient)' },
     { name: 'Pending', value: 150, fill: 'url(#goldGradient)' },
     { name: 'Rejected', value: 50, fill: 'url(#redGradient)' },
 ];
 
-// Used for both the Heatmap and the Risk Bar Chart
 export const heatmapData = [
     { product: 'Payments', Compliance: 40, Operational: 20, Market: 15, Credit: 80 },
     { product: 'Lending', Compliance: 30, Operational: 50, Market: 60, Credit: 90 },
@@ -95,7 +91,6 @@ export const gapAssessmentData = [
     { name: 'Regulatory Reporting', adherence: 95 },
 ];
 
-
 // --- Data for Compliance Reporting Page ---
 
 export const mockTemplates = [
@@ -109,7 +104,6 @@ export const mockReports = [
     { id: 'rep2', name: 'CTR-2023-04-11 (NG)', status: 'Filed', type: 'CTR', regulator: 'NDIC', jurisdiction: 'Nigeria' },
     { id: 'rep3', name: 'ACR-2022-Q4 (KE)', status: 'Draft', type: 'Annual Review', regulator: 'CMA', jurisdiction: 'Kenya' },
 ];
-
 
 // --- Data for Library & Data Management ---
 
@@ -130,35 +124,115 @@ export const initialLibraryStructure = [
         ]
     }
 ];
-export const initialDataSources = [
-    { id: 'ds01', name: 'Stripe Payments API', type: 'API', status: 'Connected' },
-    { id: 'ds02', name: 'Chainalysis KYT', type: 'API', status: 'Connected' },
-    { id: 'ds03', name: 'Internal User Database', type: 'SFTP', status: 'Pending' },
-    { id: 'ds04', name: 'On-chain Polygon Transactions', type: 'API', status: 'Error' },
-];
-export const kpiAndKriData = [
-    { id: 'METRIC-01', name: 'Transaction Monitoring Alert Rate', type: 'KRI', category: 'Financial Crime', status: 'Active' },
-    { id: 'METRIC-02', name: 'KYC Verification Success Rate', type: 'KPI', category: 'Onboarding', status: 'Active' },
-    { id: 'METRIC-03', name: 'Overdue Compliance Tasks', type: 'KRI', category: 'Operational', status: 'Inactive' },
+
+export const mockDataSources = [
+  {
+    id: 'src-1',
+    name: 'Stripe Payments API',
+    type: 'API',
+    status: 'Connected',
+    lastSync: '15m ago',
+    dataQuality: 99.2,
+    recordsSynced: 18450,
+    chartData: [ { value: 30 }, { value: 50 }, { value: 40 }, { value: 70 }, { value: 60 }, { value: 90 }, { value: 85 } ],
+    logHistory: [
+        { timestamp: 'Jul 18, 11:30 AM', event: 'Sync Success', triggeredBy: 'Manual', details: 'Fetched 1,254 records.' },
+        { timestamp: 'Jul 18, 11:00 AM', event: 'Sync Failed', triggeredBy: 'Scheduled', details: 'Error: API key is invalid.' },
+        { timestamp: 'Jul 17, 04:00 PM', event: 'Settings Update', triggeredBy: 'Kene Gold', details: 'API key was updated.' },
+    ]
+  },
+  {
+    id: 'src-2',
+    name: 'Chainalysis KYT',
+    type: 'API',
+    status: 'Connected',
+    dataQuality: 99.8,
+    recordsSynced: 2300,
+    chartData: [ { value: 60 }, { value: 55 }, { value: 70 }, { value: 65 }, { value: 80 }, { value: 75 }, { value: 95 } ],
+    logHistory: [
+        { timestamp: 'Jul 18, 10:45 AM', event: 'Sync Success', triggeredBy: 'Scheduled', details: 'Fetched 312 records.' },
+    ]
+  },
+  {
+    id: 'src-3',
+    name: 'Internal User Database',
+    type: 'SFTP',
+    status: 'Pending',
+    dataQuality: 97.5,
+    recordsSynced: 5210,
+    chartData: [ { value: 80 }, { value: 60 }, { value: 70 }, { value: 50 }, { value: 65 }, { value: 40 }, { value: 30 } ],
+    logHistory: [
+      { timestamp: 'Jul 16, 08:00 AM', event: 'Connection Created', triggeredBy: 'Alex Ray', details: 'New SFTP source added.' },
+    ]
+  },
+  {
+    id: 'src-4',
+    name: 'On-chain Polygon Transactions',
+    type: 'API',
+    status: 'Error',
+    dataQuality: 92.1,
+    recordsSynced: 580,
+    chartData: [ { value: 90 }, { value: 85 }, { value: 80 }, { value: 70 }, { value: 30 }, { value: 20 } ],
+    logHistory: [
+        { timestamp: 'Jul 18, 11:30 AM', event: 'Sync Failed', triggeredBy: 'Manual', details: 'Error: Connection timed out.' },
+    ]
+  },
 ];
 
+// --- KPIs and KRIs with Embedded Logic ---
+export const mockIndicators = [
+  {
+    id: 'kri-user-access',
+    type: 'KRI',
+    name: 'Privileged Access Review',
+    description: 'Ensures non-privileged users do not have administrative access.',
+    category: 'IT Governance',
+    targetValue: 0,
+    targetUnit: 'Violations',
+    linkedSourceIds: [],
+    validationRule: {
+        description: "A 'guest' user cannot have 'Admin' level access.",
+        failsWhen: (row) => {
+            const email = (row.employee_email || '').toLowerCase();
+            const access = (row.access_level || '').toLowerCase();
+            return email.includes('guest') && access === 'admin';
+        }
+    }
+  },
+  {
+    id: 'kpi-kyc-time',
+    type: 'KPI',
+    name: 'KYC Processing Time',
+    description: 'Measures the average time to complete Know Your Customer verifications.',
+    category: 'Operational Efficiency',
+    targetValue: 24,
+    targetUnit: 'Hours',
+    linkedSourceIds: ['src-2'],
+    calculation: {
+        description: "Calculate the average of the 'processing_time_hours' column.",
+        execute: (rowsAsObjects) => {
+            if (!rowsAsObjects || rowsAsObjects.length === 0) return 0;
+            const total = rowsAsObjects.reduce((sum, row) => sum + parseFloat(row.processing_time_hours || 0), 0);
+            return (total / rowsAsObjects.length).toFixed(1);
+        }
+    }
+  },
+];
 
 // --- Data for Calendar ---
-
 export const reportingEvents = [
     { date: '2025-07-15', title: 'File Q2 SAR Summary (NG)', type: 'Filing', urgency: 'high', jurisdiction: 'Nigeria' },
     { date: '2025-07-15', title: 'Submit VASP License Attestation (KE)', type: 'Filing', urgency: 'high', jurisdiction: 'Kenya' },
     { date: '2025-07-20', title: 'Internal Audit Committee Meeting', type: 'Meeting', jurisdiction: 'Global' },
-    { date: '2025-07-22', title: 'File K-CMA Monthly Report', type: 'Filing', urgency: 'high', jurisdiction: 'Kenya' },
-    { date: '2025-07-28', title: 'Review Draft of new AML Policy', type: 'Report', jurisdiction: 'Global' },
 ];
+
 export const mockIntegrations = [
   { id: 'int-01', name: 'Slack Notifications', type: 'Messaging', status: 'Active' },
   { id: 'int-02', name: 'Jira Task Creation', type: 'Project Management', status: 'Active' },
   { id: 'int-03', name: 'Chainalysis API', type: 'Data Provider', status: 'Inactive' },
 ];
-// --- Data for Settings Page ---
 
+// --- Data for Settings Page ---
 export const mockUsers = [
     { id: 'usr-01', name: 'Kene Gold', email: 'kene@example.com', title: 'Company Founder', role: 'Admin', status: 'Active' },
     { id: 'usr-02', name: 'Adesanmi Adeosun', email: 'adesanmi@example.com', title: 'Compliance Officer', role: 'Editor', status: 'Active' },

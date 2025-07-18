@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector, Legend, Tooltip, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, ComposedChart } from 'recharts';
-import { reportStatusData, monthlySubmissionsData } from '../../../data/mockData.js';
 
 // Custom component for the active donut slice
 const renderActiveShape = (props) => {
@@ -14,7 +13,7 @@ const renderActiveShape = (props) => {
     );
 };
 
-const ReportingOverview = () => {
+const ReportingOverview = ({ reportStatusData, monthlySubmissionsData }) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const onPieEnter = (_, index) => setActiveIndex(index);
 
