@@ -1,13 +1,11 @@
-// src/App.jsx
-
 import React, { useState } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 
-// --- (No Change) ---
+// --- Import all your page components ---
 import ActionOrientedDashboard from './features/dashboard';
 import ComplianceReporting from './features/complianceReporting';
-import DataManagement from './features/dataManagement';
+import DataManagement from './features/dataManagement'; 
 import Library from './features/library';
 import RiskAssessment from './features/riskAssessment';
 import Licensing from './features/licensing';
@@ -16,13 +14,31 @@ import Manage from './features/manage';
 import Settings from './features/settings';
 
 const App = () => {
-    const [activeTab, setActiveTab] = useState('Dashboard');
+    // --- Existing State ---
+    const [activeTab, setActiveTab] = useState('Data Management'); // Start on Data Management to see the flow
     const [userMode, setUserMode] = useState('Pro');
     const [pageContext, setPageContext] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [activeJurisdiction, setActiveJurisdiction] = useState('Global');
 
-    // --- UPDATED: The handleNavigate function is now more robust ---
+    // --- NEW: State for Library Evidence ---
+    // This state is "lifted up" to the App component so it can be shared
+    // between DataManagement (which adds to it) and the Library (which displays it).
+    const [libraryEvidence, setLibraryEvidence] = useState([
+      { name: 'Q1 Board Meeting Minutes.pdf', status: 'New', id: 'evid-1' }
+    ]);
+
+    // --- NEW: Handler to add a file to the Library ---
+    // This function will be passed down to the DataManagement component.
+    const handlePromoteToLibrary = (fileToPromote) => {
+        const newEvidence = {
+          id: `evid-${Date.now()}`,
+          name: fileToPromote.name,
+          status: 'New', // Promoted files always start with a 'New' status
+        };
+        setLibraryEvidence(currentEvidence => [newEvidence, ...currentEvidence]);
+    };
+
     const handleNavigate = (tab, context = null) => {
         setActiveTab(tab);
         setPageContext(context);
@@ -33,7 +49,6 @@ const App = () => {
     };
 
     const renderContent = () => {
-        // --- UPDATED: We've simplified pageProps ---
         const pageProps = {
             onNavigate: handleNavigate,
             context: pageContext,
@@ -42,14 +57,19 @@ const App = () => {
         };
 
         switch (activeTab) {
-           case 'Dashboard':
-                return <ActionOrientedDashboard {...pageProps} onPrepareReport={(reportContext) => handleNavigate('ComplianceReporting', reportContext)} />; 
+            case 'Dashboard':
+                return <ActionOrientedDashboard {...pageProps} onPrepareReport={(reportContext) => handleNavigate('ComplianceReporting', reportContext)} />;
             case 'ComplianceReporting':
                 return <ComplianceReporting {...pageProps} />;
+            
+            case 'Data Management': 
             case 'DataManagement':
-                return <DataManagement {...pageProps} />;
+                // --- UPDATED: Pass the new handler to DataManagement ---
+                return <DataManagement {...pageProps} onPromoteToLibrary={handlePromoteToLibrary} />;
+            
             case 'Library':
-                return <Library {...pageProps} />;
+                // --- UPDATED: Pass the evidence list to the Library ---
+                return <Library {...pageProps} evidence={libraryEvidence} />;
             case 'RiskAssessment':
                 return <RiskAssessment {...pageProps} />;
             case 'Licensing':

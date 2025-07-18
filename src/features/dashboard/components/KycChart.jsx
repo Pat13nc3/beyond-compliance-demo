@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { kycData } from '../../../data/mockData.js';
+import { kycChartData } from '../../../data/mockData';
 
 // This is a helper component to define the color gradients for the chart
 const ChartGradients = () => (
