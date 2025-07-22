@@ -84,7 +84,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
     const [activeTab, setActiveTab] = useState('Data Sources');
     const [confirmationModal, setConfirmationModal] = useState(null);
     const [detailedRecordsFilters, setDetailedRecordsFilters] = useState({});
-    const [etlDetailsModalData, setEtlDetailsModalData] = useState(null); // FIX: Added missing useState declaration
+    const [etlDetailsModalData, setEtlDetailsModalData] = useState(null);
 
     useEffect(() => {
         if (context) {
@@ -263,8 +263,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
         } else if (nodeId === 'system-reporting') {
             onNavigate('ComplianceReporting', { action: 'initiateReportGeneration' });
             setToastMessage(`Navigating to Compliance Reporting to prepare reports.`);
-        }
-        else if (nodeId.startsWith('system-')) {
+        } else if (nodeId.startsWith('system-')) {
             setActiveTab('Detailed Records');
             if (nodeId === 'system-compliance-db') {
                 setDetailedRecordsFilters({ source: 'Internal', type: 'All' });
@@ -273,6 +272,14 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                 setDetailedRecordsFilters({ type: 'KYC', status: 'Rejected' });
                 setToastMessage(`Mapped to Detailed Records. Displaying 'Rejected' KYC records for Risk Assessment review.`);
             }
+        } else if (nodeId === 'external-regulator-suptech') {
+            setActiveTab('Detailed Records');
+            setDetailedRecordsFilters({ status: 'Approved', type: 'All' }); // Simulate showing relevant approved data
+            setToastMessage(`Data is being prepared for direct submission to Regulator Suptech. Review the detailed records to ensure compliance before final filing.`);
+        } else if (nodeId === 'external-beyond-supervision') {
+            setActiveTab('Detailed Records');
+            setDetailedRecordsFilters({ status: 'Approved', type: 'All' }); // Simulate showing relevant approved data
+            setToastMessage(`Data is available for oversight by the Beyond Supervision platform. Ensure all relevant data is accurate for external auditing and continuous monitoring.`);
         } else {
             setToastMessage(`No specific drill-down configured for '${nodeName}'. Consider checking related Data Sources or Detailed Records manually.`);
         }

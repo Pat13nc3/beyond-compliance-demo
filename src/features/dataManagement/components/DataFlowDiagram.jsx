@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, Zap, FileText, ArrowRight, Server, Cloud, Shield } from 'lucide-react';
+import { Database, Zap, FileText, ArrowRight, Server, Cloud, Shield, Share, Link2 } from 'lucide-react';
 
 /**
  * Mock data for demonstrating data flow.
@@ -14,6 +14,8 @@ const mockDataFlow = {
         { id: 'system-compliance-db', name: 'Compliance Data Lake', type: 'Database', icon: <Cloud size={24} className="text-indigo-400" /> },
         { id: 'system-reporting', name: 'Reporting Engine', type: 'Process', icon: <FileText size={24} className="text-red-400" /> },
         { id: 'system-risk-engine', name: 'Risk Assessment Engine', type: 'Process', icon: <Shield size={24} className="text-orange-400" /> },
+        { id: 'external-regulator-suptech', name: 'Regulator Suptech', type: 'External Platform', icon: <Share size={24} className="text-cyan-400" /> },
+        { id: 'external-beyond-supervision', name: 'Beyond Supervision', type: 'External Platform', icon: <Link2 size={24} className="text-purple-400" /> },
     ],
     links: [
         { source: 'source-stripe', target: 'system-etl', description: 'Raw Payment Data' },
@@ -21,7 +23,9 @@ const mockDataFlow = {
         { source: 'source-hr-file', target: 'system-etl', description: 'Employee Access Data' },
         { source: 'system-etl', target: 'system-compliance-db', description: 'Transformed & Validated Data' },
         { source: 'system-compliance-db', target: 'system-reporting', description: 'Aggregated Data for Reports' },
-        { source: 'system-compliance-db', target: 'system-risk-engine', description: 'Analyzed Data for Risk' },
+        { source: 'system-compliance-db', target: 'system-risk-engine', description: 'Data for Risk Analysis' },
+        { source: 'system-compliance-db', target: 'external-regulator-suptech', description: 'Direct Data Submission' },
+        { source: 'system-compliance-db', target: 'external-beyond-supervision', description: 'Data for Oversight' },
     ]
 };
 
@@ -48,7 +52,7 @@ const DataFlowDiagram = ({ onNodeClick }) => {
             </p>
 
             <div className="flex-grow flex items-center justify-center relative">
-                {/* Nodes */}
+                {/* Source Nodes */}
                 <div className="absolute top-1/4 left-10 flex flex-col space-y-8">
                     {mockDataFlow.nodes.filter(node => node.id.startsWith('source')).map(node => (
                         <div
@@ -65,6 +69,7 @@ const DataFlowDiagram = ({ onNodeClick }) => {
                     ))}
                 </div>
 
+                {/* ETL and Compliance Data Lake Nodes */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col space-y-8">
                      {mockDataFlow.nodes.filter(node => node.id.startsWith('system-etl')).map(node => (
                         <div
@@ -91,8 +96,24 @@ const DataFlowDiagram = ({ onNodeClick }) => {
                     </div>
                 </div>
 
-                <div className="absolute top-1/4 right-10 flex flex-col space-y-8">
+                {/* Reporting, Risk, and External Platform Nodes */}
+                {/* Adjusted top and right values for better spacing and alignment */}
+                <div className="absolute top-[18%] right-10 flex flex-col space-y-6"> {/* Adjusted top and space-y */}
                     {mockDataFlow.nodes.filter(node => node.id.startsWith('system-reporting') || node.id.startsWith('system-risk')).map(node => (
+                        <div
+                            key={node.id}
+                            className="bg-gray-700 p-4 rounded-lg shadow-md flex items-center space-x-3 w-64 cursor-pointer hover:bg-gray-600 transition-colors duration-200"
+                            onClick={() => onNodeClick(node.id, node.name, node.type)}
+                        >
+                            {node.icon}
+                            <div>
+                                <p className="font-semibold text-gray-100">{node.name}</p>
+                                <p className="text-xs text-gray-400">{node.type}</p>
+                            </div>
+                        </div>
+                    ))}
+                    {/* New External Platform Nodes */}
+                    {mockDataFlow.nodes.filter(node => node.id.startsWith('external-')).map(node => (
                         <div
                             key={node.id}
                             className="bg-gray-700 p-4 rounded-lg shadow-md flex items-center space-x-3 w-64 cursor-pointer hover:bg-gray-600 transition-colors duration-200"
@@ -110,16 +131,21 @@ const DataFlowDiagram = ({ onNodeClick }) => {
                 {/* Simplified Arrows (for visual representation, not actual SVG paths) */}
                 <div className="absolute inset-0 pointer-events-none">
                     {/* Source to ETL */}
-                    <div className="absolute top-[28%] left-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
-                    <div className="absolute top-[50%] left-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
-                    <div className="absolute top-[72%] left-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
+                    <div className="absolute top-[calc(25%+24px)] left-[260px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
+                    <div className="absolute top-[calc(50%+24px)] left-[260px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
+                    <div className="absolute top-[calc(75%+24px)] left-[260px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
                     
                     {/* ETL to Compliance DB */}
                     <div className="absolute top-[50%] left-[550px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
 
                     {/* Compliance DB to Reporting/Risk */}
-                    <div className="absolute top-[38%] right-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
-                    <div className="absolute top-[62%] right-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
+                    <div className="absolute top-[calc(50%-100px)] right-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div> {/* Adjusted top */}
+                    <div className="absolute top-[calc(50%+10px)] right-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>  {/* Adjusted top */}
+
+                    {/* Compliance DB to External Platforms */}
+                    {/* Adjusted top values to match new node spacing */}
+                    <div className="absolute top-[calc(50%+120px)] right-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div> 
+                    <div className="absolute top-[calc(50%+200px)] right-[250px] w-20 h-0.5 bg-gray-500 transform -translate-y-1/2"></div>
                 </div>
             </div>
             <p className="text-gray-500 text-sm mt-6 text-center">
