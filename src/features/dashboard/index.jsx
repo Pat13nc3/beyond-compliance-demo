@@ -38,8 +38,7 @@ const initialLayout = [
     { id: 'pulse', name: 'Regulatory Pulse', visible: true, fullWidth: false },
 ];
 
-// The `onPrepareReport` prop is passed in from a higher-level component (like App.jsx)
-const ActionOrientedDashboard = ({ onPrepareReport, onViewUpdate, jurisdiction }) => {
+const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
     const [dashboardLayout, setDashboardLayout] = useState([]);
 
     useEffect(() => {
@@ -76,16 +75,47 @@ const ActionOrientedDashboard = ({ onPrepareReport, onViewUpdate, jurisdiction }
         return regulatoryPulseData.filter(pulse => pulse.jurisdiction === jurisdiction);
     }, [jurisdiction]);
 
-    // This function now correctly uses the onPrepareReport prop for redirection
+    const handleHotspotClick = (item) => {
+        console.log("Hotspot clicked (handleHotspotClick in index.jsx):", item.id, item.cta); // ADDED console.log
+        switch (item.id) {
+            case 'CTRL-01': // KYC Verification: "Review Records"
+                onNavigate('Data Management', { initialTab: 'Detailed Records', detailedRecordsFilters: { type: 'KYC', status: 'Pending' } });
+                break;
+            case 'CTRL-02': // Transaction Monitoring Rules: "Adjust Rules"
+                onNavigate('Manage', { initialTab: 'Rules Engine' });
+                break;
+            case 'CTRL-03': // Sanctions Screening: "View Details"
+                onNavigate('Data Management', { initialTab: 'Data Sources', sourceId: 'src-chainalysis-kyt' });
+                break;
+            default:
+                console.log(`Unhandled hotspot action for ${item.name}`);
+                break;
+        }
+    };
+
     const handleActionClick = (action) => {
-        if (action.cta === "Prepare Report") {
-            // This will call the function in the parent component to handle the redirect
-            onPrepareReport({ category: 'Regulatory Filings', template: 'AML Summary' });
+        switch (action.cta) {
+            case "Prepare Report":
+                onNavigate('ComplianceReporting', { action: 'initiateReportGeneration' });
+                break;
+            case "Review Now":
+                onNavigate('Data Management', { initialTab: 'Detailed Records', detailedRecordsFilters: { type: 'KYC', status: 'Pending' } });
+                break;
+            case "Start Renewal":
+                onNavigate('Licensing');
+                break;
+            case "Submit Evidence":
+                setSelectedAction(action);
+                setModals(prev => ({ ...prev, submitEvidence: true }));
+                break;
+            default:
+                console.log(`Unhandled action: ${action.cta} for ${action.title}`);
+                break;
         }
-        else if (action.cta === "Submit Evidence") {
-            setSelectedAction(action);
-            setModals(prev => ({ ...prev, submitEvidence: true }));
-        }
+    };
+
+    const handlePulseClick = (pulseItem) => {
+        console.log(`Clicked Regulatory Pulse: ${pulseItem.title}.`);
     };
 
     const renderCard = (item) => {
@@ -107,11 +137,11 @@ const ActionOrientedDashboard = ({ onPrepareReport, onViewUpdate, jurisdiction }
             );
             case 'headquarters': return <HeadquartersView structure={companyStructure} />;
             case 'team': return <BuildTeamCard onInvite={() => setModals(prev => ({ ...prev, inviteUser: true }))} />;
-            case 'hotspots': return <ControlHotspotAnalysis data={controlHotspotData} />;
+            case 'hotspots': return <ControlHotspotAnalysis data={controlHotspotData} onActionClick={handleHotspotClick} />;
             case 'pulse': return (
                 <div className="bg-[#1e252d] p-6 rounded-xl shadow-lg text-white flex flex-col h-full">
                     <h3 className="text-xl font-semibold mb-4 text-[#c0933e]">Regulatory Pulse</h3>
-                    <div className="space-y-4 flex-grow">{filteredPulse.map(p => <PulseItem key={p.id} pulse={p} onClick={() => onViewUpdate(p)} />)}</div>
+                    <div className="space-y-4 flex-grow">{filteredPulse.map(p => <PulseItem key={p.id} pulse={p} onClick={handlePulseClick} />)}</div>
                 </div>
             );
             default: return null;

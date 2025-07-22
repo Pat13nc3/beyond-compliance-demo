@@ -1,12 +1,14 @@
+// src/features/complianceReporting/index.jsx
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { LayoutGrid, CalendarDays, Upload, FilePlus2, Sparkles, CheckCircle } from 'lucide-react';
-// 1. ADD 'monthlySubmissionsData' to the import from mockData
+import { LayoutGrid, CalendarDays, Sparkles, CheckCircle } from 'lucide-react'; // Removed Upload, FilePlus2 as they are not needed for top buttons
 import { mockReports, reportingEvents, monthlySubmissionsData } from '../../data/mockData';
 
 // Component Imports
 import ReportingOverview from './components/ReportingOverview';
 import ReportingCalendar from './components/ReportingCalendar';
 import SmartFiling from './components/SmartFiling';
+import ReportingDashboard from './components/ReportingDashboard';
 
 // Modal Imports
 import GenerateReportModal from './modals/GenerateReportModal';
@@ -15,7 +17,7 @@ import ReportDraftModal from './modals/ReportDraftModal';
 import FilingModal from './modals/FilingModal';
 import ActionChoiceModal from './modals/ActionChoiceModal';
 
-const ComplianceReporting = ({ jurisdiction }) => {
+const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [reports, setReports] = useState(mockReports);
   const [activeModal, setActiveModal] = useState(null);
@@ -23,15 +25,44 @@ const ComplianceReporting = ({ jurisdiction }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  // Your existing filteredReports logic is perfect. No changes needed.
-  const filteredReports = useMemo(() => {
-    if (!jurisdiction || jurisdiction === 'Global') {
-      return reports;
-    }
-    return reports.filter(report => report.jurisdiction === jurisdiction);
-  }, [reports, jurisdiction]);
+  const [reportingDashboardFilters, setReportingDashboardFilters] = useState({
+      regulator: 'All',
+      reportType: 'All',
+      status: 'All'
+  });
 
-  // Your existing filteredEvents logic is also perfect. No changes needed.
+  useEffect(() => {
+    if (context && context.initialTab) {
+      setActiveTab(context.initialTab);
+    }
+
+    if (context && context.action === 'initiateReportGeneration') {
+      setActiveModal('actionChoice');
+      if (onCleanContext) {
+        onCleanContext();
+      }
+    }
+  }, [context, onCleanContext]);
+
+  const filteredReports = useMemo(() => {
+    let filtered = reports;
+    if (jurisdiction && jurisdiction !== 'Global') {
+      filtered = filtered.filter(report => report.jurisdiction === jurisdiction);
+    }
+
+    if (reportingDashboardFilters.regulator !== 'All') {
+        filtered = filtered.filter(report => report.regulator === reportingDashboardFilters.regulator);
+    }
+    if (reportingDashboardFilters.reportType !== 'All') {
+        filtered = filtered.filter(report => report.type === reportingDashboardFilters.reportType);
+    }
+    if (reportingDashboardFilters.status !== 'All') {
+        filtered = filtered.filter(report => report.status === reportingDashboardFilters.status);
+    }
+    return filtered;
+
+  }, [reports, jurisdiction, reportingDashboardFilters]);
+
   const filteredEvents = useMemo(() => {
     if (!jurisdiction || jurisdiction === 'Global') {
       return reportingEvents;
@@ -39,9 +70,6 @@ const ComplianceReporting = ({ jurisdiction }) => {
     return reportingEvents.filter(event => event.jurisdiction === jurisdiction);
   }, [jurisdiction]);
 
-
-  // 2. ADD the logic to calculate dynamic chart data.
-  // This uses your 'filteredReports' to derive the data for the donut chart.
   const dynamicReportStatusData = useMemo(() => {
     const counts = { Submitted: 0, 'In Review': 0, Draft: 0, Overdue: 0, Filed: 0, 'Pending Submission': 0 };
 
@@ -51,7 +79,6 @@ const ComplianceReporting = ({ jurisdiction }) => {
       }
     });
 
-    // We combine 'Filed', 'Submitted', and 'Pending Submission' for the chart's "Submitted" category.
     return [
       { name: 'Submitted', value: counts.Submitted + counts.Filed + counts['Pending Submission'], fill: '#22c55e' },
       { name: 'In Review', value: counts['In Review'], fill: '#3b82f6' },
@@ -60,8 +87,6 @@ const ComplianceReporting = ({ jurisdiction }) => {
     ];
   }, [filteredReports]);
 
-
-  // --- All your handler functions below this remain unchanged ---
   useEffect(() => {
     if (toastMessage) {
       const timer = setTimeout(() => setToastMessage(''), 3000);
@@ -76,8 +101,10 @@ const ComplianceReporting = ({ jurisdiction }) => {
       status: 'Draft',
       type: newReportData.template?.type || 'Uploaded',
       regulator: newReportData.regulator,
-      jurisdiction: jurisdiction === 'Global' ? 'Global' : jurisdiction, // This is correct
-      content: `This is an AI-generated draft for "${newReportData.name}". Please review and edit.`
+      jurisdiction: jurisdiction === 'Global' ? 'Global' : jurisdiction,
+      content: `This is an AI-generated draft for "${newReportData.name}". Please review and edit.`,
+      linkedDataDescription: `Data used for ${newReportData.name} (simulated)`,
+      linkedDataFilters: { type: 'All', period: 'Month' }
     };
     setReports(prevReports => [newReport, ...prevReports]);
     setSelectedReport(newReport);
@@ -92,6 +119,7 @@ const ComplianceReporting = ({ jurisdiction }) => {
     );
     setActiveModal(null);
     setToastMessage('Report sent to the Smart Filing queue!');
+    setActiveTab('smartFiling');
   };
 
   const handleFileReport = (reportToSubmit) => {
@@ -114,6 +142,7 @@ const ComplianceReporting = ({ jurisdiction }) => {
   const handleActionChoice = (choice) => {
     if (choice === 'generate') setActiveModal('generate');
     else if (choice === 'upload') setActiveModal('upload');
+    setSelectedEvent(null);
   };
 
   const handleOpenDraftModal = (report) => {
@@ -126,31 +155,55 @@ const ComplianceReporting = ({ jurisdiction }) => {
     setActiveModal('filing');
   };
 
+  const handleNavigateToDetailedRecords = (filters) => {
+    if (onNavigate) {
+      onNavigate('Data Management', { initialTab: 'Detailed Records', detailedRecordsFilters: filters });
+    }
+  };
+
+  const handleReportingDashboardFilterChange = (filterName, value) => {
+      setReportingDashboardFilters(prev => ({ ...prev, [filterName]: value }));
+  };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        // 3. UPDATE the props being passed to ReportingOverview
-        return <ReportingOverview
-          reportStatusData={dynamicReportStatusData}
-          monthlySubmissionsData={monthlySubmissionsData}
-          // The other props your component had are no longer needed since the child doesn't use them
-          // We keep it clean by only passing what's necessary for the charts.
-        />;
+        return (
+            <>
+                <ReportingOverview
+                    reportStatusData={dynamicReportStatusData}
+                    monthlySubmissionsData={monthlySubmissionsData}
+                />
+                <div className="mt-6">
+                    <ReportingDashboard
+                        reports={filteredReports}
+                        filters={reportingDashboardFilters}
+                        onFilterChange={handleReportingDashboardFilterChange}
+                        regulators={['All', 'CBN', 'CMA', 'NDIC', 'SARB']}
+                        reportTypes={['All', 'SAR', 'CTR', 'Annual Review', 'Uploaded']}
+                        statuses={['All', 'Draft', 'Pending Submission', 'Filed', 'In Review', 'Overdue']}
+                        onGenerateReport={() => setActiveModal('generate')}
+                        onUploadReport={() => setActiveModal('upload')}
+                        onEditReport={handleOpenDraftModal}
+                        onNavigateToDetailedRecords={handleNavigateToDetailedRecords}
+                    />
+                </div>
+            </>
+        );
       case 'calendar':
         return <ReportingCalendar events={filteredEvents} onEventClick={handleCalendarEventClick} />;
       case 'smartFiling':
         return <SmartFiling reports={filteredReports} onFileNow={handleOpenFileModal} />;
       default:
-        // Fallback case
-        return <ReportingOverview
-          reportStatusData={dynamicReportStatusData}
-          monthlySubmissionsData={monthlySubmissionsData}
-        />;
+        return (
+            <ReportingOverview
+                reportStatusData={dynamicReportStatusData}
+                monthlySubmissionsData={monthlySubmissionsData}
+            />
+        );
     }
   };
 
-  // --- All the JSX for rendering the component below this remains unchanged ---
   return (
     <div className="p-6 space-y-6 animate-fade-in relative">
       <div className="flex justify-between items-start">
@@ -158,10 +211,13 @@ const ComplianceReporting = ({ jurisdiction }) => {
           <h1 className="text-3xl font-bold text-gray-800">Compliance Reporting</h1>
           <p className="text-gray-500">Manage, generate, and file all your regulatory reports.</p>
         </div>
+        {/* REMOVED: Top-level Generate Report and Upload Existing buttons */}
+        {/*
         <div className="flex space-x-2">
           <button onClick={() => setActiveModal('upload')} className="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 flex items-center text-sm"><Upload size={16} className="mr-2"/> Upload Existing</button>
           <button onClick={() => setActiveModal('generate')} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-500 flex items-center text-sm"><FilePlus2 size={16} className="mr-2"/> Generate Report</button>
         </div>
+        */}
       </div>
 
       <div className="border-b border-gray-200">

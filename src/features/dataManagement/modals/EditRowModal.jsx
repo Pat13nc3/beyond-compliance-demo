@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
 
+/**
+ * EditRowModal Component
+ *
+ * This modal allows users to edit individual rows of data, typically used for
+ * remediating non-compliant records identified during data analysis.
+ *
+ * Props:
+ * - rowData: The array of data for the row to be edited.
+ * - headers: An array of column headers, used to label the input fields.
+ * - onSave: Function to call when changes are saved. Receives the updated row data array.
+ * - onClose: Function to call to close the modal.
+ */
 const EditRowModal = ({ rowData, headers, onSave, onClose }) => {
     const [editedData, setEditedData] = useState([]);
 
+    // Initialize editedData when rowData prop changes
     useEffect(() => {
         if (rowData) {
             setEditedData([...rowData]);
         }
     }, [rowData]);
 
+    // If rowData is null or undefined, don't render the modal
     if (!rowData) return null;
 
     const handleInputChange = (e, index) => {
@@ -31,7 +45,7 @@ const EditRowModal = ({ rowData, headers, onSave, onClose }) => {
                     <button onClick={onClose} className="text-gray-400 hover:text-white"><X size={24} /></button>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2"> {/* Added max-height and overflow for scrollability */}
                     {headers.map((header, index) => (
                         <div key={index}>
                             <label className="block text-sm font-medium text-gray-300 mb-1">{header}</label>

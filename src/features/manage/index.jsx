@@ -1,91 +1,127 @@
-import React, { useState } from 'react';
-import { Cpu, ListChecks, Puzzle, Plus, Edit, Trash2, Power, PowerOff, Zap } from 'lucide-react';
-import CreateRuleModal from './modals/CreateRuleModal.jsx';
-import CreateTaskModal from './modals/CreateTaskModal.jsx';
-import ActionMenu from '../../components/ui/ActionMenu.jsx';
-// --- CORRECT: We only import what exists in your file ---
-import { mockIntegrations } from '../../data/mockData.js';
+// src/features/manage/index.jsx
 
-// --- STABLE FIX: Use an empty array for rules since it's not in mockData.js ---
-const mockRules = [];
+import React, { useState, useEffect, useMemo } from 'react';
+import { Settings, Users, Link, FileText, GanttChart } from 'lucide-react';
 
-// --- Rules Engine View ---
-const RulesEngine = ({ rules, onOpenCreateModal }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-semibold">Core Intelligence: Rules Engine</h3><button onClick={onOpenCreateModal} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center"><Plus size={20} className="mr-2" /> Create New Rule</button></div>
-        <div className="overflow-x-auto">
-            <table className="min-w-full">
-                <thead><tr className="border-b"><th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Rule Name</th><th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Type</th><th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Status</th><th className="text-right py-3 px-4 text-sm font-medium uppercase text-gray-500">Actions</th></tr></thead>
-                <tbody>
-                    {rules.length > 0 ? rules.map(rule => (
-                        <tr key={rule.id} className="border-b hover:bg-gray-50"><td className="px-4 py-4 font-medium">{rule.name}</td><td className="px-4 py-4 text-gray-600">{rule.type}</td><td className="px-4 py-4"><span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${rule.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{rule.status}</span></td><td className="px-4 py-4 text-right"><ActionMenu items={[{ label: 'Edit', icon: Edit }, { label: 'Delete', icon: Trash2 }]} /></td></tr>
-                    )) : <tr><td colSpan="4" className="text-center py-8 text-gray-500">No rules defined.</td></tr>}
-                </tbody>
-            </table>
-        </div>
-    </div>
-);
+// Component Imports
+import UserManagement from './components/UserManagement';
+import Integrations from './components/Integrations';
+import Alerts from './components/Alerts';
+import RulesEngine from './components/RulesEngine'; // Assuming you have a RulesEngine component
+import TaskManagementBoard from './components/TaskManagementBoard';
 
-// --- Task Management View ---
-const TaskManagementBoard = ({ onCreateTaskClick }) => {
-    const [tasks] = useState({'To Do': [{ id: 'task-1', content: 'Review new CBN guidelines' }],'In Progress': [{ id: 'task-3', content: 'Prepare VASP White Paper' }],'Done': [{ id: 'task-4', content: 'Submit Q2 AML Summary' }]});
-    return (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-semibold">Compliance Task Board</h3><button onClick={onCreateTaskClick} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center"><Plus size={20} className="mr-2" /> Create New Task</button></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {Object.entries(tasks).map(([status, taskList]) => (
-                    <div key={status} className="bg-gray-50 p-4 rounded-lg"><h4 className="font-bold text-gray-600 mb-4">{status} ({taskList.length})</h4><div className="space-y-3">{taskList.map(task => (<div key={task.id} className="bg-white p-3 rounded-md shadow border"><p className="text-sm text-gray-800">{task.content}</p></div>))}</div></div>
-                ))}
-            </div>
-        </div>
-    );
-};
+// Modal Imports
+import CreateRuleModal from './modals/CreateRuleModal';
+import CreateTaskModal from './modals/CreateTaskModal';
+import { mockUsers, mockRoles, mockAlerts, mockIntegrations } from '../../data/mockData';
 
-// --- Integrations View ---
-const IntegrationsView = () => (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4"><h3 className="text-xl font-semibold">Ecosystem Integrations</h3><button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center"><Plus size={20} className="mr-2" /> Add Integration</button></div>
-        <div className="overflow-x-auto">
-            <table className="min-w-full">
-                <thead><tr className="border-b"><th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Integration</th><th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Type</th><th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Status</th><th className="text-right py-3 px-4 text-sm font-medium uppercase text-gray-500">Actions</th></tr></thead>
-                <tbody>
-                    {mockIntegrations.map(item => (
-                        <tr key={item.id} className="border-b hover:bg-gray-50">
-                            <td className="px-4 py-4 font-medium flex items-center"><Zap size={16} className="mr-3 text-yellow-500" />{item.name}</td>
-                            <td className="px-4 py-4 text-gray-600">{item.type}</td>
-                            <td className="px-4 py-4"><span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{item.status}</span></td>
-                            <td className="px-4 py-4 text-right"><ActionMenu items={[{ label: 'Toggle Status', icon: item.status === 'Active' ? PowerOff : Power }, { label: 'Settings', icon: Edit }]} /></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    </div>
-);
+// Manage component receives `context` and `onCleanContext` from App.jsx
+const Manage = ({ jurisdiction, context, onCleanContext }) => {
+    const [activeTab, setActiveTab] = useState('users'); // Default active tab
+    const [users, setUsers] = useState(mockUsers);
+    const [roles, setRoles] = useState(mockRoles);
+    const [alerts, setAlerts] = useState(mockAlerts);
+    const [integrations, setIntegrations] = useState(mockIntegrations);
 
-// --- MAIN MANAGE PAGE ---
-const Manage = () => {
-    const [activeTab, setActiveTab] = useState('tasks');
     const [isCreateRuleModalOpen, setIsCreateRuleModalOpen] = useState(false);
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
 
+    // NEW: useEffect to handle context passed for initial tab setting
+    useEffect(() => {
+        if (context && context.initialTab) {
+            setActiveTab(context.initialTab);
+            // Clean up context after processing it to prevent re-triggering
+            if (onCleanContext) {
+                onCleanContext();
+            }
+        }
+    }, [context, onCleanContext]); // Add onCleanContext to dependencies
+
+    const handleInviteUser = (newUser) => {
+        setUsers(prev => [...prev, newUser]);
+    };
+
+    const handleSaveUser = (updatedUser) => {
+        setUsers(prev => prev.map(user => user.id === updatedUser.id ? updatedUser : user));
+    };
+
+    const handleDeleteUser = (userId) => {
+        setUsers(prev => prev.filter(user => user.id !== userId));
+    };
+
+    const handleCreateRule = (newRule) => {
+        console.log("Creating new rule:", newRule);
+        setIsCreateRuleModalOpen(false);
+        // In a real app, you'd add this to your mock data or state management
+    };
+
+    const handleCreateTask = (newTask) => {
+        console.log("Creating new task:", newTask);
+        setIsCreateTaskModalOpen(false);
+        // In a real app, add to tasks state for TaskManagementBoard
+    };
+
+    // Filter alerts by jurisdiction (if applicable, though mockAlerts don't have jurisdiction)
+    const filteredAlerts = useMemo(() => {
+        // Example: If alerts had a jurisdiction property
+        // if (jurisdiction && jurisdiction !== 'Global') {
+        //    return alerts.filter(alert => alert.jurisdiction === jurisdiction);
+        // }
+        return alerts;
+    }, [alerts, jurisdiction]);
+
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'users':
+                return <UserManagement users={users} roles={roles} onInvite={handleInviteUser} onSaveUser={handleSaveUser} onDeleteUser={handleDeleteUser} />;
+            case 'integrations':
+                return <Integrations integrations={integrations} />;
+            case 'alerts':
+                return <Alerts alerts={filteredAlerts} />;
+            case 'rules': // This case will be hit when initialTab is 'rules'
+                return <RulesEngine onCreateRule={() => setIsCreateRuleModalOpen(true)} />;
+            case 'tasks':
+                return <TaskManagementBoard onCreateTask={() => setIsCreateTaskModalOpen(true)} />;
+            default:
+                return <UserManagement users={users} roles={roles} onInvite={handleInviteUser} onSaveUser={handleSaveUser} onDeleteUser={handleDeleteUser} />;
+        }
+    };
+
     return (
-        <div className="p-6">
-            <div className="space-y-6 animate-fade-in">
-                <div><h2 className="text-3xl font-bold text-gray-800">Manage Platform Core</h2><p className="text-gray-500">Control the intelligence, automation, and ecosystem of the platform.</p></div>
-                <div className="flex border-b border-gray-300">
-                    <button onClick={() => setActiveTab('tasks')} className={`py-2 px-4 flex items-center text-lg font-semibold ${activeTab === 'tasks' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}><ListChecks size={20} className="mr-2"/> Task Management</button>
-                    <button onClick={() => setActiveTab('rules')} className={`py-2 px-4 flex items-center text-lg font-semibold ${activeTab === 'rules' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}><Cpu size={20} className="mr-2"/> Core Intelligence</button>
-                    <button onClick={() => setActiveTab('integrations')} className={`py-2 px-4 flex items-center text-lg font-semibold ${activeTab === 'integrations' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}><Puzzle size={20} className="mr-2"/> Integrations</button>
+        <div className="p-6 bg-gray-900 min-h-screen text-white">
+            <div className="max-w-7xl mx-auto">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-3xl font-bold">Manage Compliance Operations</h2>
                 </div>
-                <div>
-                    {activeTab === 'tasks' && <TaskManagementBoard onCreateTaskClick={() => setIsCreateTaskModalOpen(true)} />}
-                    {activeTab === 'rules' && <RulesEngine rules={mockRules} onOpenCreateModal={() => setIsCreateRuleModalOpen(true)} />}
-                    {activeTab === 'integrations' && <IntegrationsView />}
+                <div className="border-b border-gray-700 mb-6">
+                    <nav className="-mb-px flex space-x-8">
+                        {/* Tab buttons */}
+                        <button onClick={() => setActiveTab('users')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'users' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                            <Users size={18} className="inline-block mr-2" /> User & Access
+                        </button>
+                        <button onClick={() => setActiveTab('integrations')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'integrations' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                            <Link size={18} className="inline-block mr-2" /> Integrations
+                        </button>
+                        <button onClick={() => setActiveTab('alerts')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'alerts' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                            <Settings size={18} className="inline-block mr-2" /> Alerts
+                        </button>
+                        <button onClick={() => setActiveTab('rules')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'rules' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                            <FileText size={18} className="inline-block mr-2" /> Rules Engine
+                        </button>
+                        <button onClick={() => setActiveTab('tasks')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'tasks' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                            <GanttChart size={18} className="inline-block mr-2" /> Task Management
+                        </button>
+                    </nav>
+                </div>
+
+                <div className="mt-6">
+                    {renderContent()}
                 </div>
             </div>
-            {isCreateRuleModalOpen && <CreateRuleModal onClose={() => setIsCreateRuleModalOpen(false)} />}
-            {isCreateTaskModalOpen && <CreateTaskModal onClose={() => setIsCreateTaskModalOpen(false)} />}
+
+            {isCreateRuleModalOpen && <CreateRuleModal onClose={() => setIsCreateRuleModalOpen(false)} onCreate={handleCreateRule} />}
+            {isCreateTaskModalOpen && <CreateTaskModal onClose={() => setIsCreateTaskModalOpen(false)} onCreate={handleCreateTask} />}
         </div>
     );
 };

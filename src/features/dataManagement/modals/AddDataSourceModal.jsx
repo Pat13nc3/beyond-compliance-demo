@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 import { X, Save, UploadCloud } from 'lucide-react';
 
-const AddDataSourceModal = ({ onAdd, onClose }) => {
+/**
+ * AddDataSourceModal Component
+ *
+ * This modal allows users to add new data sources to the platform.
+ * It supports various integration types like API, SFTP, Database, and File Upload.
+ *
+ * Props:
+ * - onAdd: Function to call when a new data source is successfully added.
+ * Receives an object with source data (name, type, credentials/fileInfo).
+ * - onClose: Function to call to close the modal.
+ * - setToastMessage: Function to display a toast notification (e.g., for validation errors).
+ */
+const AddDataSourceModal = ({ onAdd, onClose, setToastMessage }) => {
     // General state
     const [integrationName, setIntegrationName] = useState('');
     const [integrationType, setIntegrationType] = useState('API');
@@ -21,47 +33,55 @@ const AddDataSourceModal = ({ onAdd, onClose }) => {
     };
 
     const handleSave = () => {
-        if (!integrationName) {
-            alert("Please provide an Integration Name.");
+        if (!integrationName.trim()) {
+            setToastMessage("Please provide an Integration Name.");
             return;
         }
 
-        let sourceData = { name: integrationName, type: integrationType };
+        let sourceData = { name: integrationName.trim(), type: integrationType };
+        let isValid = true;
+        let errorMessage = '';
         
         switch (integrationType) {
             case 'API':
-                if (!apiFields.endpoint || !apiFields.key) {
-                    alert("API Endpoint and Key are required.");
-                    return;
+                if (!apiFields.endpoint.trim() || !apiFields.key.trim()) {
+                    errorMessage = "API Endpoint and Key are required.";
+                    isValid = false;
                 }
                 sourceData.credentials = apiFields;
                 break;
             case 'SFTP':
-                 if (!sftpFields.host || !sftpFields.user || !sftpFields.pass) {
-                    alert("SFTP Host, Username, and Password are required.");
-                    return;
+                 if (!sftpFields.host.trim() || !sftpFields.user.trim() || !sftpFields.pass.trim()) {
+                    errorMessage = "SFTP Host, Username, and Password are required.";
+                    isValid = false;
                 }
                 sourceData.credentials = sftpFields;
                 break;
             case 'Database':
-                 if (!dbFields.host || !dbFields.user || !dbFields.pass || !dbFields.dbname) {
-                    alert("Database Host, Username, Password, and Database Name are required.");
-                    return;
+                 if (!dbFields.host.trim() || !dbFields.user.trim() || !dbFields.pass.trim() || !dbFields.dbname.trim()) {
+                    errorMessage = "Database Host, Username, Password, and Database Name are required.";
+                    isValid = false;
                 }
                 sourceData.credentials = dbFields;
                 break;
             case 'File Upload':
                 if (!file) {
-                    alert("Please select a file to upload.");
-                    return;
+                    errorMessage = "Please select a file to upload.";
+                    isValid = false;
                 }
-                sourceData.fileInfo = { name: file.name, size: file.size };
+                sourceData.fileInfo = { name: file?.name, size: file?.size }; // Use optional chaining for file properties
                 break;
             default:
-                alert("Invalid integration type.");
-                return;
+                errorMessage = "Invalid integration type.";
+                isValid = false;
+                break;
         }
         
+        if (!isValid) {
+            setToastMessage(errorMessage);
+            return;
+        }
+
         onAdd(sourceData);
     };
 

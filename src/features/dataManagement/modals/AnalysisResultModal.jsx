@@ -1,7 +1,23 @@
 import React from 'react';
 import { X, CheckCircle, AlertTriangle, ArrowRight, Edit } from 'lucide-react';
 
-// The onReview prop will now receive the non-compliant rows
+/**
+ * AnalysisResultModal Component
+ *
+ * This modal displays the results of a data analysis, showing the count of compliant
+ * and non-compliant records. It also lists the specific non-compliant rows with
+ * their reasons, and provides an option to "Isolate & Review Errors" for remediation.
+ *
+ * Props:
+ * - result: An object containing the analysis outcome:
+ * - compliantCount: Number of compliant records.
+ * - nonCompliantCount: Number of non-compliant records.
+ * - nonCompliantRows: An array of objects, each detailing a non-compliant row
+ * (rowNumber, reason, rowData).
+ * - onClose: Function to call to close the modal.
+ * - onPromote: Function to call to promote the data to the library (if all compliant).
+ * - onReview: Function to call to initiate the review/remediation process for non-compliant rows.
+ */
 const AnalysisResultModal = ({ result, onClose, onPromote, onReview }) => {
     const { compliantCount, nonCompliantCount, nonCompliantRows } = result;
     const canPromote = nonCompliantCount === 0;
@@ -33,7 +49,7 @@ const AnalysisResultModal = ({ result, onClose, onPromote, onReview }) => {
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Items Requiring Attention</h3>
                             <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                                 {nonCompliantRows.map(item => (
-                                    <div key={item.rowNumber} className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                    <div key={item.rowNumber} className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-red-400">
                                         <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">Row {item.rowNumber}: <span className="text-red-600 dark:text-red-400">{item.reason}</span></p>
                                         <p className="text-xs text-gray-600 dark:text-gray-400 truncate">Data: {item.rowData.join(', ')}</p>
                                     </div>
@@ -50,8 +66,8 @@ const AnalysisResultModal = ({ result, onClose, onPromote, onReview }) => {
                     )}
                     <div className="flex justify-end space-x-4">
                         {!canPromote && (
-                            <button 
-                                onClick={() => onReview(nonCompliantRows)} 
+                            <button
+                                onClick={() => onReview(nonCompliantRows)}
                                 className="px-6 py-2 border border-yellow-500 text-yellow-500 font-semibold rounded-md flex items-center hover:bg-yellow-500/10"
                             >
                                 <Edit size={16} className="mr-2" />

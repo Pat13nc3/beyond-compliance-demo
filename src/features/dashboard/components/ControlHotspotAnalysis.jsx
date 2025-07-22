@@ -3,7 +3,7 @@
 import React from 'react';
 import { AlertTriangle, XCircle, ShieldCheck } from 'lucide-react';
 
-const ControlHotspotAnalysis = ({ data }) => {
+const ControlHotspotAnalysis = ({ data, onActionClick }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'At Risk':
@@ -26,9 +26,7 @@ const ControlHotspotAnalysis = ({ data }) => {
   }
 
   return (
-    // UPDATED: Applied dark theme and styling to match other dashboard cards
     <div className="bg-[#1e252d] p-6 rounded-xl shadow-lg text-white h-full">
-      {/* UPDATED: Title is now bold and uses the consistent gold color */}
       <h3 className="text-xl font-semibold mb-4 text-[#c0933e]">Control Hotspot Analysis</h3>
       
       <div className="space-y-4">
@@ -42,7 +40,13 @@ const ControlHotspotAnalysis = ({ data }) => {
                 <span className="text-gray-300 ml-1">{item.reason}</span>
               </p>
             </div>
-            <button className="self-center bg-gray-600 hover:bg-gray-500 text-white text-xs font-bold py-2 px-3 rounded-md transition-colors whitespace-nowrap">
+            <button
+              onClick={() => {
+                console.log("Button in ControlHotspotAnalysis clicked for:", item.id); // ADDED console.log
+                onActionClick(item);
+              }}
+              className="self-center bg-gray-600 hover:bg-gray-500 text-white text-xs font-bold py-2 px-3 rounded-md transition-colors whitespace-nowrap"
+            >
               {item.cta} &rsaquo;
             </button>
           </div>

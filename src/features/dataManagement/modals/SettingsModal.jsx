@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
 import { X, Save, Trash2, PowerOff } from 'lucide-react';
 
-const SettingsModal = ({ source, onClose, onSave, onDelete }) => {
+/**
+ * SettingsModal Component
+ *
+ * This modal allows users to view and modify settings for a specific data source,
+ * including its name, API key (mocked), sync schedule, and provides options to
+ * deactivate or delete the integration.
+ *
+ * Props:
+ * - source: The data source object whose settings are being managed.
+ * - onClose: Function to call to close the modal.
+ * - onSave: Function to call to save updated settings.
+ * - onDelete: Function to call to delete the data source.
+ * - setConfirmationModal: Function to trigger the ConfirmationModal for delete confirmation.
+ */
+const SettingsModal = ({ source, onClose, onSave, onDelete, setConfirmationModal }) => {
     if (!source) return null;
 
     const [name, setName] = useState(source.name);
-    const [apiKey, setApiKey] = useState('**********');
-    const [syncSchedule, setSyncSchedule] = useState('manual');
+    const [apiKey, setApiKey] = useState('**********'); // API key should ideally not be passed to frontend for display
+    const [syncSchedule, setSyncSchedule] = useState(source.syncSchedule || 'manual'); // Default to 'manual' if not set
 
     const handleSave = () => {
         onSave(source.id, { name, syncSchedule });
@@ -14,10 +28,18 @@ const SettingsModal = ({ source, onClose, onSave, onDelete }) => {
     };
     
     const handleDelete = () => {
-        if(window.confirm(`Are you sure you want to delete ${source.name}? This action is irreversible.`)) {
-            onDelete(source.id);
-            onClose();
-        }
+        // Use the setConfirmationModal prop to trigger the ConfirmationModal
+        setConfirmationModal({
+            title: "Delete Integration",
+            message: `Are you sure you want to delete "${source.name}"? This action is irreversible and will remove all associated data and configurations.`,
+            onConfirm: () => {
+                onDelete(source.id); // Call the onDelete prop which is handled in DataManagement/index.jsx
+                // The ConfirmationModal will be closed by DataManagement/index.jsx after onDelete completes
+            },
+            onCancel: () => {
+                setConfirmationModal(null); // Close the confirmation modal if canceled
+            }
+        });
     };
 
     return (

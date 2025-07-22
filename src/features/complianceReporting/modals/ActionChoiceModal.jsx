@@ -4,14 +4,16 @@ import React from 'react';
 import { X, FilePlus2, Upload } from 'lucide-react';
 
 const ActionChoiceModal = ({ event, onClose, onChoice }) => {
-  if (!event) return null;
+  // If no event is provided, default to a generic title and description
+  const modalTitle = event ? `Start: ${event.title}` : "Initiate Report Creation";
+  const modalDescription = event ? `How would you like to begin this report?` : "Choose how to prepare your report using available data.";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 animate-fade-in">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
         <div className="p-4 border-b text-center">
-          <h2 className="text-xl font-bold text-gray-800">Start: {event.title}</h2>
-          <p className="text-sm text-gray-500 mt-1">How would you like to begin this report?</p>
+          <h2 className="text-xl font-bold text-gray-800">{modalTitle}</h2>
+          <p className="text-sm text-gray-500 mt-1">{modalDescription}</p>
         </div>
         <div className="p-6 space-y-3">
           <button

@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import { X, PlusCircle, TrendingUp, Shield } from 'lucide-react';
 
-const AddIndicatorModal = ({ onClose, onAdd }) => {
+/**
+ * AddIndicatorModal Component
+ *
+ * This modal allows users to create new Key Risk Indicators (KRIs) or Key Performance Indicators (KPIs).
+ *
+ * Props:
+ * - onClose: Function to call to close the modal.
+ * - onAdd: Function to call when a new indicator is successfully added.
+ * - setToastMessage: Function to display a toast notification (e.g., for validation errors).
+ */
+const AddIndicatorModal = ({ onClose, onAdd, setToastMessage }) => {
     const [type, setType] = useState('KRI'); // 'KRI' or 'KPI'
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -10,19 +20,24 @@ const AddIndicatorModal = ({ onClose, onAdd }) => {
     const [targetUnit, setTargetUnit] = useState('');
 
     const handleAdd = () => {
-        if (!name || !description || !targetValue || !targetUnit) {
-            alert('Please fill out all fields.');
+        if (!name.trim() || !description.trim() || !targetValue || !targetUnit.trim()) {
+            setToastMessage('Please fill out all fields.');
             return;
         }
+        if (isNaN(parseFloat(targetValue))) {
+            setToastMessage('Target Value must be a number.');
+            return;
+        }
+
         onAdd({
             id: `${type.toLowerCase()}-${Date.now()}`,
             type,
-            name,
-            description,
+            name: name.trim(),
+            description: description.trim(),
             category,
             status: 'Active',
             targetValue: parseFloat(targetValue),
-            targetUnit,
+            targetUnit: targetUnit.trim(),
             linkedSources: 0,
         });
         onClose();

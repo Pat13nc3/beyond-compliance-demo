@@ -1,7 +1,15 @@
+// src/features/dashboard/components/PulseItem.jsx
+
 import React from 'react';
 import { Newspaper, Lightbulb } from 'lucide-react';
 
 const PulseItem = ({ pulse, onClick }) => {
+    // Defensive check: If 'pulse' prop is undefined or null, prevent rendering and crashing
+    if (!pulse) {
+        console.warn("PulseItem received an undefined or null 'pulse' prop. Skipping render.");
+        return null; // Return null to prevent the component from trying to access properties of undefined
+    }
+
     const icons = {
         UPDATE: <Newspaper size={20} className="text-gray-400" />,
         ANALYSIS: <Lightbulb size={20} className="text-yellow-400" />
