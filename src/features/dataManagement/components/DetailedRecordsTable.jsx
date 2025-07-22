@@ -16,19 +16,23 @@ import {
  * generateDummyData Function
  *
  * This function creates an array of dummy data records for demonstration purposes.
- * It includes various types (KYC, User, Payment) with different sources, statuses,
+ * It includes various types (KYC, User, Payment, AML Alert, Sanctions Check) with different sources, statuses,
  * and detailed information for drill-down.
  * In a real application, this data would be fetched from a backend API or Firestore.
  */
 const generateDummyData = () => {
     const data = [];
-    const types = ['KYC', 'User', 'Payment'];
+    // UPDATED: Added new types for AML
+    const types = ['KYC', 'User', 'Payment', 'AML Alert', 'Sanctions Check'];
     const kycStatuses = ['Approved', 'Pending', 'Rejected'];
+    // UPDATED: Added new sources for KYC and AML
     const paymentSources = ['Stripe', 'Visa', 'Mastercard'];
     const userActions = ['Login', 'Logout', 'Profile Update', 'Password Reset'];
-    const internalSources = ['Internal', 'Manual']; // Sources for KYC and User data
+    const internalSources = ['Internal', 'Manual'];
+    const kycVerificationSources = ['SmileID', 'Onfido', 'Internal']; // New KYC sources
+    const amlSources = ['TransactionMonitor', 'WatchlistScreen']; // New AML sources
 
-    for (let i = 0; i < 200; i++) { // Generate more data for better testing
+    for (let i = 0; i < 300; i++) { // Generate more data for better testing
         const type = types[Math.floor(Math.random() * types.length)];
         const date = new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)); // Up to 1 year old
         let description = '';
@@ -39,10 +43,10 @@ const generateDummyData = () => {
 
         if (type === 'KYC') {
             const customerId = `CUST-${Math.floor(1000 + Math.random() * 9000)}`;
+            status = kycStatuses[Math.floor(Math.random() * kycStatuses.length)];
+            source = kycVerificationSources[Math.floor(Math.random() * kycVerificationSources.length)]; // Use new KYC sources
             description = `KYC check for ${customerId}`;
             value = 'N/A';
-            status = kycStatuses[Math.floor(Math.random() * kycStatuses.length)];
-            source = internalSources[Math.floor(Math.random() * internalSources.length)];
             details = {
                 customerId: customerId,
                 applicantName: `Applicant ${String.fromCharCode(65 + Math.floor(Math.random() * 26))} ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}.`,
@@ -50,6 +54,7 @@ const generateDummyData = () => {
                 submissionDate: new Date(date.getTime() - Math.floor(Math.random() * 86400000)).toLocaleDateString(),
                 reviewer: `Reviewer ${Math.floor(Math.random() * 10)}`,
                 riskScore: (Math.random() * 100).toFixed(2),
+                verificationProvider: source, // Link source to details
             };
         } else if (type === 'User') {
             const userId = `USER-${Math.floor(100 + Math.random() * 900)}`;
@@ -65,7 +70,7 @@ const generateDummyData = () => {
                 device: Math.random() > 0.5 ? 'Desktop' : 'Mobile',
                 browser: Math.random() > 0.5 ? 'Chrome' : 'Firefox',
             };
-        } else { // Payment
+        } else if (type === 'Payment') {
             const amount = (Math.random() * 1000 + 10).toFixed(2);
             const currency = Math.random() > 0.5 ? 'USD' : 'EUR';
             source = paymentSources[Math.floor(Math.random() * paymentSources.length)];
@@ -80,7 +85,38 @@ const generateDummyData = () => {
                 fee: (amount * 0.01).toFixed(2),
                 customerEmail: `customer${i}@example.com`,
             };
+        } else if (type === 'AML Alert') { // NEW AML Alert Type
+            const alertTypes = ['High-Value Transfer', 'Unusual Activity Pattern', 'Sanctioned Entity Interaction Attempt'];
+            const alertReason = alertTypes[Math.floor(Math.random() * alertTypes.length)];
+            description = `AML Alert: ${alertReason}`;
+            value = (Math.random() * 50000 + 10000).toFixed(2); // High value
+            status = Math.random() > 0.3 ? 'Flagged' : 'Under Review';
+            source = 'TransactionMonitor'; // Specific AML source
+            details = {
+                alertId: `AML-${Math.floor(1000 + Math.random() * 9000)}`,
+                alertReason: alertReason,
+                transactionAmount: value,
+                involvedParties: `Party A, Party B`,
+                statusHistory: [{ date: new Date().toLocaleDateString(), event: status }],
+                assignedTo: Math.random() > 0.5 ? 'AML Team' : 'Compliance Officer',
+            };
+        } else if (type === 'Sanctions Check') { // NEW Sanctions Check Type
+            const matchStatuses = ['No Match', 'Potential Match', 'Confirmed Hit'];
+            status = matchStatuses[Math.floor(Math.random() * matchStatuses.length)];
+            description = `Sanctions Screening Result`;
+            value = 'N/A';
+            source = 'WatchlistScreen'; // Specific AML source
+            details = {
+                screeningId: `SNC-${Math.floor(1000 + Math.random() * 9000)}`,
+                entityName: `Entity ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`,
+                matchConfidence: (Math.random() * 100).toFixed(0) + '%',
+                watchlistType: Math.random() > 0.5 ? 'OFAC' : 'UNSC',
+                resolution: status,
+            };
         }
+        
+        // Console log for debugging data generation
+        // console.log(`Generated record: Type: ${type}, Source: ${source}, Status: ${status}`);
 
         data.push({
             id: i,
@@ -145,15 +181,22 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
     const applyFiltersAndSort = () => {
         let tempFiltered = [...allData];
 
+        // Console log for debugging filters
+        // console.log(`Applying filters: Type='${currentDataTypeFilter}', Source='${currentSourceFilter}', Time='${currentTimeFilter}', Search='${searchTerm}'`);
+
         // 1. Filter by Data Type
         if (currentDataTypeFilter !== 'All') {
             tempFiltered = tempFiltered.filter(record => record.type === currentDataTypeFilter);
         }
+        // console.log(`After Type filter (${currentDataTypeFilter}): ${tempFiltered.length} records`);
+
 
         // 2. Filter by Source
         if (currentSourceFilter !== 'All') {
             tempFiltered = tempFiltered.filter(record => record.source === currentSourceFilter);
         }
+        // console.log(`After Source filter (${currentSourceFilter}): ${tempFiltered.length} records`);
+
 
         // 3. Filter by Time Aggregation
         const now = new Date();
@@ -167,6 +210,8 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
             const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
             tempFiltered = tempFiltered.filter(record => record.date >= oneWeekAgo);
         }
+        // console.log(`After Time filter (${currentTimeFilter}): ${tempFiltered.length} records`);
+
 
         // 4. Apply Search Term
         if (searchTerm) {
@@ -179,6 +224,8 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                 )
             );
         }
+        // console.log(`After Search filter: ${tempFiltered.length} records`);
+
 
         // 5. Apply Sorting
         tempFiltered.sort((a, b) => {
@@ -200,6 +247,7 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
         });
 
         setFilteredData(tempFiltered);
+        // console.log(`Final filtered data count: ${tempFiltered.length}`);
     };
 
     /**
@@ -242,7 +290,7 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                     <div className="flex flex-col md:flex-row justify-between items-center mb-6">
                         <h2 className="text-2xl font-semibold text-gray-200 mb-4 md:mb-0">Data Filters</h2>
                         <div className="flex flex-wrap gap-4">
-                            {/* Data Type Filters */}
+                            {/* Data Type Filters - UPDATED */}
                             <button
                                 onClick={() => setCurrentDataTypeFilter('All')}
                                 className={filterButtonClass(currentDataTypeFilter === 'All')}
@@ -253,7 +301,7 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                                 onClick={() => setCurrentDataTypeFilter('KYC')}
                                 className={filterButtonClass(currentDataTypeFilter === 'KYC')}
                             >
-                                KYC Transactions
+                                KYC Records
                             </button>
                             <button
                                 onClick={() => setCurrentDataTypeFilter('User')}
@@ -267,12 +315,25 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                             >
                                 Payments
                             </button>
+                            <button
+                                onClick={() => setCurrentDataTypeFilter('AML Alert')}
+                                className={filterButtonClass(currentDataTypeFilter === 'AML Alert')}
+                            >
+                                AML Alerts
+                            </button>
+                            <button
+                                onClick={() => setCurrentDataTypeFilter('Sanctions Check')}
+                                className={filterButtonClass(currentDataTypeFilter === 'Sanctions Check')}
+                            >
+                                Sanctions Checks
+                            </button>
                         </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-between items-center mb-6">
                         <h3 className="text-xl font-medium text-gray-300 mb-4 md:mb-0">Source Filters</h3>
                         <div className="flex flex-wrap gap-4">
+                            {/* Source Filters - UPDATED */}
                             <button
                                 onClick={() => setCurrentSourceFilter('All')}
                                 className={filterButtonClass(currentSourceFilter === 'All')}
@@ -308,6 +369,30 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                                 className={filterButtonClass(currentSourceFilter === 'Manual')}
                             >
                                 Manual
+                            </button>
+                            <button
+                                onClick={() => setCurrentSourceFilter('SmileID')}
+                                className={filterButtonClass(currentSourceFilter === 'SmileID')}
+                            >
+                                SmileID
+                            </button>
+                            <button
+                                onClick={() => setCurrentSourceFilter('Onfido')}
+                                className={filterButtonClass(currentSourceFilter === 'Onfido')}
+                            >
+                                Onfido
+                            </button>
+                            <button
+                                onClick={() => setCurrentSourceFilter('TransactionMonitor')}
+                                className={filterButtonClass(currentSourceFilter === 'TransactionMonitor')}
+                            >
+                                Transaction Monitor
+                            </button>
+                            <button
+                                onClick={() => setCurrentSourceFilter('WatchlistScreen')}
+                                className={filterButtonClass(currentSourceFilter === 'WatchlistScreen')}
+                            >
+                                Watchlist Screen
                             </button>
                         </div>
                     </div>
@@ -403,8 +488,10 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{record.value}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                    record.status === 'Approved' || record.status === 'Success' ? 'bg-green-900 text-green-300' :
-                                                    record.status === 'Pending' ? 'bg-yellow-900 text-yellow-300' :
+                                                    // Updated status coloring logic
+                                                    record.status === 'Approved' || record.status === 'Success' || record.status === 'No Match' ? 'bg-green-900 text-green-300' :
+                                                    record.status === 'Pending' || record.status === 'Under Review' || record.status === 'Potential Match' ? 'bg-yellow-900 text-yellow-300' :
+                                                    // This will catch 'Rejected', 'Failed', 'Flagged', 'Confirmed Hit', and any other unhandled statuses as red
                                                     'bg-red-900 text-red-300'
                                                 }`}>
                                                     {record.status}

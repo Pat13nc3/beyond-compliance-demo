@@ -38,7 +38,7 @@ const initialLayout = [
     { id: 'pulse', name: 'Regulatory Pulse', visible: true, fullWidth: false },
 ];
 
-const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
+const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => { // jurisdiction is received here
     const [dashboardLayout, setDashboardLayout] = useState([]);
 
     useEffect(() => {
@@ -76,7 +76,7 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
     }, [jurisdiction]);
 
     const handleHotspotClick = (item) => {
-        console.log("Hotspot clicked (handleHotspotClick in index.jsx):", item.id, item.cta); // ADDED console.log
+        console.log("Hotspot clicked (handleHotspotClick in index.jsx):", item.id, item.cta);
         switch (item.id) {
             case 'CTRL-01': // KYC Verification: "Review Records"
                 onNavigate('Data Management', { initialTab: 'Detailed Records', detailedRecordsFilters: { type: 'KYC', status: 'Pending' } });
@@ -173,13 +173,13 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
             )}
 
             {activeDashboard === 'kyc' && <KycDashboard />}
-            {activeDashboard === 'transactions' && <TransactionMonitoringDashboard />}
+            {activeDashboard === 'transactions' && <TransactionMonitoringDashboard jurisdiction={jurisdiction} />} {/* FIX IS HERE: Pass jurisdiction prop */}
 
             {modals.submitEvidence && <SubmitEvidenceModal action={selectedAction} onClose={() => setModals(prev => ({ ...prev, submitEvidence: false }))} onComplete={() => {}} />}
             {modals.analytics && <AnalyticsCenterModal onClose={() => setModals(prev => ({ ...prev, analytics: false }))} />}
             {modals.customize && <CustomizeDashboardModal items={dashboardLayout} onSave={handleSaveLayout} onClose={() => setModals(prev => ({ ...prev, customize: false }))} />}
             {modals.export && <ExportDashboardModal onClose={() => setModals(prev => ({ ...prev, export: false }))} />}
-            {modals.inviteUser && <InviteUserModal onClose={() => setModals(prev => ({ ...prev, inviteUser: false }))} />}
+            {modals.inviteUser && <InviteUserModal onClose={() => setModals(prev => ({ ...prev, inviteUser: true }))} />}
         </div>
     );
 };
