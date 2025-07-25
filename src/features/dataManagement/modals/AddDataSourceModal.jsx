@@ -11,9 +11,9 @@ import { X, Save, UploadCloud } from 'lucide-react';
  * - onAdd: Function to call when a new data source is successfully added.
  * Receives an object with source data (name, type, credentials/fileInfo).
  * - onClose: Function to call to close the modal.
- * - setToastMessage: Function to display a toast notification (e.g., for validation errors).
+ * - showToast: Function to display a toast notification (e.g., for validation errors). // MODIFIED PROP
  */
-const AddDataSourceModal = ({ onAdd, onClose, setToastMessage }) => {
+const AddDataSourceModal = ({ onAdd, onClose, showToast }) => { // MODIFIED: Changed setToastMessage to showToast
     // General state
     const [integrationName, setIntegrationName] = useState('');
     const [integrationType, setIntegrationType] = useState('API');
@@ -34,7 +34,7 @@ const AddDataSourceModal = ({ onAdd, onClose, setToastMessage }) => {
 
     const handleSave = () => {
         if (!integrationName.trim()) {
-            setToastMessage("Please provide an Integration Name.");
+            showToast("Please provide an Integration Name.", 'error'); // FIXED: Use showToast
             return;
         }
 
@@ -71,6 +71,14 @@ const AddDataSourceModal = ({ onAdd, onClose, setToastMessage }) => {
                 }
                 sourceData.fileInfo = { name: file?.name, size: file?.size }; // Use optional chaining for file properties
                 break;
+            case 'On-chain': // Ensure On-chain is handled if it's an option in your select
+                // Add specific validation for On-chain if needed, or just allow
+                if (!apiFields.endpoint.trim()) { // Assuming endpoint for On-chain too
+                    errorMessage = "Blockchain endpoint is required.";
+                    isValid = false;
+                }
+                sourceData.credentials = apiFields; // Re-using apiFields for simplicity here, adjust as needed
+                break;
             default:
                 errorMessage = "Invalid integration type.";
                 isValid = false;
@@ -78,26 +86,30 @@ const AddDataSourceModal = ({ onAdd, onClose, setToastMessage }) => {
         }
         
         if (!isValid) {
-            setToastMessage(errorMessage);
+            showToast(errorMessage, 'error'); // FIXED: Use showToast
             return;
         }
 
         onAdd(sourceData);
+        onClose(); // Close modal after successful add
     };
 
     const renderFields = () => {
         switch (integrationType) {
             case 'API':
+            case 'On-chain': // Include On-chain if it re-uses API fields, adjust if separate fields are needed
                 return (
                     <div className="space-y-4 animate-fade-in-fast">
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">API Endpoint URL</label>
                             <input type="text" value={apiFields.endpoint} onChange={e => setApiFields({...apiFields, endpoint: e.target.value})} placeholder="https://api.example.com/v1/data" className="w-full pl-4 pr-4 py-2 border-gray-600 bg-gray-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500" />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">API Key</label>
-                            <input type="password" value={apiFields.key} onChange={e => setApiFields({...apiFields, key: e.target.value})} placeholder="Paste API Key here" className="w-full pl-4 pr-4 py-2 border-gray-600 bg-gray-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500" />
-                        </div>
+                        {integrationType === 'API' && ( // Only show API Key for traditional API type
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">API Key</label>
+                                <input type="password" value={apiFields.key} onChange={e => setApiFields({...apiFields, key: e.target.value})} placeholder="Paste API Key here" className="w-full pl-4 pr-4 py-2 border-gray-600 bg-gray-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500" />
+                            </div>
+                        )}
                     </div>
                 );
             case 'SFTP':
@@ -142,7 +154,7 @@ const AddDataSourceModal = ({ onAdd, onClose, setToastMessage }) => {
                 </div>
                 <div className="space-y-4">
                     <div><label className="block text-sm font-medium text-gray-300 mb-1">Integration Name</label><input type="text" value={integrationName} onChange={e => setIntegrationName(e.target.value)} placeholder="e.g., SmileID KYC" className="w-full border-gray-600 bg-gray-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500" /></div>
-                    <div><label className="block text-sm font-medium text-gray-300 mb-1">Integration Type</label><select value={integrationType} onChange={e => setIntegrationType(e.target.value)} className="w-full border-gray-600 bg-gray-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500"><option>API</option><option>SFTP</option><option>Database</option><option>File Upload</option></select></div>
+                    <div><label className="block text-sm font-medium text-gray-300 mb-1">Integration Type</label><select value={integrationType} onChange={e => setIntegrationType(e.target.value)} className="w-full border-gray-600 bg-gray-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500"><option>API</option><option>SFTP</option><option>Database</option><option>File Upload</option><option>On-chain</option></select></div> {/* Added On-chain option if not present */}
                     {renderFields()}
                 </div>
                 <div className="flex justify-end space-x-4 pt-6 mt-6 border-t border-gray-700">

@@ -35,7 +35,7 @@ const ReportingDashboard = ({ reports, filters, onFilterChange, regulators, repo
                             <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-400">Report Name</th>
                             <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-400">Status</th>
                             <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-400">Type</th>
-                            <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-400">Data Used</th> {/* New Column */}
+                            <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-400">Data Used</th>
                             <th className="text-right py-3 px-4 text-sm font-medium uppercase text-gray-400">Actions</th>
                         </tr>
                     </thead>

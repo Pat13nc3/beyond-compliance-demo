@@ -159,7 +159,7 @@ export const mockDataSources = [
         recordsSynced: 18450,
         lastSync: '15m ago',
         chartData: [{ value: 50 }, { value: 55 }, { value: 60 }, { value: 58 }, { value: 62 }, { value: 65 }],
-        syncHistory: [{ recordCount: 18450, headers: ['Transaction ID', 'Amount', 'Status'], previewRows: [['txn_abc', '$150.00', 'Completed'], ['txn_def', '$2300.50', 'Completed']] }],
+        syncHistory: [{ recordCount: 18450, headers: ['Transaction ID', 'Amount', 'Status'], previewRows: [['txn_abc', '$150.00', 'Completed', new Date().toLocaleString()], ['txn_def', '$2300.50', 'Completed', new Date().toLocaleString()]] }],
         logHistory: [{ timestamp: 'Jul 15, 10:30 AM', event: 'Sync Started', triggeredBy: 'System', details: 'Automated hourly sync initiated.' }, { timestamp: 'Jul 15, 10:35 AM', event: 'Sync Completed', triggeredBy: 'System', details: '18450 records ingested.' }],
         jurisdiction: 'Global'
     },
@@ -336,23 +336,519 @@ export const mockUserAccessData = {
 
 // New mock data for transaction logs
 export const mockTransactionData = {
-  headers: ['transaction_id', 'amount', 'currency', 'country', 'timestamp'],
+  headers: ['transaction_id', 'amount', 'currency', 'timestamp', 'transactionType', 'senderAccount', 'receiverAccount', 'senderCountry', 'receiverCountry', 'fraudScore', 'amlFlag'],
   rows: [
-    ['TXN001', 1200, 'USD', 'USA', '2025-07-19'],
-    ['TXN002', 15000, 'USD', 'IRN', '2025-07-19'],
-    ['TXN003', 500, 'EUR', 'DEU', '2025-07-20'],
-    ['TXN004', 20000, 'NGN', 'NGA', '2025-07-20'],
-    ['TXN005', 800, 'USD', 'USA', '2025-07-21'],
-    ['TXN006', 7500, 'USD', 'USA', '2025-07-21'],
-    ['TXN007', 11000, 'GBP', 'PRK', '2025-07-22'],
-    ['TXN008', 300, 'CAD', 'CAN', '2025-07-22'],
-    ['TXN009', 9000, 'USD', 'USA', '2025-07-22'],
-    ['TXN010', 10500, 'JPY', 'JPN', '2025-07-23'],
-    ['TXN011', 200, 'CHF', 'SWI', '2025-07-23'],
-    ['TXN012', 3000, 'AUD', 'AUS', '2025-07-24'],
+    ['TXN001', 1200, 'USD', '2025-07-19', 'Payment', 'ACC001', 'ACC002', 'USA', 'CAN', 15.2, false],
+    ['TXN002', 15000, 'USD', '2025-07-19', 'Transfer', 'ACC003', 'ACC004', 'IRN', 'GBR', 95.1, true], // High value, flagged country
+    ['TXN003', 500, 'EUR', '2025-07-20', 'Withdrawal', 'ACC005', 'N/A', 'DEU', 'DEU', 5.0, false],
+    ['TXN004', 20000, 'NGN', '2025-07-20', 'Deposit', 'N/A', 'ACC006', 'NGA', 'NGA', 22.8, false],
+    ['TXN005', 800, 'USD', '2025-07-21', 'Payment', 'ACC007', 'ACC008', 'USA', 'MEX', 10.1, false],
+    ['TXN006', 7500, 'USD', '2025-07-21', 'Transfer', 'ACC009', 'ACC010', 'USA', 'USA', 30.7, false],
+    ['TXN007', 11000, 'GBP', '2025-07-22', 'Payment', 'ACC011', 'ACC012', 'PRK', 'JPN', 88.3, true], // High value, flagged country
+    ['TXN008', 300, 'CAD', '2025-07-22', 'Deposit', 'N/A', 'ACC013', 'CAN', 'CAN', 2.1, false],
+    ['TXN009', 9000, 'USD', '2025-07-22', 'Withdrawal', 'ACC014', 'N/A', 'USA', 'USA', 18.9, false],
+    ['TXN010', 10500, 'JPY', '2025-07-23', 'Transfer', 'ACC015', 'ACC016', 'JPN', 'CHN', 70.0, true], // High value
+    ['TXN011', 200, 'CHF', '2025-07-23', 'Payment', 'ACC017', 'ACC018', 'SWI', 'FRA', 8.5, false],
+    ['TXN012', 3000, 'AUD', '2025-07-24', 'Deposit', 'N/A', 'ACC019', 'AUS', 'NZL', 12.3, false],
   ],
 };
 
+// --- New processed data for KYC Dashboard ---
+export const processedKycDashboardData = {
+    verificationRate: 95.8, // Example value, align with kpi-verification-rate history
+    rejectionRate: 2.5,     // Example value, align with kri-rejection-rate history
+    avgTurnaroundTime: "22.5 Hours", // Example value, align with kpi-kyc-processing-time history
+    dailyVerificationsData: [
+        { day: 'Mon', count: 120 },
+        { day: 'Tue', count: 135 },
+        { day: 'Wed', count: 140 },
+        { day: 'Thu', count: 160 },
+        { day: 'Fri', count: 155 },
+        { day: 'Sat', count: 180 },
+        { day: 'Sun', count: 170 },
+    ],
+};
+
+// --- New processed data for Transaction Monitoring Dashboard ---
+export const processedTransactionDashboardData = {
+    totalTransactions: 18765, // Example value, align with kri-total-transactions history
+    flaggedTransactions: 45, // Example
+    totalValue: "$1.5M", // Example value, align with kri-total-transaction-value history
+    transactionsByDay: [
+        { day: 'Mon', count: 3500, flagged: 20 },
+        { day: 'Tue', count: 3800, flagged: 25 },
+        { day: 'Wed', count: 3200, flagged: 18 },
+        { day: 'Thu', count: 4100, flagged: 30 },
+        { day: 'Fri', count: 3900, flagged: 28 },
+        { day: 'Sat', count: 3000, flagged: 15 },
+        { day: 'Sun', count: 2800, flagged: 12 },
+    ],
+    transactionsByRiskLevel: [
+        { name: 'Low Risk', value: 80000, fill: '#4ade80' },
+        { name: 'Medium Risk', value: 15000, fill: '#facc15' },
+        { name: 'High Risk', value: 5000, fill: '#ef4444' },
+    ],
+};
+
+export const reportingEvents = [
+    {
+        id: 'evt1',
+        date: '2025-07-25',
+        title: 'Q2 AML Report Submission Deadline',
+        description: 'Final submission deadline for the Anti-Money Laundering report for Q2 2025.',
+        type: 'Deadline',
+        jurisdiction: 'Nigeria',
+        status: 'Upcoming',
+        severity: 'High'
+    },
+    {
+        id: 'evt2',
+        date: '2025-07-20',
+        title: 'Regulatory Change: New Data Privacy Laws',
+        description: 'New national data privacy regulations effective starting July 20, 2025. Requires policy updates.',
+        type: 'Regulatory Update',
+        jurisdiction: 'Kenya',
+        status: 'Completed',
+        severity: 'Medium'
+    },
+    {
+        id: 'evt3',
+        date: '2025-08-10',
+        title: 'Internal Audit: KYC Procedures Review',
+        description: 'Scheduled internal audit to review KYC (Know Your Customer) procedures and effectiveness.',
+        type: 'Audit',
+        jurisdiction: 'Global',
+        status: 'Scheduled',
+        severity: 'Low'
+    },
+    {
+        id: 'evt4',
+        date: '2025-07-22',
+        title: 'SAR Filing Training Session',
+        description: 'Mandatory training session for compliance officers on Suspicious Activity Report (SAR) filing protocols.',
+        type: 'Training',
+        jurisdiction: 'Global',
+        status: 'Completed',
+        severity: 'Low'
+    },
+    {
+        id: 'evt5',
+        date: '2025-09-01',
+        title: 'Annual Compliance Review Meeting',
+        description: 'Annual review meeting with senior management to discuss overall compliance posture and strategic initiatives.',
+        type: 'Meeting',
+        jurisdiction: 'Global',
+        status: 'Scheduled',
+        severity: 'Medium'
+    },
+];
+
+// Mock data for files pending analysis, used in Data Management Workbench
+export const filesPendingAnalysis = [
+    {
+        id: 'file-1',
+        name: 'customer_data_q1_2025.csv',
+        uploadDate: '2025-07-20',
+        status: 'Pending Analysis',
+        sampleContent: [
+            {
+                id: 'CUST001',
+                name: 'Alice Smith',
+                email: 'alice.s@example.com',
+                registered: '2024-01-15',
+                status: 'Active',
+                nationalID: '123456789',
+                phoneNumber: '254712345678',
+                address: '123 Main St, Nairobi',
+                countryOfResidence: 'KEN',
+                occupation: 'Software Engineer',
+                pepStatus: false,
+                sanctionsStatus: false,
+                riskScore: 35.5
+            },
+            {
+                id: 'CUST002',
+                name: 'Bob Johnson',
+                email: 'bob.j@example.com',
+                registered: '2024-02-20',
+                status: 'Inactive',
+                nationalID: '987654321',
+                phoneNumber: '254721098765',
+                address: '456 Elm St, Mombasa',
+                countryOfResidence: 'KEN',
+                occupation: 'Accountant',
+                pepStatus: false,
+                sanctionsStatus: false,
+                riskScore: 60.1
+            },
+            {
+                id: 'CUST003',
+                name: 'Charlie Brown',
+                email: 'charlie.b@example.com',
+                registered: '2024-03-01',
+                status: 'Active',
+                nationalID: '112233445',
+                phoneNumber: '2348011223344',
+                address: '789 Oak Ave, Lagos',
+                countryOfResidence: 'NGA',
+                occupation: 'Marketing Manager',
+                pepStatus: true, // Example of PEP
+                sanctionsStatus: false,
+                riskScore: 85.0
+            },
+            {
+                id: 'CUST004',
+                name: 'Diana Prince',
+                email: 'diana.p@example.com',
+                registered: '2024-04-10',
+                status: 'Active',
+                nationalID: '556677889',
+                phoneNumber: '27712345678',
+                address: '101 Pine St, Cape Town',
+                countryOfResidence: 'ZAF',
+                occupation: 'Architect',
+                pepStatus: false,
+                sanctionsStatus: false,
+                riskScore: 40.2
+            },
+            {
+                id: 'CUST005',
+                name: 'Eva Green',
+                email: 'eva.g@example.com',
+                registered: '2024-05-05',
+                status: 'Active',
+                nationalID: '998877665',
+                phoneNumber: '233209876543',
+                address: '201 Cedar St, Accra',
+                countryOfResidence: 'GHA',
+                occupation: 'Artist',
+                pepStatus: false,
+                sanctionsStatus: true, // Example of Sanctioned
+                riskScore: 92.7
+            },
+        ],
+    },
+    {
+        id: 'file-2',
+        name: 'transactions_june_2025.json',
+        uploadDate: '2025-07-21',
+        status: 'Pending Analysis',
+        sampleContent: [
+            {
+                transactionId: 'TXN789',
+                timestamp: '2025-06-15T10:30:00Z',
+                amount: 1500,
+                currency: 'USD',
+                type: 'Deposit', // maps to transactionType
+                senderAccount: 'ACCT1001',
+                receiverAccount: 'ACCT2001',
+                senderCountry: 'USA', // can map to senderCountry
+                receiverCountry: 'USA',
+                fraudScore: 10,
+                amlFlag: false
+            },
+            {
+                transactionId: 'TXN790',
+                timestamp: '2025-06-16T14:45:00Z',
+                amount: 250,
+                currency: 'EUR',
+                type: 'Withdrawal',
+                senderAccount: 'ACCT1002',
+                receiverAccount: 'ACCT2002',
+                senderCountry: 'DEU',
+                receiverCountry: 'FRA',
+                fraudScore: 5,
+                amlFlag: false
+            },
+            {
+                transactionId: 'TXN791',
+                timestamp: '2025-06-17T09:00:00Z',
+                amount: 5000,
+                currency: 'GBP',
+                type: 'Transfer',
+                senderAccount: 'ACCT1003',
+                receiverAccount: 'ACCT2003',
+                senderCountry: 'GBR',
+                receiverCountry: 'IND',
+                fraudScore: 70, // Higher risk example
+                amlFlag: true // AML flag example
+            },
+            {
+                transactionId: 'TXN792',
+                timestamp: '2025-06-18T11:20:00Z',
+                amount: 10000,
+                currency: 'USD',
+                type: 'Payment',
+                senderAccount: 'ACCT1004',
+                receiverAccount: 'ACCT2004',
+                senderCountry: 'CAN',
+                receiverCountry: 'USA',
+                fraudScore: 25,
+                amlFlag: false
+            },
+            {
+                transactionId: 'TXN793',
+                timestamp: '2025-06-19T16:00:00Z',
+                amount: 750,
+                currency: 'JPY',
+                type: 'Deposit',
+                senderAccount: 'ACCT1005',
+                receiverAccount: 'ACCT2005',
+                senderCountry: 'JPN',
+                receiverCountry: 'JPN',
+                fraudScore: 8,
+                amlFlag: false
+            },
+        ],
+    },
+];
+
+// Mock data for industry schemas, used in Workbench
+export const mockIndustrySchemas = [
+    {
+        id: 'schema-customer-profile',
+        name: 'Customer Profile Schema (AML/KYC)',
+        description: 'Standard schema for customer due diligence and KYC records, compliant with common AML regulations.',
+        fields: [
+            { id: 'customerID', name: 'Customer ID', type: 'string', required: true, format: 'alphanumeric' },
+            { id: 'firstName', name: 'First Name', type: 'string', required: true },
+            { id: 'lastName', name: 'Last Name', type: 'string', required: true },
+            { id: 'dateOfBirth', name: 'Date of Birth', type: 'date', required: true, format: 'YYYY-MM-DD' },
+            { id: 'nationalID', name: 'National ID', type: 'string', required: false },
+            { id: 'email', name: 'Email Address', type: 'string', required: true, format: 'email' },
+            { id: 'phoneNumber', name: 'Phone Number', type: 'string', required: false },
+            { id: 'address', name: 'Address', type: 'string', required: true },
+            { id: 'countryOfResidence', name: 'Country of Residence', type: 'string', required: true, format: 'ISO 3166-1 alpha-3' },
+            { id: 'occupation', name: 'Occupation', type: 'string', required: false },
+            { id: 'pepStatus', name: 'PEP Status', type: 'boolean', required: true, enum: [true, false] },
+            { id: 'sanctionsStatus', name: 'Sanctions Status', type: 'boolean', required: true, enum: [true, false] },
+            { id: 'riskScore', name: 'Risk Score', type: 'number', required: true },
+        ],
+    },
+    {
+        id: 'schema-transaction-data',
+        name: 'Financial Transaction Schema (AML/Fraud)',
+        description: 'Standard schema for financial transaction reporting, including AML and fraud monitoring fields.',
+        fields: [
+            { id: 'transactionID', name: 'Transaction ID', type: 'string', required: true, format: 'alphanumeric' },
+            { id: 'timestamp', name: 'Timestamp', type: 'date', required: true, format: 'YYYY-MM-DDTHH:mm:ssZ' },
+            { id: 'amount', name: 'Amount', type: 'number', required: true },
+            { id: 'currency', name: 'Currency', type: 'string', required: true, format: 'ISO 4217' },
+            { id: 'transactionType', name: 'Transaction Type', type: 'string', required: true, enum: ['Deposit', 'Withdrawal', 'Transfer', 'Payment'] },
+            { id: 'senderAccount', name: 'Sender Account', type: 'string', required: true },
+            { id: 'receiverAccount', name: 'Receiver Account', type: 'string', required: true },
+            { id: 'senderCountry', name: 'Sender Country', type: 'string', required: false, format: 'ISO 3166-1 alpha-3' },
+            { id: 'receiverCountry', name: 'Receiver Country', type: 'string', required: false, format: 'ISO 3166-1 alpha-3' },
+            { id: 'fraudScore', name: 'Fraud Score', type: 'number', required: false },
+            { id: 'amlFlag', name: 'AML Flag', type: 'boolean', required: true, enum: [true, false] },
+        ],
+    },
+];
+
+// Mock data for saving mapping templates
+export const mockMappingTemplates = [
+    {
+        id: 'template_financial_transactions_q1_2025',
+        name: 'Financial Transactions Q1 2025',
+        description: 'Mapping for quarterly financial transactions to AML/Fraud schema.',
+        sourceSchemaExample: ['transaction_id_src', 'value_src', 'currency_code_src', 'type_src', 'sender_account_src', 'receiver_account_src'],
+        targetSchemaId: 'schema-transaction-data',
+        mappings: [
+            { sourceField: 'transaction_id_src', targetField: 'transactionID', transformation: null },
+            { sourceField: 'value_src', targetField: 'amount', transformation: { type: 'convertToNumber' } },
+            { sourceField: 'currency_code_src', targetField: 'currency', transformation: { type: 'toUpperCase' } },
+            { sourceField: 'type_src', targetField: 'transactionType', transformation: null },
+            { sourceField: 'sender_account_src', targetField: 'senderAccount', transformation: null },
+            { sourceField: 'receiver_account_src', targetField: 'receiverAccount', transformation: null },
+        ],
+    },
+    {
+        id: 'template_customer_onboarding_v1',
+        name: 'Customer Onboarding V1',
+        description: 'Initial mapping for new customer onboarding data to Customer Profile schema.',
+        sourceSchemaExample: ['cust_id', 'f_name', 'l_name', 'dob', 'email_addr', 'home_address', 'country_iso'],
+        targetSchemaId: 'schema-customer-profile',
+        mappings: [
+            { sourceField: 'cust_id', targetField: 'customerID', transformation: null },
+            { sourceField: 'f_name', targetField: 'firstName', transformation: null },
+            { sourceField: 'l_name', targetField: 'lastName', transformation: null },
+            { sourceField: 'dob', targetField: 'dateOfBirth', transformation: { type: 'formatDate', from: 'DD/MM/YYYY', to: 'YYYY-MM-DD' } },
+            { sourceField: 'email_addr', targetField: 'email', transformation: null },
+            { sourceField: 'home_address', targetField: 'address', transformation: null },
+            { sourceField: 'country_iso', targetField: 'countryOfResidence', transformation: { type: 'toUpperCase' } },
+        ],
+    },
+];
+
+// Mock data for alerts
+export const mockAlerts = [
+    {
+        id: 'alert-1',
+        message: 'High-risk transaction detected from unverified source.',
+        type: 'Fraud Alert',
+        status: 'Open',
+        date: '2025-07-24',
+        action: 'Review Transaction',
+        severity: 'Critical',
+        details: 'Transaction TXN98765 valued at $15,000 from IP 192.168.1.1. Associated with customer profile CUST456, which has incomplete KYC. Recommend immediate review and potential suspension.',
+        linkedEntities: [
+            { type: 'Transaction', id: 'TXN98765', link: '/transactions/TXN98765' },
+            { type: 'Customer', id: 'CUST456', link: '/customers/CUST456' }
+        ]
+    },
+    {
+        id: 'alert-2',
+        message: 'Multiple failed login attempts for administrator account.',
+        type: 'Security Alert',
+        status: 'Acknowledged',
+        date: '2025-07-23',
+        action: 'Investigate Activity',
+        severity: 'High',
+        details: 'Admin user "john.doe" experienced 5 failed login attempts within 10 minutes from various geolocations. Account temporarily locked. Recommend checking audit logs.',
+        linkedEntities: [
+            { type: 'User', id: 'john.doe', link: '/users/john.doe' },
+            { type: 'Audit Log', id: 'log-security-20250723', link: '/audit-logs/security-20250723' }
+        ]
+    },
+    {
+        id: 'alert-3',
+        message: 'Compliance report overdue: Q2 Regulatory Filing.',
+        type: 'Compliance Alert',
+        status: 'Closed',
+        date: '2025-07-20',
+        action: 'View Report',
+        severity: 'Medium',
+        details: 'The Quarterly Regulatory Filing for Q2 2025 was due on 2025-07-15. Report has since been filed and marked as compliant. Investigation into delay initiated.',
+        linkedEntities: [
+            { type: 'Report', id: 'REG2025Q2', link: '/reports/REG2025Q2' }
+        ]
+    },
+    {
+        id: 'alert-4',
+        message: 'New regulatory guideline published: VASP licensing.',
+        type: 'Regulatory Update',
+        status: 'Open',
+        date: '2025-07-18',
+        action: 'Review Guideline',
+        severity: 'Low',
+        details: 'Central Bank has issued new guidelines concerning Virtual Asset Service Provider (VASP) licensing requirements. Review required to assess impact on current operations.',
+        linkedEntities: [
+            { type: 'Regulation', id: 'REG2025VASP', link: '/regulations/REG2025VASP' }
+        ]
+    },
+];
+
+// Mock data for integrations (similar to mockDataSources, but conceptually for 'integrations' page)
+export const mockIntegrations = [
+    {
+        id: 'integration-stripe',
+        name: 'Stripe Payments',
+        type: 'Payment Gateway',
+        status: 'Active',
+        lastSync: '15m ago',
+        dataQuality: 99.2,
+        recordsSynced: 18450,
+        description: 'Connects to Stripe API for payment transaction data.',
+        configuration: { apiKey: 'sk_live_****', webhookUrl: 'https://webhook.example.com/stripe' },
+        linkedDataSources: ['src-stripe-api']
+    },
+    {
+        id: 'integration-chainalysis',
+        name: 'Chainalysis KYT',
+        type: 'Blockchain Analytics',
+        status: 'Active',
+        lastSync: '2h ago',
+        dataQuality: 99.8,
+        recordsSynced: 2300,
+        description: 'Integrates with Chainalysis KYT for crypto transaction risk scoring.',
+        configuration: { apiEndpoint: 'https://api.chainalysis.com/kyt', licenseKey: '****' },
+        linkedDataSources: ['src-chainalysis-kyt']
+    },
+    {
+        id: 'integration-crm',
+        name: 'Salesforce CRM',
+        type: 'CRM System',
+        status: 'Inactive',
+        lastSync: '3w ago',
+        dataQuality: 85.0,
+        recordsSynced: 0,
+        description: 'Placeholder for Salesforce integration for customer data. Currently inactive.',
+        configuration: { instanceUrl: 'https://innovateinc.salesforce.com', userId: 'crm_admin' },
+        linkedDataSources: []
+    },
+];
+
+// Mock data for user roles
+export const mockRoles = [
+    {
+        id: 'role-admin',
+        name: 'Administrator',
+        description: 'Full access to all system features and configurations.',
+        permissions: ['manage_users', 'manage_settings', 'view_all_data', 'create_reports', 'manage_integrations'],
+    },
+    {
+        id: 'role-compliance-officer',
+        name: 'Compliance Officer',
+        description: 'Access to compliance reporting, data management, and alert investigation features.',
+        permissions: ['view_compliance_dashboard', 'manage_data_sources', 'view_alerts', 'investigate_alerts', 'generate_reports', 'manage_templates'],
+    },
+    {
+        id: 'role-analyst',
+        name: 'Analyst',
+        description: 'Read-only access to dashboards, reports, and specific data views for analysis.',
+        permissions: ['view_dashboard', 'view_reports', 'view_data'],
+    },
+    {
+        id: 'role-auditor',
+        name: 'Auditor',
+        description: 'Read-only access to audit logs and compliance evidence for auditing purposes.',
+        permissions: ['view_audit_logs', 'view_evidence_files', 'view_reports'],
+    },
+];
+
+// Mock data for users
+export const mockUsers = [
+    {
+        id: 'user-1',
+        name: 'Kene Gold',
+        email: 'kene.gold@innovateinc.com',
+        role: 'Administrator',
+        status: 'Active',
+        lastLogin: '2025-07-24',
+        createdAt: '2024-01-01',
+        twoFactorEnabled: true,
+    },
+    {
+        id: 'user-2',
+        name: 'Jane Smith',
+        email: 'jane.smith@innovateinc.com',
+        role: 'Compliance Officer',
+        status: 'Active',
+        lastLogin: '2025-07-23',
+        createdAt: '2024-03-10',
+        twoFactorEnabled: false,
+    },
+    {
+        id: 'user-3',
+        name: 'Mark Davis',
+        email: 'mark.davis@innovateinc.com',
+        role: 'Analyst',
+        status: 'Inactive',
+        lastLogin: '2025-06-15',
+        createdAt: '2024-02-01',
+        twoFactorEnabled: true,
+    },
+    {
+        id: 'user-4',
+        name: 'Sarah Chen',
+        email: 'sarah.chen@innovateinc.com',
+        role: 'Auditor',
+        status: 'Active',
+        lastLogin: '2025-07-22',
+        createdAt: '2024-05-01',
+        twoFactorEnabled: false,
+    },
+];
 
 export const mockIndicators = [
     {
@@ -471,68 +967,3 @@ export const mockIndicators = [
         jurisdiction: 'Global'
     },
 ];
-
-// --- Data for Calendar ---
-export const reportingEvents = [
-    { date: '2025-07-15', title: 'File Q2 SAR Summary (NG)', type: 'Filing', urgency: 'high', jurisdiction: 'Nigeria' },
-    { date: '2025-07-15', title: 'Submit VASP License Attestation (KE)', type: 'Filing', urgency: 'high', jurisdiction: 'Kenya' },
-    { date: '2025-07-20', title: 'Internal Audit Committee Meeting', type: 'Meeting', jurisdiction: 'Global' },
-];
-
-export const mockIntegrations = [
-    { id: 'int-01', name: 'Slack Notifications', type: 'Messaging', status: 'Active' },
-    { id: 'int-02', name: 'Jira Task Creation', type: 'Project Management', status: 'Active' },
-    { id: 'int-03', name: 'Chainalysis API', type: 'Data Provider', status: 'Inactive' },
-];
-
-// --- Data for Settings Page ---
-export const mockUsers = [
-    { id: 'usr-01', name: 'Kene Gold', email: 'kene@example.com', title: 'Company Founder', role: 'Admin', status: 'Active' },
-    { id: 'usr-02', name: 'Adesanmi Adeosun', email: 'adesanmi@example.com', title: 'Compliance Officer', role: 'Editor', status: 'Active' },
-    { id: 'usr-03', name: 'Patience O.', email: 'patience@example.com', title: 'Risk Analyst', role: 'Editor', status: 'Active' },
-    { id: 'usr-04', name: 'John Doe', email: 'john.d@example.com', title: 'External Counsel', role: 'Viewer', status: 'Inactive' },
-];
-
-export const mockRoles = [
-    { name: 'Admin', description: 'Full access to all modules and settings.', permissions: 32 },
-    { name: 'Editor', description: 'Can create and edit drafts, but cannot submit.', permissions: 15 },
-    { name: 'Viewer', description: 'Read-only access to dashboards and reports.', permissions: 8 },
-];
-
-export const mockAlerts = [
-    { id: 'alert-1', name: 'High-Risk Transaction', condition: 'When transaction value > $10,000', notify: ['Admin', 'Compliance Officer'], active: true },
-    { id: 'alert-2', name: 'License Renewal Reminder', condition: '30 days before expiry', notify: ['Admin'], active: true },
-    { id: 'alert-3', name: 'Failed Data Source Sync', condition: 'When any data source fails to connect', notify: ['Admin'], active: false },
-];
-
-// NEW: Processed data for KYC Dashboard
-export const processedKycDashboardData = {
-    verificationRate: 95.8,
-    avgTurnaroundTime: '3.9 hours',
-    rejectionRate: 2.5,
-    dailyVerificationsData: [
-        { day: 'Mon', count: 160 },
-        { day: 'Tue', count: 195 },
-        { day: 'Wed', count: 220 },
-        { day: 'Thu', count: 200 },
-        { day: 'Fri', count: 265 },
-        { day: 'Sat', count: 130 },
-        { day: 'Sun', count: 100 },
-    ],
-};
-
-// NEW: Processed data for Transaction Monitoring Dashboard
-export const processedTransactionDashboardData = {
-    totalValue: '1.5M USD',
-    totalTransactions: '18,765',
-    alertsGenerated: 85,
-    dailyFraudMonitoring: [
-        { name: 'Mon', transactions: 4200, flagged: 20 },
-        { name: 'Tue', transactions: 3100, flagged: 15 },
-        { name: 'Wed', transactions: 2100, flagged: 10 },
-        { name: 'Thu', transactions: 2850, flagged: 30 },
-        { name: 'Fri', transactions: 1950, flagged: 40 },
-        { name: 'Sat', transactions: 2450, flagged: 35 },
-        { name: 'Sun', transactions: 3550, flagged: 40 },
-    ],
-};
