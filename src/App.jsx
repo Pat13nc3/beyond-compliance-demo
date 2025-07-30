@@ -54,13 +54,12 @@ const App = () => {
 
         switch (activeTab) {
             case 'Dashboard':
-                // Removed onPrepareReport from ActionOrientedDashboard
                 return <ActionOrientedDashboard {...pageProps} />; 
             case 'ComplianceReporting':
                 return <ComplianceReporting {...pageProps} />;
 
             case 'Data Management':
-            case 'DataManagement':
+            case 'DataManagement': // Fallback for consistency
                 return <DataManagement {...pageProps} onPromoteToLibrary={handlePromoteToLibrary} jurisdiction={activeJurisdiction} onNavigate={handleNavigate} />;
 
             case 'Library':
@@ -76,18 +75,19 @@ const App = () => {
             case 'Settings':
                 return <Settings {...pageProps} />;
             default:
-                // Default case should also align
                 return <ActionOrientedDashboard {...pageProps} />; 
         }
     };
 
     return (
+        // Outer container: flex to layout sidebar and main content, h-screen to fill viewport height
         <div className="flex h-screen bg-gray-900 text-white">
             <Sidebar
                 activeTab={activeTab}
                 setActiveTab={handleNavigate}
                 isSidebarOpen={isSidebarOpen}
             />
+            {/* Main content area: flex-1 to take remaining width, flex-col for vertical stacking */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header
                     activeTab={activeTab}
@@ -98,7 +98,8 @@ const App = () => {
                     activeJurisdiction={activeJurisdiction}
                     setActiveJurisdiction={setActiveJurisdiction}
                 />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e7f1fe]">
+                {/* Main content area for pages: flex-1 to take remaining height, overflow for scrolling, bg-gray-900 for consistent dark background */}
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 h-full">
                     {renderContent()}
                 </main>
             </div>

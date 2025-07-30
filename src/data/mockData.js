@@ -684,21 +684,23 @@ export const mockMappingTemplates = [
 export const mockAlerts = [
     {
         id: 'alert-1',
-        message: 'High-risk transaction detected from unverified source.',
+        name: 'High-risk transaction detected from unverified source.',
         type: 'Fraud Alert',
         status: 'Open',
         date: '2025-07-24',
         action: 'Review Transaction',
         severity: 'Critical',
-        details: 'Transaction TXN98765 valued at $15,000 from IP 192.168.1.1. Associated with customer profile CUST456, which has incomplete KYC. Recommend immediate review and potential suspension.',
+        details: 'Transaction TXN98765 valued at $15,000 from IP 192.168.1.10. Associated with customer profile CUST456, which has incomplete KYC. Recommend immediate review and potential suspension.',
         linkedEntities: [
             { type: 'Transaction', id: 'TXN98765', link: '/transactions/TXN98765' },
             { type: 'Customer', id: 'CUST456', link: '/customers/CUST456' }
-        ]
+        ],
+        eventType: 'Transaction Triggered', // Add eventType for existing mock alerts
+        messageTemplate: 'High-risk transaction detected from unverified source. Review transaction {{transaction.id}}.'
     },
     {
         id: 'alert-2',
-        message: 'Multiple failed login attempts for administrator account.',
+        name: 'Multiple failed login attempts for administrator account.',
         type: 'Security Alert',
         status: 'Acknowledged',
         date: '2025-07-23',
@@ -708,11 +710,13 @@ export const mockAlerts = [
         linkedEntities: [
             { type: 'User', id: 'john.doe', link: '/users/john.doe' },
             { type: 'Audit Log', id: 'log-security-20250723', link: '/audit-logs/security-20250723' }
-        ]
+        ],
+        eventType: 'Security Breach',
+        messageTemplate: 'Multiple failed login attempts for administrator account {{user.name}}.'
     },
     {
         id: 'alert-3',
-        message: 'Compliance report overdue: Q2 Regulatory Filing.',
+        name: 'Compliance report overdue: Q2 Regulatory Filing.',
         type: 'Compliance Alert',
         status: 'Closed',
         date: '2025-07-20',
@@ -721,11 +725,13 @@ export const mockAlerts = [
         details: 'The Quarterly Regulatory Filing for Q2 2025 was due on 2025-07-15. Report has since been filed and marked as compliant. Investigation into delay initiated.',
         linkedEntities: [
             { type: 'Report', id: 'REG2025Q2', link: '/reports/REG2025Q2' }
-        ]
+        ],
+        eventType: 'Compliance Reporting Deadline',
+        messageTemplate: 'Compliance report overdue: {{report.name}}.'
     },
     {
         id: 'alert-4',
-        message: 'New regulatory guideline published: VASP licensing.',
+        name: 'New regulatory guideline published: VASP licensing.',
         type: 'Regulatory Update',
         status: 'Open',
         date: '2025-07-18',
@@ -734,7 +740,9 @@ export const mockAlerts = [
         details: 'Central Bank has issued new guidelines concerning Virtual Asset Service Provider (VASP) licensing requirements. Review required to assess impact on current operations.',
         linkedEntities: [
             { type: 'Regulation', id: 'REG2025VASP', link: '/regulations/REG2025VASP' }
-        ]
+        ],
+        eventType: 'Regulatory Circular Publication',
+        messageTemplate: 'New regulatory guideline published: {{circular.title}}.'
     },
 ];
 
@@ -817,6 +825,7 @@ export const mockUsers = [
         lastLogin: '2025-07-24',
         createdAt: '2024-01-01',
         twoFactorEnabled: true,
+        title: 'Chief Compliance Officer', // Added title for existing user
     },
     {
         id: 'user-2',
@@ -827,6 +836,7 @@ export const mockUsers = [
         lastLogin: '2025-07-23',
         createdAt: '2024-03-10',
         twoFactorEnabled: false,
+        title: 'Senior Compliance Analyst', // Added title
     },
     {
         id: 'user-3',
@@ -837,6 +847,7 @@ export const mockUsers = [
         lastLogin: '2025-06-15',
         createdAt: '2024-02-01',
         twoFactorEnabled: true,
+        title: 'Financial Data Analyst', // Added title
     },
     {
         id: 'user-4',
@@ -847,6 +858,7 @@ export const mockUsers = [
         lastLogin: '2025-07-22',
         createdAt: '2024-05-01',
         twoFactorEnabled: false,
+        title: 'Internal Auditor', // Added title
     },
 ];
 
@@ -965,5 +977,154 @@ export const mockIndicators = [
         linkedSourceIds: [],
         history: [{ date: '2024-01-01', value: 12000 }, { date: '2024-02-01', value: 13500 }, { date: '2024-03-01', value: 14000 }, { date: '2024-04-01', value: 16000 }, { date: '2024-05-01', value: 15500 }, { date: '2024-06-01', value: 18765 }],
         jurisdiction: 'Global'
+    },
+];
+
+// Mock data for rules
+export const mockRules = [
+    {
+        id: 'rule-1',
+        name: 'High-Value Transaction Alert',
+        description: 'Flags transactions over $10,000 from any country.',
+        type: 'Web2',
+        context: 'Global - All PSP',
+        status: 'Active',
+        conditions: [
+            { field: 'Transaction Value', operator: 'exceeds', value: '10000' }
+        ],
+        actions: [
+            { type: 'Create Alert' },
+            { type: 'Flag for Review' }
+        ]
+    },
+    {
+        id: 'rule-2',
+        name: 'KYC Document Expiry Alert',
+        description: 'Alerts on KYC documents expiring within 30 days and triggers a task.',
+        type: 'Web2',
+        context: 'Nigeria - All PSP',
+        status: 'Active',
+        conditions: [
+            { field: 'KYC Status', operator: 'is from', value: 'expiring in 30 days' } // Placeholder for more complex date logic
+        ],
+        actions: [
+            { type: 'Create Alert' },
+            { type: 'Trigger Workflow' }
+        ]
+    },
+    {
+        id: 'rule-3',
+        name: 'Sanctioned Crypto Address Block',
+        description: 'Blocks transactions with addresses identified on sanctions lists for digital assets.',
+        type: 'Web3',
+        context: 'Global - Digital Assets',
+        status: 'Inactive',
+        conditions: [
+            { field: 'Digital Asset Type', operator: 'contains', value: 'sanctioned' }, // Placeholder for actual sanctions list check
+            { field: 'Transaction Value', operator: 'exceeds', value: '500' }
+        ],
+        actions: [
+            { type: 'Block Transaction' },
+            { type: 'Create Alert' }
+        ]
+    },
+    {
+        id: 'rule-4',
+        name: 'New Regulatory Circular Review',
+        description: 'Triggers a task for the compliance team when a new regulatory circular is published.',
+        type: 'Web2',
+        context: 'Kenya - All',
+        status: 'Active',
+        conditions: [
+            { field: 'Regulatory Update', operator: 'is equal to', value: 'new publication' } // Placeholder
+        ],
+        actions: [
+            { type: 'Trigger Workflow' },
+            { type: 'Generate Report' }
+        ]
+    }
+];
+
+// Mock data for the tasks
+export const initialTasks = {
+    'To Do': [
+        { id: 'TASK-1', title: 'Review new CBN guidelines for PSPs', description: 'Analyze impact of recent CBN updates on payment service providers.', priority: 'High', dueDate: '2025-08-10', status: 'To Do' },
+        { id: 'TASK-2', title: 'Schedule Q3 internal audit', description: 'Coordinate with internal and external auditors for the third-quarter audit.', priority: 'Medium', dueDate: '2025-08-01', status: 'To Do' },
+        { id: 'TASK-6', title: 'Draft new AML/CFT Policy Addendum', description: 'Incorporate new regulatory requirements for virtual asset service providers.', priority: 'High', assignedTo: 'Jane Smith', dueDate: '2025-09-15', status: 'To Do' },
+    ],
+    'In Progress': [
+        { id: 'TASK-3', title: 'Prepare VASP White Paper draft', description: 'Outline the company\'s approach to virtual asset services and compliance.', priority: 'High', assignedTo: 'Kene Gold', dueDate: '2025-08-20', status: 'In Progress' },
+        { id: 'TASK-4', title: 'Update Data Encryption Policy', description: 'Revise current data encryption standards to meet new industry best practices.', priority: 'Low', assignedTo: 'Mark Davis', dueDate: '2025-07-30', status: 'In Progress' },
+    ],
+    'Done': [
+        { id: 'TASK-5', title: 'Submit Q2 AML Summary', description: 'Quarterly Anti-Money Laundering summary report submitted to regulatory authority.', priority: 'High', assignedTo: 'Sarah Chen', dueDate: '2025-07-15', status: 'Done' },
+    ],
+};
+
+// Mock data for Workflows
+export const mockWorkflows = [
+    {
+        id: 'wf-1',
+        name: 'New License Application',
+        description: 'Standard workflow for submitting new license applications to regulators.',
+        steps: [
+            { name: 'Gather Required Documents' },
+            { name: 'Complete Application Forms' },
+            { name: 'Internal Legal Review' },
+            { name: 'Submit to Regulator' },
+            { name: 'Track Application Status' },
+        ],
+    },
+    {
+        id: 'wf-2',
+        name: 'Quarterly AML Reporting',
+        description: 'Automated workflow for preparing and submitting quarterly AML reports.',
+        steps: [
+            { name: 'Collect Transaction Data' },
+            { name: 'Run AML Screening Rules' },
+            { name: 'Generate SAR/CTR Reports' },
+            { name: 'Compliance Officer Review' },
+            { name: 'Submit to Regulator' },
+        ],
+    },
+    {
+        id: 'wf-3',
+        name: 'KYC Document Renewal',
+        description: 'Workflow for managing the periodic renewal of KYC documents for existing clients.',
+        steps: [
+            { name: 'Identify Clients for Renewal' },
+            { name: 'Send Renewal Request' },
+            { name: 'Collect Updated Documents' },
+            { name: 'Verify New Documents' },
+            { name: 'Update Client Profile' },
+        ],
+    },
+];
+
+// Mock data for Partners
+export const mockPartners = [
+    {
+        id: 'partner-1',
+        name: 'First National Bank',
+        type: 'Bank Partner',
+        status: 'Active',
+        sharedData: ['KYC Records (Limited)', 'Transaction Data (Filtered)'],
+        lastActivity: '2025-07-28'
+    },
+    {
+        id: 'partner-2',
+        name: 'LegalShield Solutions',
+        type: 'Legal Firm',
+        status: 'Active',
+        sharedData: ['Compliance Reports', 'Audit Documentation'],
+        lastActivity: '2025-07-20'
+    },
+    {
+        id: 'partner-3',
+        name: 'Global Compliance Auditors',
+        type: 'Auditor',
+        status: 'Inactive',
+        sharedData: ['Audit Logs'],
+        lastActivity: '2025-06-10'
     },
 ];

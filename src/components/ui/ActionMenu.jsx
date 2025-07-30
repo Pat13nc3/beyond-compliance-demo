@@ -1,9 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
+// src/components/ui/ActionMenu.jsx
+
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MoreHorizontal } from 'lucide-react';
 
 const ActionMenu = ({ items }) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef(null);
+    const dropdownRef = useRef(null);
+    const [dropdownPosition, setDropdownPosition] = useState('bottom');
+
+    const calculateDropdownPosition = useCallback(() => {
+        if (dropdownRef.current && menuRef.current) {
+            const buttonRect = menuRef.current.getBoundingClientRect();
+            const dropdownHeight = dropdownRef.current.offsetHeight;
+            const viewportHeight = window.innerHeight;
+
+            if (buttonRect.bottom + dropdownHeight + 20 > viewportHeight &&
+                buttonRect.top > dropdownHeight + 20) {
+                setDropdownPosition('top');
+            } else {
+                setDropdownPosition('bottom');
+            }
+        }
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -11,39 +30,70 @@ const ActionMenu = ({ items }) => {
                 setIsOpen(false);
             }
         };
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
+
+        if (isOpen) {
+            const timeoutId = setTimeout(() => {
+                calculateDropdownPosition();
+            }, 0);
+            window.addEventListener('resize', calculateDropdownPosition);
+            return () => {
+                clearTimeout(timeoutId);
+                window.removeEventListener('resize', calculateDropdownPosition);
+            };
+        }
+
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [isOpen, calculateDropdownPosition]);
+
+    const handleButtonClick = () => {
+        setIsOpen(prev => !prev);
+    };
 
     return (
-        <div className="relative" ref={menuRef}>
-            <button onClick={() => setIsOpen(!isOpen)} className="p-1 rounded-full hover:bg-gray-200">
-                <MoreHorizontal size={20} className="text-gray-500" />
-            </button>
+        <div className="relative inline-block text-left" ref={menuRef}>
+            <div>
+                <button
+                    type="button"
+                    className="flex items-center text-gray-400 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                    onClick={handleButtonClick}
+                >
+                    <MoreHorizontal size={20} />
+                </button>
+            </div>
+
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                    <ul className="py-1">
+                <div
+                    ref={dropdownRef}
+                    // Removed comments from within the template literal string
+                    className={`absolute w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-700 focus:outline-none z-50 ${
+                        dropdownPosition === 'bottom' ? 'origin-top-right right-0 mt-2' : 'origin-bottom-right right-0 mb-2 bottom-full'
+                    }`}
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="menu-button"
+                    tabIndex="-1"
+                >
+                    <div className="py-1" role="none">
                         {items.map((item, index) => (
-                            <li key={index}>
-                                <button
-                                    onClick={() => {
-                                        item.action();
-                                        setIsOpen(false);
-                                    }}
-                                    className={`w-full text-left flex items-center px-4 py-2 text-sm ${
-                                        item.color || 'text-gray-700'
-                                    } hover:bg-gray-100`}
-                                >
-                                    {/* --- THIS IS THE FIX --- */}
-                                    {/* We now correctly render the icon as a component */}
-                                    {item.icon && <item.icon className="mr-3 h-4 w-4" />}
-                                    {item.label}
-                                </button>
-                            </li>
+                            <button
+                                key={index}
+                                onClick={() => {
+                                    item.action();
+                                    setIsOpen(false);
+                                }}
+                                className={`block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white w-full text-left flex items-center ${item.color || ''}`}
+                                role="menuitem"
+                                tabIndex="-1"
+                                id={`menu-item-${index}`}
+                            >
+                                {item.icon && <item.icon size={16} className="mr-3" />}
+                                {item.label}
+                            </button>
                         ))}
-                    </ul>
+                    </div>
                 </div>
             )}
         </div>

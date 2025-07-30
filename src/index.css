@@ -1,3 +1,41 @@
+/* src/index.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ensure html and body fill the screen perfectly and remove default margins */
+html, body {
+  height: 100%; /* Ensure they take full height of their parent (viewport) */
+  min-height: 100vh; /* Ensure they take at least viewport height */
+  margin: 0; /* REMOVE default browser margins */
+  padding: 0; /* REMOVE default browser padding */
+  background-color: #1a202c; /* Ensure a consistent dark background at the highest level (Tailwind's bg-gray-900 is #1a202c) */
+  color: #e2e8f0; /* Default text color for dark mode */
+}
+
+/* Optional: Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Width for vertical scrollbar */
+  height: 8px; /* Height for horizontal scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #2d3748; /* Dark track */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4a5568; /* Darker thumb */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #616e7f; /* Even darker on hover */
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4a5568 #2d3748;
+}
