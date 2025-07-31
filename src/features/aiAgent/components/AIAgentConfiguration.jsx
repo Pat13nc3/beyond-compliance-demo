@@ -1,10 +1,10 @@
-// src/features/manage/components/RegulatoryAIAgentView.jsx
+// src/features/aiAgent/components/AIAgentConfiguration.jsx
 
 import React, { useState, useEffect } from 'react';
-// CORRECTED: Added AlertTriangle to the import list
-import { Save, Bot, PlayCircle, PauseCircle, Settings, CheckCircle, Clock, FileText, BarChart2, Lightbulb, AlertTriangle } from 'lucide-react';
+// Removed FileText, BarChart2, Lightbulb, AlertTriangle as they are no longer used here
+import { Save, Bot, PlayCircle, PauseCircle, Settings, Lightbulb } from 'lucide-react';
 
-const RegulatoryAIAgentView = ({ onSaveAiConfig, initialAiConfig = {}, onSimulateAiAction, onViewInsight }) => {
+const AIAgentConfiguration = ({ onSaveAiConfig, initialAiConfig = {} }) => {
     const [aiStatus, setAiStatus] = useState(initialAiConfig.aiStatus || 'Active');
     const [enableRecommendations, setEnableRecommendations] = useState(
         initialAiConfig.enableRecommendations !== undefined ? initialAiConfig.enableRecommendations : true
@@ -15,12 +15,7 @@ const RegulatoryAIAgentView = ({ onSaveAiConfig, initialAiConfig = {}, onSimulat
         initialAiConfig.smartContractMonitoring !== undefined ? initialAiConfig.smartContractMonitoring : true
     );
 
-    const mockInsights = [
-        { id: 'ins1', title: 'New Risk Pattern Identified', details: 'AI detected a correlation between high-value cross-border payments and unverified new users. Recommended review of KYC onboarding for specific regions.', date: '2025-07-28', type: 'Risk Analysis' },
-        { id: 'ins2', title: 'Optimized Report Submission Schedule', details: 'AI recommends shifting Q3 SAR report submission from Aug 15 to Aug 10 for better resource allocation, based on historical data.', date: '2025-07-27', type: 'Recommendation' },
-        { id: 'ins3', title: 'Potential Compliance Gap in New Regulation', details: 'AI highlights a potential oversight in the recently published CBN guidelines concerning digital asset service providers. Suggests review of Rule #45.', date: '2025-07-26', type: 'Alert' },
-        { id: 'ins4', title: 'On-chain Anomaly Alert (Ethereum)', details: 'AI detected unusual transaction patterns from a smart contract address linked to a defi protocol. Recommends on-chain data verification.', date: '2025-07-25', type: 'Digital Asset Alert' },
-    ];
+    // Removed mockInsights as it's no longer displayed here
 
     useEffect(() => {
         if (initialAiConfig) {
@@ -46,15 +41,24 @@ const RegulatoryAIAgentView = ({ onSaveAiConfig, initialAiConfig = {}, onSimulat
     return (
         <div className="bg-gray-800 p-6 rounded-lg shadow-md text-white space-y-6">
             <h3 className="text-xl font-semibold text-[#c0933e] mb-4 flex items-center">
-                <Bot size={24} className="mr-3 text-gray-400" /> Regulatory AI Agent Overview
+                <Bot size={24} className="mr-3 text-gray-400" /> AI Agent Configuration
             </h3>
 
+            {/* AI Status and Toggles */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 border-b border-gray-700">
                 <div className="flex items-center space-x-3 p-3 bg-gray-700 rounded-md">
                     {aiStatus === 'Active' ? <PlayCircle size={24} className="text-green-400" /> : <PauseCircle size={24} className="text-red-400" />}
                     <div>
                         <p className="text-sm font-semibold">AI Agent Status</p>
                         <p className="text-lg font-bold">{aiStatus}</p>
+                        <button 
+                            onClick={() => setAiStatus(aiStatus === 'Active' ? 'Inactive' : 'Active')}
+                            className={`mt-1 px-2 py-1 text-xs rounded ${
+                                aiStatus === 'Active' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+                            } text-white`}
+                        >
+                            {aiStatus === 'Active' ? 'Deactivate' : 'Activate'}
+                        </button>
                     </div>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-gray-700 rounded-md">
@@ -97,6 +101,7 @@ const RegulatoryAIAgentView = ({ onSaveAiConfig, initialAiConfig = {}, onSimulat
                 </div>
             </div>
 
+            {/* Model Version and Training Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label htmlFor="modelVersion" className="block text-sm font-medium text-gray-300 mb-2">AI Model Version</label>
@@ -121,66 +126,8 @@ const RegulatoryAIAgentView = ({ onSaveAiConfig, initialAiConfig = {}, onSimulat
                 </div>
             </div>
 
-            <div className="pt-6 border-t border-gray-700 mt-6">
-                <h4 className="text-lg font-semibold text-gray-200 mb-4 flex items-center">
-                    <PlayCircle size={20} className="mr-2 text-blue-400" /> Simulate AI Actions
-                </h4>
-                <p className="text-sm text-gray-400 mb-4">Trigger AI-powered outputs to see how the agent can assist with compliance tasks.</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button
-                        onClick={() => onSimulateAiAction('Generate Report Template')}
-                        className="bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center justify-center"
-                    >
-                        <FileText size={16} className="mr-2" /> Generate Report Template
-                    </button>
-                    <button
-                        onClick={() => onSimulateAiAction('Generate Risk Assessment')}
-                        className="bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center justify-center"
-                    >
-                        <BarChart2 size={16} className="mr-2" /> Generate Risk Assessment
-                    </button>
-                    <button
-                        onClick={() => onSimulateAiAction('Provide Recommendation')}
-                        className="bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center justify-center"
-                    >
-                        <Lightbulb size={16} className="mr-2" /> Provide Recommendation
-                    </button>
-                </div>
-            </div>
-
-            <div className="pt-6 border-t border-gray-700 mt-6">
-                <h4 className="text-lg font-semibold text-gray-200 mb-4 flex items-center">
-                    <CheckCircle size={20} className="mr-2 text-green-400" /> AI-Powered Insights & Recommendations
-                </h4>
-                <div className="space-y-4 max-h-80 overflow-y-auto custom-scrollbar pr-2">
-                    {mockInsights.map(insight => (
-                        // Make each insight card clickable
-                        <div
-                            key={insight.id}
-                            className="bg-gray-700 p-4 rounded-md cursor-pointer hover:bg-gray-600 transition-colors duration-200"
-                            onClick={() => onViewInsight(insight)} // Call onViewInsight when clicked
-                        >
-                            <p className="font-semibold text-gray-100 mb-1 flex items-center">
-                                {insight.type === 'Recommendation' && <Lightbulb size={16} className="mr-2 text-yellow-300" />}
-                                {insight.type === 'Risk Analysis' && <BarChart2 size={16} className="mr-2 text-red-300" />}
-                                {insight.type === 'Alert' && <AlertTriangle size={16} className="mr-2 text-orange-300" />}
-                                {insight.type === 'Digital Asset Alert' && <Bot size={16} className="mr-2 text-blue-300" />}
-                                {insight.title}
-                            </p>
-                            <p className="text-sm text-gray-300 line-clamp-2">{insight.details}</p>
-                            <p className="text-xs text-gray-400 mt-2 flex items-center">
-                                <Clock size={12} className="mr-1" /> {insight.date}
-                            </p>
-                        </div>
-                    ))}
-                    {mockInsights.length === 0 && (
-                        <p className="text-gray-400 text-center py-4">No AI insights available at this time.</p>
-                    )}
-                </div>
-                <p className="text-xs text-gray-500 mt-4">
-                    These insights are generated by the Regulatory AI Agent. Always review and verify before taking action.
-                </p>
-            </div>
+            {/* Removed: Simulate AI Actions section */}
+            {/* Removed: AI-Powered Insights & Recommendations section */}
 
             <div className="flex justify-end pt-4 border-t border-gray-700 mt-6">
                 <button
@@ -194,4 +141,4 @@ const RegulatoryAIAgentView = ({ onSaveAiConfig, initialAiConfig = {}, onSimulat
     );
 };
 
-export default RegulatoryAIAgentView;
+export default AIAgentConfiguration;

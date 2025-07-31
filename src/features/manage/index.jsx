@@ -1,25 +1,24 @@
 // src/features/manage/index.jsx
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, FileText, GanttChart, Workflow, Bot, Code, Users } from 'lucide-react'; // Ensure Users icon is imported
+import { Link, FileText, GanttChart, Workflow, Code, Users } from 'lucide-react'; // Removed Bot icon
 
 // Component Imports
 import Integrations from './components/Integrations';
 import RulesEngine from './components/RulesEngine';
 import TaskManagementBoard from './components/TaskManagementBoard';
 import WorkflowDesigner from './components/WorkflowDesigner';
-import RegulatoryAIAgentView from './components/RegulatoryAIAgentView';
+// REMOVED: RegulatoryAIAgentView from here as it is now a top-level feature
 import ApiDevCentreView from './components/ApiDevCentreView';
-import PartnerCollaborationView from './components/PartnerCollaborationView'; // Ensure this is imported
+import PartnerCollaborationView from './components/PartnerCollaborationView'; 
 
 // Modal Imports
 import CreateRuleModal from './modals/CreateRuleModal';
 import CreateTaskModal from './modals/CreateTaskModal';
 import CreateIntegrationModal from './modals/CreateIntegrationModal';
 import CreateWorkflowModal from './modals/CreateWorkflowModal';
-import ViewAIInsightModal from './modals/ViewAIInsightModal';
-import SimulateAIOutputModal from './modals/SimulateAIOutputModal';
-import CreateEditPartnerModal from './modals/CreateEditPartnerModal'; // NEW: Import CreateEditPartnerModal
+// REMOVED: ViewAIInsightModal and SimulateAIOutputModal imports as they are now handled by App.jsx
+import CreateEditPartnerModal from './modals/CreateEditPartnerModal'; 
 import Toast from '../../components/ui/Toast';
 import {
     mockUsers,
@@ -27,14 +26,13 @@ import {
     mockRules as initialMockRules,
     initialTasks as initialMockTasks,
     mockWorkflows as initialMockWorkflows,
-    mockPartners as initialMockPartners // NEW: Import mockPartners
+    mockPartners as initialMockPartners 
 } from '../../data/mockData';
 
 
 // Manage component receives `context` and `onCleanContext` from App.jsx
 const Manage = ({ jurisdiction, context, onCleanContext }) => {
-    const [activeTab, setActiveTab] = useState('partnerCollaboration'); // Set default to partnerCollaboration for testing
-    const [users, setUsers] = useState(mockUsers);
+    const [activeTab, setActiveTab] = useState('integrations'); // Set default to integrations
 
     const [integrations, setIntegrations] = useState(initialMockIntegrations);
     const [editingIntegration, setEditingIntegration] = useState(null);
@@ -48,19 +46,13 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
     const [workflows, setWorkflows] = useState(initialMockWorkflows);
     const [editingWorkflow, setEditingWorkflow] = useState(null);
 
-    const [aiConfig, setAiConfig] = useState({
-        aiStatus: 'Active',
-        enableRecommendations: true,
-        modelVersion: 'v2.1.0-alpha',
-        lastTrainingDate: '2025-07-15',
-        smartContractMonitoring: true,
-    });
-    const [selectedInsight, setSelectedInsight] = useState(null);
-    const [isViewAIInsightModalOpen, setIsViewAIInsightModalOpen] = useState(false);
-
-    const [isSimulateAIOutputModalOpen, setIsSimulateAIOutputModalOpen] = useState(false);
-    const [simulateActionType, setSimulateActionType] = useState('');
-    const [simulateOutputData, setSimulateOutputData] = useState({});
+    // REMOVED: AI Agent related states and their setters
+    // const [aiConfig, setAiConfig] = useState(...)
+    // const [selectedInsight, setSelectedInsight] = useState(...)
+    // const [isViewAIInsightModalOpen, setIsViewAIInsightModalOpen] = useState(false);
+    // const [isSimulateAIOutputModalOpen, setIsSimulateAIOutputModalOpen] = useState(false);
+    // const [simulateActionType, setSimulateActionType] = useState('');
+    // const [simulateOutputData, setSimulateOutputData] = useState({});
 
     const [apiSettings, setApiSettings] = useState({
         baseUrl: 'https://api.beyondcompliance.com/v2',
@@ -73,9 +65,8 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
         ],
     });
 
-    // NEW: State for Partner Collaboration settings and editing
     const [partnerSettings, setPartnerSettings] = useState({
-        partners: initialMockPartners // Initialize from mockData
+        partners: initialMockPartners 
     });
     const [editingPartner, setEditingPartner] = useState(null);
     const [isCreateEditPartnerModalOpen, setIsCreateEditPartnerModalOpen] = useState(false);
@@ -264,35 +255,19 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
         setToastMessage(`Workflow "${workflow.name}" has been initiated! A new task has been created in your Task Management Board.`);
     };
 
-    const handleSaveAiConfig = (newAiConfig) => {
-        setAiConfig(newAiConfig);
-        setToastMessage('AI Agent configuration saved successfully!');
-    };
-
-    const handleSimulateAiAction = (actionType) => {
-        setSimulateActionType(actionType);
-        setSimulateOutputData({ modelVersion: aiConfig.modelVersion, score: Math.floor(Math.random() * 100) });
-        setIsSimulateAIOutputModalOpen(true);
-        setToastMessage(`AI Action: "${actionType}" simulated successfully!`);
-    };
-
-    const handleViewInsightClick = (insight) => {
-        setSelectedInsight(insight);
-        setIsViewAIInsightModalOpen(true);
-    };
+    // REMOVED: AI Agent handlers (handleSaveAiConfig, handleSimulateAiAction, handleViewInsightClick)
 
     const handleSaveApiSettings = (newApiSettings) => {
         setApiSettings(newApiSettings);
         setToastMessage('API & Dev Centre settings saved successfully!');
     };
 
-    // NEW: Partner Collaboration Handlers
+    // Partner Collaboration Handlers
     const handleSavePartner = (partnerToSave) => {
         setPartnerSettings(prevSettings => {
             const updatedPartners = prevSettings.partners.map(p =>
                 p.id === partnerToSave.id ? partnerToSave : p
             );
-            // If it's a new partner, add it
             if (!updatedPartners.some(p => p.id === partnerToSave.id)) {
                 updatedPartners.push(partnerToSave);
             }
@@ -304,7 +279,7 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
     };
 
     const handleAddPartnerClick = () => {
-        setEditingPartner(null); // Clear editing state for new partner
+        setEditingPartner(null);
         setIsCreateEditPartnerModalOpen(true);
     };
 
@@ -361,15 +336,7 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                         onRunWorkflow={handleRunWorkflow}
                     />
                 );
-            case 'aiAgent':
-                return (
-                    <RegulatoryAIAgentView
-                        onSaveAiConfig={handleSaveAiConfig}
-                        initialAiConfig={aiConfig}
-                        onSimulateAiAction={handleSimulateAiAction}
-                        onViewInsight={handleViewInsightClick}
-                    />
-                );
+            // REMOVED: AI Agent case from renderContent
             case 'apiDevCentre':
                 return (
                     <ApiDevCentreView
@@ -381,11 +348,11 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
             case 'partnerCollaboration':
                 return (
                     <PartnerCollaborationView
-                        partners={partnerSettings.partners} // Pass partners from state
-                        onSavePartnerSettings={handleSavePartner} // Pass handler for saving partner (add/edit)
+                        partners={partnerSettings.partners} 
+                        onSavePartnerSettings={handleSavePartner} 
                         setToastMessage={setToastMessage}
-                        onAddPartner={handleAddPartnerClick} // Pass handler for add button
-                        onEditPartner={handleEditPartnerClick} // Pass handler for card click
+                        onAddPartner={handleAddPartnerClick} 
+                        onEditPartner={handleEditPartnerClick} 
                         onConfigureSharing={handleConfigureSharing}
                         onViewSharingActivity={handleViewSharingActivity}
                     />
@@ -415,9 +382,7 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                         <button onClick={() => setActiveTab('workflows')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'workflows' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
                             <Workflow size={18} className="inline-block mr-2" /> Workflows
                         </button>
-                        <button onClick={() => setActiveTab('aiAgent')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'aiAgent' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
-                            <Bot size={18} className="inline-block mr-2" /> AI Agent
-                        </button>
+                        {/* REMOVED: AI Agent tab button */}
                         <button onClick={() => setActiveTab('apiDevCentre')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'apiDevCentre' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
                             <Code size={18} className="inline-block mr-2" /> API & Dev Centre
                         </button>
@@ -444,7 +409,7 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                     onClose={() => { setIsCreateTaskModalOpen(false); setEditingTask(null); }}
                     onSave={handleSaveTask}
                     initialData={editingTask}
-                    users={users}
+                    users={mockUsers} // Pass mockUsers directly or fetch if needed
                 />
             )}
             {isCreateIntegrationModalOpen && (
@@ -461,25 +426,12 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                     initialData={editingWorkflow}
                 />
             )}
-            {isViewAIInsightModalOpen && (
-                <ViewAIInsightModal
-                    insight={selectedInsight}
-                    onClose={() => { setIsViewAIInsightModalOpen(false); setSelectedInsight(null); }}
-                />
-            )}
-            {isSimulateAIOutputModalOpen && (
-                <SimulateAIOutputModal
-                    actionType={simulateActionType}
-                    outputData={simulateOutputData}
-                    onClose={() => { setIsSimulateAIOutputModalOpen(false); setSimulateActionType(''); setSimulateOutputData({}); }}
-                />
-            )}
-            {/* NEW: Render CreateEditPartnerModal */}
+            {/* REMOVED: ViewAIInsightModal and SimulateAIOutputModal as they are now handled by App.jsx */}
             {isCreateEditPartnerModalOpen && (
                 <CreateEditPartnerModal
                     onClose={() => { setIsCreateEditPartnerModalOpen(false); setEditingPartner(null); }}
-                    onSave={handleSavePartner} // Pass the handler for saving partner details
-                    initialData={editingPartner} // Pass partner data for editing, or null for new
+                    onSave={handleSavePartner} 
+                    initialData={editingPartner} 
                 />
             )}
 

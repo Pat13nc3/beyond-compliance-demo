@@ -18,7 +18,7 @@ import SubmitEvidenceModal from '../../components/modals/SubmitEvidenceModal.jsx
 import AnalyticsCenterModal from './modals/AnalyticsCenterModal.jsx';
 import CustomizeDashboardModal from './modals/CustomizeDashboardModal.jsx';
 import ExportDashboardModal from './modals/ExportDashboardModal.jsx';
-import InviteUserModal from '../settings/modals/InviteUserModal';
+import InviteUserModal from '../settings/modals/InviteUserModal'; // Ensure this path is correct
 
 // Data Imports
 import {
@@ -26,8 +26,9 @@ import {
     regulatoryPulseData,
     currentUser,
     companyStructure,
-    controlHotspotData
-} from '../../data/mockData';
+    controlHotspotData,
+    mockRoles // IMPORT mockRoles HERE
+} from '../../data/mockData'; //
 
 const initialLayout = [
     { id: 'welcome', name: 'Welcome Banner', visible: true, fullWidth: true },
@@ -38,7 +39,7 @@ const initialLayout = [
     { id: 'pulse', name: 'Regulatory Pulse', visible: true, fullWidth: false },
 ];
 
-const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => { // jurisdiction is received here
+const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
     const [dashboardLayout, setDashboardLayout] = useState([]);
 
     useEffect(() => {
@@ -173,13 +174,25 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => { // jurisdict
             )}
 
             {activeDashboard === 'kyc' && <KycDashboard />}
-            {activeDashboard === 'transactions' && <TransactionMonitoringDashboard jurisdiction={jurisdiction} />} {/* FIX IS HERE: Pass jurisdiction prop */}
-
+            {activeDashboard === 'transactions' && <TransactionMonitoringDashboard jurisdiction={jurisdiction} />}
+            
             {modals.submitEvidence && <SubmitEvidenceModal action={selectedAction} onClose={() => setModals(prev => ({ ...prev, submitEvidence: false }))} onComplete={() => {}} />}
             {modals.analytics && <AnalyticsCenterModal onClose={() => setModals(prev => ({ ...prev, analytics: false }))} />}
             {modals.customize && <CustomizeDashboardModal items={dashboardLayout} onSave={handleSaveLayout} onClose={() => setModals(prev => ({ ...prev, customize: false }))} />}
             {modals.export && <ExportDashboardModal onClose={() => setModals(prev => ({ ...prev, export: false }))} />}
-            {modals.inviteUser && <InviteUserModal onClose={() => setModals(prev => ({ ...prev, inviteUser: true }))} />}
+            {modals.inviteUser && (
+                <InviteUserModal 
+                    roles={mockRoles} // PASSING mockRoles HERE!
+                    onClose={() => setModals(prev => ({ ...prev, inviteUser: false }))} 
+                    // You might also need an onSave handler here if users can be saved from Dashboard
+                    onSave={(newUser) => {
+                        console.log("New user invited from Dashboard:", newUser);
+                        // Implement logic to add user to state or API here
+                        setModals(prev => ({ ...prev, inviteUser: false }));
+                        // Optionally, show a toast message: setToastMessage('User invited successfully!');
+                    }}
+                />
+            )}
         </div>
     );
 };

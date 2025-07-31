@@ -1128,3 +1128,98 @@ export const mockPartners = [
         lastActivity: '2025-06-10'
     },
 ];
+// --- Data for AI Agent Feature ---
+
+export const mockAiActivities = [
+    { id: 'act-ai-1', type: 'Configuration Update', description: 'AI Model Version updated to v2.1.0-beta by Admin.', date: '2025-07-30 14:30', status: 'Completed' },
+    { id: 'act-ai-2', type: 'Data Ingestion', description: 'Processed 5,000 new transaction records for analysis.', date: '2025-07-30 12:00', status: 'Completed' },
+    { id: 'act-ai-3', type: 'Insight Generation', description: 'Generated a new risk pattern insight: "High-value cross-border payments".', date: '2025-07-29 09:15', status: 'Completed' },
+    { id: 'act-ai-4', type: 'Simulation Run', description: 'Simulated "Generate Risk Assessment" scenario.', date: '2025-07-29 08:00', status: 'Completed' },
+    { id: 'act-ai-5', type: 'Model Retraining', description: 'Initiated re-training of AI recommendation engine.', date: '2025-07-28 23:00', status: 'In Progress' },
+    { id: 'act-ai-6', type: 'Smart Contract Monitor', description: 'Detected potential exploit attempt on smart contract: 0xAbCdEf...', date: '2025-07-28 17:00', status: 'Alert' },
+    { id: 'act-ai-7', type: 'System Health Check', description: 'Performed routine self-diagnosis; no issues detected.', date: '2025-07-28 01:00', status: 'Completed' },
+];
+
+export const mockAiInsights = [
+    {
+        id: 'insight-1',
+        type: 'Risk Analysis',
+        title: 'New High-Risk Transaction Pattern Identified',
+        description: 'AI detected a strong correlation between transactions over $10,000 originating from a specific region (Southeast Asia) and newly onboarded customers with basic KYC. Recommends enhanced due diligence for similar future transactions and a retrospective review of impacted accounts.',
+        date: '2025-07-28',
+        status: 'New',
+        priority: 'High',
+        action: 'Review Accounts',
+        linkedEntities: [
+            { type: 'Transaction', id: 'TXN-98765', link: '/data-management?tab=detailedRecords&filter=TXN-98765' },
+            { type: 'Customer Segment', id: 'SEG-NewSEA-BasicKYC', link: '/customers?segment=NewSEA-BasicKYC' }
+        ]
+    },
+    {
+        id: 'insight-2',
+        type: 'Recommendation',
+        title: 'Optimize Regulatory Reporting Workflow for Q3',
+        description: 'Based on historical submission times and regulatory changes, AI suggests re-sequencing the data aggregation and review steps for Q3 regulatory reports to improve efficiency by 15%. This could reduce overtime during peak filing periods.',
+        date: '2025-07-27',
+        status: 'New',
+        priority: 'Medium',
+        action: 'Adjust Workflow',
+        linkedEntities: [
+            { type: 'Workflow', id: 'WF-QTR-AML', link: '/manage?tab=workflows&id=WF-QTR-AML' },
+            { type: 'Report', id: 'REP-Q3-SAR', link: '/compliance-reporting?report=REP-Q3-SAR' }
+        ]
+    },
+    {
+        id: 'insight-3',
+        type: 'Alert',
+        title: 'Potential Compliance Gap in Draft Data Privacy Policy',
+        description: 'AI has identified a clause in the draft data privacy policy that may not fully align with recent updates to the ODPC framework in Kenya, specifically regarding data retention periods. Recommends legal review of Section 4.2.',
+        date: '2025-07-26',
+        status: 'Acknowledged',
+        priority: 'High',
+        action: 'Review Policy',
+        linkedEntities: [
+            { type: 'Policy Document', id: 'DOC-DPP-DRAFT', link: '/library?doc=DOC-DPP-DRAFT' },
+            { type: 'Regulation', id: 'REG-ODPC-KE', link: '/regulatory-updates?reg=ODPC-KE' }
+        ]
+    },
+    {
+        id: 'insight-4',
+        type: 'Digital Asset Alert',
+        title: 'Unusual Inflow to Whitelisted Wallet',
+        description: 'AI detected an unusually large and frequent inflow of funds from a non-whitelisted address into a company-approved digital asset wallet. Recommends immediate review for potential illicit activity or misconfigured systems.',
+        date: '2025-07-25',
+        status: 'New',
+        priority: 'Critical',
+        action: 'Investigate Wallet',
+        linkedEntities: [
+            { type: 'Wallet Address', id: '0x1A2b3C4d...', link: '/data-management?tab=crypto&address=0x1A2b3C4d' }
+        ]
+    },
+    {
+        id: 'insight-5',
+        type: 'Recommendation',
+        title: 'Automate Manual Report Data Collation',
+        description: 'Analysis shows that 30% of time spent on monthly compliance reports is manual data collation. AI suggests automating this via a new ETL process or integration with existing systems.',
+        date: '2025-07-24',
+        status: 'Closed',
+        priority: 'Medium',
+        action: 'Propose Automation',
+        linkedEntities: [
+            { type: 'ETL Process', id: 'ETL-Reporting-Data', link: '/data-management?tab=etl&id=ETL-Reporting-Data' }
+        ]
+    },
+    {
+        id: 'insight-6',
+        type: 'Risk Analysis',
+        title: 'Geographic Risk Exposure Update',
+        description: 'The AI model has updated the risk score for transactions involving Brazil due to recent regulatory changes and increased fraud indicators in the region.',
+        date: '2025-07-23',
+        status: 'New',
+        priority: 'Low',
+        action: 'Review Risk Profile',
+        linkedEntities: [
+            { type: 'Jurisdiction', id: 'Brazil', link: '/risk-assessment?geo=Brazil' }
+        ]
+    },
+];

@@ -1,7 +1,7 @@
 // src/features/manage/modals/CreateEditPartnerModal.jsx
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Share2 } from 'lucide-react';
+import { X, Save, Share2, Send } from 'lucide-react'; // Import Send icon
 
 // Predefined list of data categories that can be shared
 const availableDataCategories = [
@@ -21,6 +21,9 @@ const CreateEditPartnerModal = ({ onClose, onSave, initialData = null }) => {
     const [type, setType] = useState(initialData?.type || partnerTypes[0]);
     const [status, setStatus] = useState(initialData?.status || partnerStatuses[0]);
     const [sharedData, setSharedData] = useState(initialData?.sharedData || []); // Array of selected shared data categories
+
+    // Determine if we are in "edit" or "create" mode
+    const isEditing = initialData?.id;
 
     // Effect to reset form or pre-fill when initialData changes
     useEffect(() => {
@@ -70,7 +73,7 @@ const CreateEditPartnerModal = ({ onClose, onSave, initialData = null }) => {
             <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-lg text-white">
                 <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
                     <h3 className="text-2xl font-bold text-[#c0933e]">
-                        {initialData?.id ? 'Edit Partner' : 'Add New Partner'}
+                        {isEditing ? 'Edit Partner' : 'Add New Partner'}
                     </h3>
                     <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white">
                         <X size={24} />
@@ -133,7 +136,15 @@ const CreateEditPartnerModal = ({ onClose, onSave, initialData = null }) => {
                         Cancel
                     </button>
                     <button type="button" onClick={handleSave} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-blue-500 flex items-center">
-                        <Save size={16} className="mr-2"/> {initialData?.id ? 'Save Changes' : 'Add Partner'}
+                        {isEditing ? (
+                            <>
+                                <Save size={16} className="mr-2"/> Save Changes
+                            </>
+                        ) : (
+                            <>
+                                <Send size={16} className="mr-2"/> Send Invite
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
