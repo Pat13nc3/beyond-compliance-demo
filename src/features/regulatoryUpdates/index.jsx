@@ -1,31 +1,28 @@
+// src/features/regulatoryUpdates/index.jsx
+
 import React, { useState } from 'react';
-import { Newspaper, Filter, Eye, Sparkles, LoaderCircle } from 'lucide-react';
-import AnalysisReviewModal from './modals/AnalysisReviewModal.jsx';
+import { Newspaper, Filter, Eye } from 'lucide-react'; // Removed Sparkles, LoaderCircle
+// REMOVED: AnalysisReviewModal import
 import ViewUpdateModal from './modals/ViewUpdateModal.jsx';
-// --- CORRECTED: Importing the correct variable name and renaming it ---
 import { regulatoryPulseData as mockUpdates } from '../../data/mockData.js';
 
-const RegulatoryUpdates = ({ context, onClearContext, onNavigate }) => {
+// Receive triggerAIAnalysis from App.jsx
+const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnalysis }) => {
     const [updates, setUpdates] = useState(mockUpdates);
     const [updateToView, setUpdateToView] = useState(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-    const [updateToAnalyze, setUpdateToAnalyze] = useState(null);
-    const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
+    // REMOVED: updateToAnalyze and isAnalysisModalOpen states
+    // const [updateToAnalyze, setUpdateToAnalyze] = useState(null);
+    // const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
 
     const handleViewDetails = (update) => {
         setUpdateToView(update);
         setIsViewModalOpen(true);
     };
 
-    const handleStartAnalysis = (update) => {
-        setUpdateToAnalyze(update);
-        setIsAnalysisModalOpen(true);
-    };
-    
-    const handleConfirmAnalysis = (analysisResult) => {
-        console.log('Analysis Confirmed:', analysisResult);
-        setIsAnalysisModalOpen(false);
-    };
+    // REMOVED: handleStartAnalysis and handleConfirmAnalysis handlers
+    // const handleStartAnalysis = (update) => { ... };
+    // const handleConfirmAnalysis = (analysisResult) => { ... };
 
     return (
         <div className="p-6">
@@ -51,7 +48,8 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate }) => {
                                 </div>
                                 <div className="flex space-x-2">
                                     <button onClick={() => handleViewDetails(update)} className="text-blue-600 flex items-center"><Eye size={16} className="mr-1"/> View Details</button>
-                                    <button onClick={() => handleStartAnalysis(update)} className="bg-blue-100 text-blue-700 font-semibold px-3 py-1 rounded-full flex items-center"><Sparkles size={16} className="mr-1"/> Analyze</button>
+                                    {/* REMOVED: The old "Analyze" button */}
+                                    {/* <button onClick={() => handleStartAnalysis(update)} className="bg-blue-100 text-blue-700 font-semibold px-3 py-1 rounded-full flex items-center"><Sparkles size={16} className="mr-1"/> Analyze</button> */}
                                 </div>
                             </div>
                         ))}
@@ -59,8 +57,12 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate }) => {
                 </div>
             </div>
 
-            {isAnalysisModalOpen && <AnalysisReviewModal update={updateToAnalyze} onClose={() => setIsAnalysisModalOpen(false)} onConfirm={handleConfirmAnalysis} />}
-            {isViewModalOpen && <ViewUpdateModal update={updateToView} onClose={() => setIsViewModalOpen(false)} />}
+            {/* REMOVED: AnalysisReviewModal conditional rendering */}
+            {/* {isAnalysisModalOpen && <AnalysisReviewModal update={updateToAnalyze} onClose={() => setIsAnalysisModalOpen(false)} onConfirm={handleConfirmAnalysis} />} */}
+            {isViewModalOpen && (
+                // Pass triggerAIAnalysis to ViewUpdateModal
+                <ViewUpdateModal update={updateToView} onClose={() => setIsViewModalOpen(false)} triggerAIAnalysis={triggerAIAnalysis} />
+            )}
         </div>
     );
 };

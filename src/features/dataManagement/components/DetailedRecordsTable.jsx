@@ -10,6 +10,7 @@ import {
     Filter,
     ArrowUp,
     ArrowDown,
+    Lightbulb // Import Lightbulb icon for AI Assist button
 } from 'lucide-react';
 
 /**
@@ -22,19 +23,17 @@ import {
  */
 const generateDummyData = () => {
     const data = [];
-    // UPDATED: Added new types for AML
     const types = ['KYC', 'User', 'Payment', 'AML Alert', 'Sanctions Check'];
     const kycStatuses = ['Approved', 'Pending', 'Rejected'];
-    // UPDATED: Added new sources for KYC and AML
     const paymentSources = ['Stripe', 'Visa', 'Mastercard'];
     const userActions = ['Login', 'Logout', 'Profile Update', 'Password Reset'];
     const internalSources = ['Internal', 'Manual'];
-    const kycVerificationSources = ['SmileID', 'Onfido', 'Internal']; // New KYC sources
-    const amlSources = ['TransactionMonitor', 'WatchlistScreen']; // New AML sources
+    const kycVerificationSources = ['SmileID', 'Onfido', 'Internal'];
+    const amlSources = ['TransactionMonitor', 'WatchlistScreen'];
 
-    for (let i = 0; i < 300; i++) { // Generate more data for better testing
+    for (let i = 0; i < 300; i++) {
         const type = types[Math.floor(Math.random() * types.length)];
-        const date = new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)); // Up to 1 year old
+        const date = new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000));
         let description = '';
         let value = '';
         let status = '';
@@ -44,7 +43,7 @@ const generateDummyData = () => {
         if (type === 'KYC') {
             const customerId = `CUST-${Math.floor(1000 + Math.random() * 9000)}`;
             status = kycStatuses[Math.floor(Math.random() * kycStatuses.length)];
-            source = kycVerificationSources[Math.floor(Math.random() * kycVerificationSources.length)]; // Use new KYC sources
+            source = kycVerificationSources[Math.floor(Math.random() * kycVerificationSources.length)];
             description = `KYC check for ${customerId}`;
             value = 'N/A';
             details = {
@@ -54,7 +53,7 @@ const generateDummyData = () => {
                 submissionDate: new Date(date.getTime() - Math.floor(Math.random() * 86400000)).toLocaleDateString(),
                 reviewer: `Reviewer ${Math.floor(Math.random() * 10)}`,
                 riskScore: (Math.random() * 100).toFixed(2),
-                verificationProvider: source, // Link source to details
+                verificationProvider: source,
             };
         } else if (type === 'User') {
             const userId = `USER-${Math.floor(100 + Math.random() * 900)}`;
@@ -85,13 +84,13 @@ const generateDummyData = () => {
                 fee: (amount * 0.01).toFixed(2),
                 customerEmail: `customer${i}@example.com`,
             };
-        } else if (type === 'AML Alert') { // NEW AML Alert Type
+        } else if (type === 'AML Alert') {
             const alertTypes = ['High-Value Transfer', 'Unusual Activity Pattern', 'Sanctioned Entity Interaction Attempt'];
             const alertReason = alertTypes[Math.floor(Math.random() * alertTypes.length)];
             description = `AML Alert: ${alertReason}`;
-            value = (Math.random() * 50000 + 10000).toFixed(2); // High value
+            value = (Math.random() * 50000 + 10000).toFixed(2);
             status = Math.random() > 0.3 ? 'Flagged' : 'Under Review';
-            source = 'TransactionMonitor'; // Specific AML source
+            source = 'TransactionMonitor';
             details = {
                 alertId: `AML-${Math.floor(1000 + Math.random() * 9000)}`,
                 alertReason: alertReason,
@@ -100,12 +99,12 @@ const generateDummyData = () => {
                 statusHistory: [{ date: new Date().toLocaleDateString(), event: status }],
                 assignedTo: Math.random() > 0.5 ? 'AML Team' : 'Compliance Officer',
             };
-        } else if (type === 'Sanctions Check') { // NEW Sanctions Check Type
+        } else if (type === 'Sanctions Check') {
             const matchStatuses = ['No Match', 'Potential Match', 'Confirmed Hit'];
-            status = matchStatuses[Math.floor(Math.random() * matchStatuses.length)];
+            status = matchStatuses[Math.floor(Math.random() * Math.random() * matchStatuses.length)];
             description = `Sanctions Screening Result`;
             value = 'N/A';
-            source = 'WatchlistScreen'; // Specific AML source
+            source = 'WatchlistScreen';
             details = {
                 screeningId: `SNC-${Math.floor(1000 + Math.random() * 9000)}`,
                 entityName: `Entity ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`,
@@ -115,9 +114,6 @@ const generateDummyData = () => {
             };
         }
         
-        // Console log for debugging data generation
-        // console.log(`Generated record: Type: ${type}, Source: ${source}, Status: ${status}`);
-
         data.push({
             id: i,
             date: date,
@@ -135,70 +131,52 @@ const generateDummyData = () => {
 /**
  * DetailedRecordsTable Component
  *
- * This component displays a detailed log of various data records (KYC, Users, Payments)
- * with filtering capabilities by data type, source, and time aggregation.
- * It also supports drill-down to individual record details via a modal.
- *
  * Props:
  * - initialFilters: An optional object to set initial filter states when the component mounts.
- * e.g., { type: 'KYC', source: 'Internal', period: 'Month' }
+ * - triggerAIAnalysis: Function passed from App.jsx to trigger AI analysis
  */
-const DetailedRecordsTable = ({ initialFilters = {} }) => {
+const DetailedRecordsTable = ({ initialFilters = {}, triggerAIAnalysis }) => {
     const [allData, setAllData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
-    // Initialize states with initialFilters directly
     const [currentDataTypeFilter, setCurrentDataTypeFilter] = useState(initialFilters.type || 'All');
     const [currentSourceFilter, setCurrentSourceFilter] = useState(initialFilters.source || 'All');
     const [currentTimeFilter, setCurrentTimeFilter] = useState(initialFilters.period || 'All');
-    const [selectedRecord, setSelectedRecord] = useState(null); // State for drill-down modal
-    const [searchTerm, setSearchTerm] = useState(''); // State for search functionality
-    const [sortBy, setSortBy] = useState('date'); // State for sorting
-    const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
+    const [selectedRecord, setSelectedRecord] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState('date');
+    const [sortOrder, setSortOrder] = useState('desc');
 
-    // Load dummy data on component mount
+    // Define filter options for dropdowns
+    const dataTypeOptions = ['All', 'KYC', 'User', 'Payment', 'AML Alert', 'Sanctions Check'];
+    const sourceOptions = ['All', 'Stripe', 'Visa', 'Mastercard', 'Internal', 'Manual', 'SmileID', 'Onfido', 'TransactionMonitor', 'WatchlistScreen'];
+
+
     useEffect(() => {
         setAllData(generateDummyData());
     }, []);
 
-    // NEW: useEffect to update internal filter states when initialFilters prop changes
     useEffect(() => {
         setCurrentDataTypeFilter(initialFilters.type || 'All');
         setCurrentSourceFilter(initialFilters.source || 'All');
         setCurrentTimeFilter(initialFilters.period || 'All');
-        setSearchTerm(initialFilters.searchTerm || ''); // Also update search term if part of filters
-        // Trigger filter application after states are updated
-        // The dependency array of the applyFiltersAndSort useEffect will handle the re-filter
-    }, [initialFilters]); // Rerun this effect when initialFilters prop changes
+        setSearchTerm(initialFilters.searchTerm || '');
+    }, [initialFilters]);
 
-    // Apply filters whenever filter states or allData changes
     useEffect(() => {
         applyFiltersAndSort();
     }, [allData, currentDataTypeFilter, currentSourceFilter, currentTimeFilter, searchTerm, sortBy, sortOrder]);
 
-    /**
-     * Applies all active filters and sorting to the data.
-     */
     const applyFiltersAndSort = () => {
         let tempFiltered = [...allData];
 
-        // Console log for debugging filters
-        // console.log(`Applying filters: Type='${currentDataTypeFilter}', Source='${currentSourceFilter}', Time='${currentTimeFilter}', Search='${searchTerm}'`);
-
-        // 1. Filter by Data Type
         if (currentDataTypeFilter !== 'All') {
             tempFiltered = tempFiltered.filter(record => record.type === currentDataTypeFilter);
         }
-        // console.log(`After Type filter (${currentDataTypeFilter}): ${tempFiltered.length} records`);
 
-
-        // 2. Filter by Source
         if (currentSourceFilter !== 'All') {
             tempFiltered = tempFiltered.filter(record => record.source === currentSourceFilter);
         }
-        // console.log(`After Source filter (${currentSourceFilter}): ${tempFiltered.length} records`);
 
-
-        // 3. Filter by Time Aggregation
         const now = new Date();
         if (currentTimeFilter === 'Year') {
             const oneYearAgo = new Date(now.setFullYear(now.getFullYear() - 1));
@@ -210,10 +188,7 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
             const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
             tempFiltered = tempFiltered.filter(record => record.date >= oneWeekAgo);
         }
-        // console.log(`After Time filter (${currentTimeFilter}): ${tempFiltered.length} records`);
 
-
-        // 4. Apply Search Term
         if (searchTerm) {
             const lowerCaseSearchTerm = searchTerm.toLowerCase();
             tempFiltered = tempFiltered.filter(record =>
@@ -224,10 +199,7 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                 )
             );
         }
-        // console.log(`After Search filter: ${tempFiltered.length} records`);
 
-
-        // 5. Apply Sorting
         tempFiltered.sort((a, b) => {
             let valA, valB;
             if (sortBy === 'date') {
@@ -247,27 +219,17 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
         });
 
         setFilteredData(tempFiltered);
-        // console.log(`Final filtered data count: ${tempFiltered.length}`);
     };
 
-    /**
-     * Handles sorting when a table header is clicked.
-     * @param {string} column - The column to sort by.
-     */
     const handleSort = (column) => {
         if (sortBy === column) {
             setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
         } else {
             setSortBy(column);
-            setSortOrder('asc'); // Default to ascending when changing column
+            setSortOrder('asc');
         }
     };
 
-    /**
-     * Renders the sort icon next to the column header.
-     * @param {string} column - The column identifier.
-     * @returns {JSX.Element|null} The sort icon.
-     */
     const renderSortIcon = (column) => {
         if (sortBy === column) {
             return sortOrder === 'asc' ? <ArrowUp size={14} className="ml-1" /> : <ArrowDown size={14} className="ml-1" />;
@@ -275,10 +237,26 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
         return null;
     };
 
-    const filterButtonClass = (isActive) =>
-        isActive
-            ? 'px-6 py-3 bg-[#c0933e] text-[#1e252d] rounded-full shadow-lg font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e] transition duration-300'
-            : 'px-6 py-3 bg-gray-700 text-white rounded-full shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 transition duration-300';
+    const handleAnalyzeWithAI = () => {
+        if (triggerAIAnalysis) {
+            triggerAIAnalysis({
+                dataType: currentDataTypeFilter,
+                source: currentSourceFilter,
+                timePeriod: currentTimeFilter,
+                searchTerm: searchTerm,
+                recordCount: filteredData.length,
+                sampleData: filteredData.slice(0, Math.min(filteredData.length, 5)).map(rec => ({
+                    id: rec.id,
+                    type: rec.type,
+                    description: rec.description,
+                    status: rec.status,
+                    value: rec.value
+                }))
+            }, 'DataAnalysis');
+        } else {
+            console.error("triggerAIAnalysis prop is undefined in DetailedRecordsTable.");
+        }
+    };
 
     return (
         <div className="p-6 bg-gray-900 min-h-screen text-white">
@@ -289,141 +267,50 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                 <div className="mb-8 p-6 bg-gray-800 rounded-lg shadow-inner border border-gray-700">
                     <div className="flex flex-col md:flex-row justify-between items-center mb-6">
                         <h2 className="text-2xl font-semibold text-gray-200 mb-4 md:mb-0">Data Filters</h2>
-                        <div className="flex flex-wrap gap-4">
-                            {/* Data Type Filters - UPDATED */}
-                            <button
-                                onClick={() => setCurrentDataTypeFilter('All')}
-                                className={filterButtonClass(currentDataTypeFilter === 'All')}
+                        {/* CHANGED: Data Type Filter to Dropdown */}
+                        <div className="relative flex items-center"> {/* Added flex and items-center for icon alignment */}
+                            <select
+                                value={currentDataTypeFilter}
+                                onChange={(e) => setCurrentDataTypeFilter(e.target.value)}
+                                className="appearance-none bg-gray-700 text-white border border-gray-600 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                             >
-                                All Data
-                            </button>
-                            <button
-                                onClick={() => setCurrentDataTypeFilter('KYC')}
-                                className={filterButtonClass(currentDataTypeFilter === 'KYC')}
-                            >
-                                KYC Records
-                            </button>
-                            <button
-                                onClick={() => setCurrentDataTypeFilter('User')}
-                                className={filterButtonClass(currentDataTypeFilter === 'User')}
-                            >
-                                Internal Users
-                            </button>
-                            <button
-                                onClick={() => setCurrentDataTypeFilter('Payment')}
-                                className={filterButtonClass(currentDataTypeFilter === 'Payment')}
-                            >
-                                Payments
-                            </button>
-                            <button
-                                onClick={() => setCurrentDataTypeFilter('AML Alert')}
-                                className={filterButtonClass(currentDataTypeFilter === 'AML Alert')}
-                            >
-                                AML Alerts
-                            </button>
-                            <button
-                                onClick={() => setCurrentDataTypeFilter('Sanctions Check')}
-                                className={filterButtonClass(currentDataTypeFilter === 'Sanctions Check')}
-                            >
-                                Sanctions Checks
-                            </button>
+                                {dataTypeOptions.map(option => (
+                                    <option key={option} value={option}>{option === 'All' ? 'All Data Types' : option}</option>
+                                ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.096 6.924 4.682 8.338z"/></svg>
+                            </div>
                         </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-between items-center mb-6">
                         <h3 className="text-xl font-medium text-gray-300 mb-4 md:mb-0">Source Filters</h3>
-                        <div className="flex flex-wrap gap-4">
-                            {/* Source Filters - UPDATED */}
-                            <button
-                                onClick={() => setCurrentSourceFilter('All')}
-                                className={filterButtonClass(currentSourceFilter === 'All')}
+                        {/* CHANGED: Source Filter to Dropdown */}
+                        <div className="relative flex items-center"> {/* Added flex and items-center for icon alignment */}
+                            <select
+                                value={currentSourceFilter}
+                                onChange={(e) => setCurrentSourceFilter(e.target.value)}
+                                className="appearance-none bg-gray-700 text-white border border-gray-600 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                             >
-                                All Sources
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('Stripe')}
-                                className={filterButtonClass(currentSourceFilter === 'Stripe')}
-                            >
-                                Stripe
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('Visa')}
-                                className={filterButtonClass(currentSourceFilter === 'Visa')}
-                            >
-                                Visa
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('Mastercard')}
-                                className={filterButtonClass(currentSourceFilter === 'Mastercard')}
-                            >
-                                Mastercard
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('Internal')}
-                                className={filterButtonClass(currentSourceFilter === 'Internal')}
-                            >
-                                Internal
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('Manual')}
-                                className={filterButtonClass(currentSourceFilter === 'Manual')}
-                            >
-                                Manual
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('SmileID')}
-                                className={filterButtonClass(currentSourceFilter === 'SmileID')}
-                            >
-                                SmileID
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('Onfido')}
-                                className={filterButtonClass(currentSourceFilter === 'Onfido')}
-                            >
-                                Onfido
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('TransactionMonitor')}
-                                className={filterButtonClass(currentSourceFilter === 'TransactionMonitor')}
-                            >
-                                Transaction Monitor
-                            </button>
-                            <button
-                                onClick={() => setCurrentSourceFilter('WatchlistScreen')}
-                                className={filterButtonClass(currentSourceFilter === 'WatchlistScreen')}
-                            >
-                                Watchlist Screen
-                            </button>
+                                {sourceOptions.map(option => (
+                                    <option key={option} value={option}>{option === 'All' ? 'All Sources' : option}</option>
+                                ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.096 6.924 4.682 8.338z"/></svg>
+                            </div>
                         </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <h3 className="text-xl font-medium text-gray-300 mb-4 md:mb-0">Time Aggregation</h3>
+                        {/* KEPT: Time Aggregation as buttons */}
                         <div className="flex flex-wrap gap-4">
-                            <button
-                                onClick={() => setCurrentTimeFilter('All')}
-                                className={filterButtonClass(currentTimeFilter === 'All')}
-                            >
-                                All Time
-                            </button>
-                            <button
-                                onClick={() => setCurrentTimeFilter('Year')}
-                                className={filterButtonClass(currentTimeFilter === 'Year')}
-                            >
-                                Last Year
-                            </button>
-                            <button
-                                onClick={() => setCurrentTimeFilter('Month')}
-                                className={filterButtonClass(currentTimeFilter === 'Month')}
-                            >
-                                Last Month
-                            </button>
-                            <button
-                                onClick={() => setCurrentTimeFilter('Week')}
-                                className={filterButtonClass(currentTimeFilter === 'Week')}
-                                >
-                                Last Week
-                            </button>
+                            <button onClick={() => setCurrentTimeFilter('All')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'All' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>All Time</button>
+                            <button onClick={() => setCurrentTimeFilter('Year')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'Year' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>Last Year</button>
+                            <button onClick={() => setCurrentTimeFilter('Month')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'Month' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>Last Month</button>
+                            <button onClick={() => setCurrentTimeFilter('Week')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'Week' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>Last Week</button>
                         </div>
                     </div>
                     <div className="mt-6">
@@ -447,10 +334,21 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
 
                 {/* Data Display Section */}
                 <div className="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
-                    <h2 className="text-3xl font-bold text-gray-100 mb-6">
-                        {currentDataTypeFilter !== 'All' ? currentDataTypeFilter + ' ' : 'All '}Data Records
-                        <span className="text-gray-400 text-lg ml-2">({filteredData.length} records)</span>
-                    </h2>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-3xl font-bold text-gray-100">
+                            {currentDataTypeFilter !== 'All' ? currentDataTypeFilter + ' ' : 'All '}Data Records
+                            <span className="text-gray-400 text-lg ml-2">({filteredData.length} records)</span>
+                        </h2>
+                        {/* Analyze with AI Button */}
+                        <button
+                            onClick={handleAnalyzeWithAI}
+                            disabled={filteredData.length === 0} // Disable if no data to analyze
+                            // Removed temporary diagnostic style, assuming it will render correctly now
+                            className="bg-purple-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-purple-500 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Lightbulb size={16} className="mr-2"/> Analyze with AI
+                        </button>
+                    </div>
                     <div className="overflow-x-auto rounded-lg shadow-md border border-gray-700">
                         <table className="min-w-full divide-y divide-gray-700">
                             <thead className="bg-gray-700">
@@ -488,10 +386,8 @@ const DetailedRecordsTable = ({ initialFilters = {} }) => {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{record.value}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                    // Updated status coloring logic
                                                     record.status === 'Approved' || record.status === 'Success' || record.status === 'No Match' ? 'bg-green-900 text-green-300' :
                                                     record.status === 'Pending' || record.status === 'Under Review' || record.status === 'Potential Match' ? 'bg-yellow-900 text-yellow-300' :
-                                                    // This will catch 'Rejected', 'Failed', 'Flagged', 'Confirmed Hit', and any other unhandled statuses as red
                                                     'bg-red-900 text-red-300'
                                                 }`}>
                                                     {record.status}

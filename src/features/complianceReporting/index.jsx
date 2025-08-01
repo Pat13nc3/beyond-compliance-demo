@@ -1,8 +1,17 @@
 // src/features/complianceReporting/index.jsx
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { LayoutGrid, CalendarDays, Sparkles, CheckCircle } from 'lucide-react'; // Removed Upload, FilePlus2 as they are not needed for top buttons
-import { mockReports, reportingEvents, monthlySubmissionsData } from '../../data/mockData';
+import { LayoutGrid, CalendarDays, Sparkles, CheckCircle } from 'lucide-react';
+// Import mock data needed for dynamic content
+import {
+    mockReports,
+    reportingEvents,
+    monthlySubmissionsData,
+    mockTransactionData,
+    mockUserAccessData,
+    userAccessValidationRule,
+    mockTemplates
+} from '../../data/mockData';
 
 // Component Imports
 import ReportingOverview from './components/ReportingOverview';
@@ -17,7 +26,7 @@ import ReportDraftModal from './modals/ReportDraftModal';
 import FilingModal from './modals/FilingModal';
 import ActionChoiceModal from './modals/ActionChoiceModal';
 
-const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext }) => {
+const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext, triggerAIAnalysis }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [reports, setReports] = useState(mockReports);
   const [activeModal, setActiveModal] = useState(null);
@@ -67,7 +76,7 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
     if (!jurisdiction || jurisdiction === 'Global') {
       return reportingEvents;
     }
-    return reportingEvents.filter(event => event.jurisdiction === jurisdiction);
+    return reportingEvents.filter(event => event.jurisdiction === filteredEvents);
   }, [jurisdiction]);
 
   const dynamicReportStatusData = useMemo(() => {
@@ -94,17 +103,143 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
     }
   }, [toastMessage]);
 
+  const simulateFileContentExtraction = (fileName) => {
+    let template;
+    if (fileName.includes('SAR')) {
+        template = mockTemplates.find(t => t.type === 'SAR');
+    } else if (fileName.includes('CTR')) {
+        template = mockTemplates.find(t => t.type === 'CTR');
+    } else if (fileName.includes('ACR') || fileName.includes('Annual Compliance')) {
+        template = mockTemplates.find(t => t.type === 'Annual Review');
+    }
+  
+    if (template) {
+        let content = template.content;
+        // Replace placeholders with generic info to simulate data extraction
+        content = content.replace(/\[CurrentDate\]/g, new Date().toLocaleDateString());
+        content = content.replace(/\[CurrentYear\]/g, new Date().getFullYear());
+        content = content.replace(/\[ReportID\]/g, 'UPLOAD-' + Date.now());
+        content = content.replace(/\[AI-Identified Suspect Name\]/g, '[Name from AI]');
+        content = content.replace(/\[AI-Identified Account\]/g, '[Account from AI]');
+        content = content.replace(/\[AI-Identified Nationality\]/g, '[Nationality from AI]');
+        content = content.replace(/\[AI-Identified Transaction Timestamp\]/g, '[Transaction Timestamp from AI]');
+        content = content.replace(/\[AI-Identified Transaction Amount\]/g, '[Transaction Amount from AI]');
+        content = content.replace(/\[AI-Identified Transaction Currency\]/g, '[Transaction Currency from AI]');
+        content = content.replace(/\[AI-Identified Transaction Type\]/g, '[Transaction Type from AI]');
+        content = content.replace(/\[AI-Summarized Transaction Purpose\]/g, '[Summarized Transaction Purpose from AI]');
+        content = content.replace(/\[AI-Assessed Status\]/g, '[Status from AI]');
+        content = content.replace(/\[AI-Assessed Registration Comments\]/g, 'Registration comments from AI');
+        content = content.replace(/\[AI-Assessed Risk Assessment Comments\]/g, 'Risk assessment comments from AI');
+        content = content.replace(/\[AI-Assessed Internal Control Comments\]/g, 'Internal control comments from AI');
+        content = content.replace(/\[AI-Assessed CDD Comments\]/g, 'Customer Due Diligence comments from AI');
+        content = content.replace(/\[AI-Assessed Suspicious Activity Comments\]/g, 'Suspicious Activity comments from AI');
+        content = content.replace(/\[AI-Assessed Record Keeping Comments\]/g, 'Record Keeping comments from AI');
+        content = content.replace('[describe specific behavior, e.g., "multiple incoming small deposits followed by a large outbound transfer to a jurisdiction known for illicit finance"]', 'AI-generated narrative based on file content.');
+        return { content, type: template.type };
+    }
+  
+    // Fallback for unrecognized files
+    return { content: `This is simulated content for the uploaded file: "${fileName}".\n\nThe AI has extracted key details and is ready for you to review and create a draft.`, type: 'Uploaded' };
+  };
+
   const handleProcessReport = (newReportData) => {
+    let generatedContent = '';
+    let reportType = newReportData.template?.type || 'Uploaded';
+    let linkedDataDescription = `Data used for ${newReportData.name} (simulated)`;
+    let linkedDataFilters = { type: 'All', period: 'Month' }; // Default filters
+
+    // Handle reports generated from a template
+    if (newReportData.template) {
+        generatedContent = newReportData.template.content || "No content available for this draft.";
+        // Simulate dynamic content generation based on report type
+        switch (newReportData.template.type) {
+            case 'SAR':
+                const sarTransaction = mockTransactionData.rows.find(row => row.amlFlag === true);
+                if (sarTransaction) {
+                    generatedContent = generatedContent
+                        .replace(/\[AI-Identified Suspect Name\]/g, `Customer ${sarTransaction.senderAccount}`)
+                        .replace(/\[AI-Identified Account\]/g, sarTransaction.senderAccount)
+                        .replace(/\[AI-Identified Nationality\]/g, sarTransaction.senderCountry)
+                        .replace(/\[AI-Identified Transaction Timestamp\]/g, sarTransaction.timestamp)
+                        .replace(/\[AI-Identified Transaction Amount\]/g, sarTransaction.amount)
+                        .replace(/\[AI-Identified Transaction Currency\]/g, sarTransaction.currency)
+                        .replace(/\[AI-Identified Transaction Type\]/g, sarTransaction.transactionType)
+                        .replace(/\[AI-Summarized Transaction Purpose\]/g, `Transfer of ${sarTransaction.amount} ${sarTransaction.currency} to ${sarTransaction.receiverCountry}`)
+                        .replace(/\[AI-Assessed Reason for Suspicion\]/g, 'Unusual transfer to flagged jurisdiction.')
+                        .replace(/\[AI-Generated Narrative\]/g, `a single high-value transfer of ${sarTransaction.amount} ${sarTransaction.currency} from ${sarTransaction.senderCountry} to ${sarTransaction.receiverCountry}, which is a flagged jurisdiction.`);
+                    linkedDataDescription = `Relevant data includes high-risk transaction ${sarTransaction.transaction_id}`;
+                    linkedDataFilters = { type: 'Transaction', id: sarTransaction.transaction_id };
+                }
+                break;
+            case 'CTR':
+                const ctrTransaction = mockTransactionData.rows.find(row => parseFloat(row.amount) > 10000 && row.transactionType === 'Deposit');
+                if (ctrTransaction) {
+                    generatedContent = generatedContent
+                        .replace(/\[AI-Identified Transaction Date\]/g, ctrTransaction.timestamp.split('T')[0])
+                        .replace(/\[AI-Identified Transaction Amount\]/g, ctrTransaction.amount)
+                        .replace(/\[AI-Identified Transaction Currency\]/g, ctrTransaction.currency)
+                        .replace(/\[AI-Identified Transaction Type\]/g, ctrTransaction.transactionType === 'Deposit' ? 'Cash Deposit' : 'Cash Withdrawal')
+                        .replace(/\[AI-Identified Branch\/Location\]/g, 'Main Branch, Lagos') // Simulated
+                        .replace(/\[AI-Identified Customer Name\]/g, 'John Doe') // Simulated
+                        .replace(/\[AI-Identified Customer Account\]/g, 'ACC12345') // Simulated
+                        .replace(/\[AI-Identified ID Type & Number\]/g, 'NIN: 1234567890') // Simulated
+                        .replace(/\[AI-Summarized Purpose of Transaction\]/g, 'Capital Injection for Business') // Simulated
+                        .replace(/\[AI-Identified Source of Funds\]/g, 'Personal Savings') // Simulated
+                        .replace(/\[AI-Identified Destination of Funds\]/g, 'Company Operating Account'); // Simulated
+                    linkedDataDescription = `Relevant data includes high-value transaction ${ctrTransaction.transaction_id}`;
+                    linkedDataFilters = { type: 'Transaction', id: ctrTransaction.transaction_id };
+                }
+                break;
+            case 'Annual Review':
+                const userAccessIssues = mockUserAccessData.rows.filter(row => {
+                    const validationResult = userAccessValidationRule.rules.some(rule => {
+                        const value = row[mockUserAccessData.headers.indexOf(rule.field)];
+                        return !rule.check(value, row);
+                    });
+                    return validationResult;
+                }).length;
+                const complianceStatus = userAccessIssues === 0 ? 'Complied' : 'Did Not Comply';
+                const comment = userAccessIssues > 0
+                  ? `Internal control measures for user access show ${userAccessIssues} potential issues, requiring further review to ensure full compliance with internal policies.`
+                  : `Internal control measures, including AML/CFT compliance arrangements, employee screening, ongoing training programs, and independent audit functions, are actively implemented. A manual of compliance procedures is maintained.`;
+
+                generatedContent = newReportData.template.content
+                  .replace(/\[AI-Assessed Status\]/g, complianceStatus)
+                  .replace(/\[AI-Assessed Internal Control Comments\]/g, comment);
+                  
+                generatedContent = generatedContent
+                  .replace(/\[AI-Assessed Registration Comments\]/g, 'Registration comments from AI')
+                  .replace(/\[AI-Assessed Risk Assessment Comments\]/g, 'Risk assessment comments from AI')
+                  .replace(/\[AI-Assessed CDD Comments\]/g, 'Customer Due Diligence comments from AI')
+                  .replace(/\[AI-Assessed Suspicious Activity Comments\]/g, 'Suspicious Activity comments from AI')
+                  .replace(/\[AI-Assessed Record Keeping Comments\]/g, 'Record Keeping comments from AI');
+                
+                linkedDataDescription = `Compliance status derived from user access data analysis.`;
+                linkedDataFilters = { type: 'User Access', status: 'Flagged' };
+                break;
+            default:
+                break;
+        }
+    } else if (newReportData.file) {
+        // Handle reports uploaded from a file
+        const fileExtractionResult = simulateFileContentExtraction(newReportData.file.name);
+        generatedContent = fileExtractionResult.content;
+        reportType = fileExtractionResult.type;
+        linkedDataDescription = `AI-extracted content from uploaded file "${newReportData.file.name}"`;
+        linkedDataFilters = { type: 'File', name: newReportData.file.name };
+    }
+
+
     const newReport = {
       id: `rep-${Date.now()}`,
       name: newReportData.name,
       status: 'Draft',
-      type: newReportData.template?.type || 'Uploaded',
+      type: reportType,
       regulator: newReportData.regulator,
       jurisdiction: jurisdiction === 'Global' ? 'Global' : jurisdiction,
-      content: `This is an AI-generated draft for "${newReportData.name}". Please review and edit.`,
-      linkedDataDescription: `Data used for ${newReportData.name} (simulated)`,
-      linkedDataFilters: { type: 'All', period: 'Month' }
+      content: generatedContent, // Use dynamically generated content
+      linkedDataDescription: linkedDataDescription,
+      linkedDataFilters: linkedDataFilters
     };
     setReports(prevReports => [newReport, ...prevReports]);
     setSelectedReport(newReport);
@@ -211,13 +346,6 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
           <h1 className="text-3xl font-bold text-gray-800">Compliance Reporting</h1>
           <p className="text-gray-500">Manage, generate, and file all your regulatory reports.</p>
         </div>
-        {/* REMOVED: Top-level Generate Report and Upload Existing buttons */}
-        {/*
-        <div className="flex space-x-2">
-          <button onClick={() => setActiveModal('upload')} className="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 flex items-center text-sm"><Upload size={16} className="mr-2"/> Upload Existing</button>
-          <button onClick={() => setActiveModal('generate')} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-500 flex items-center text-sm"><FilePlus2 size={16} className="mr-2"/> Generate Report</button>
-        </div>
-        */}
       </div>
 
       <div className="border-b border-gray-200">
@@ -232,9 +360,9 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
         {renderContent()}
       </div>
 
-      {activeModal === 'generate' && <GenerateReportModal onClose={() => setActiveModal(null)} onProcessReport={handleProcessReport} />}
+      {activeModal === 'generate' && <GenerateReportModal onClose={() => setActiveModal(null)} onProcessReport={handleProcessReport} triggerAIAnalysis={triggerAIAnalysis} />}
       {activeModal === 'upload' && <UploadExistingReportModal onClose={() => setActiveModal(null)} onProcessReport={handleProcessReport} />}
-      {activeModal === 'draft' && <ReportDraftModal report={selectedReport} onClose={() => setActiveModal(null)} onReadyForSubmission={handleReadyForSubmission} />}
+      {activeModal === 'draft' && <ReportDraftModal report={selectedReport} onClose={() => setActiveModal(null)} onReadyForSubmission={handleReadyForSubmission} triggerAIAnalysis={triggerAIAnalysis} />}
       {activeModal === 'filing' && <FilingModal report={selectedReport} onClose={() => setActiveModal(null)} onFile={handleFileReport} />}
       {activeModal === 'actionChoice' && <ActionChoiceModal event={selectedEvent} onClose={() => setActiveModal(null)} onChoice={handleActionChoice} />}
 

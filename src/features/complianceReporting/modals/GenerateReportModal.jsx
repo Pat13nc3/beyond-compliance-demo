@@ -1,10 +1,11 @@
 // src/features/complianceReporting/modals/GenerateReportModal.jsx
 
 import React, { useState, useEffect } from 'react';
-import { X, FileText, Sparkles, Info, LoaderCircle } from 'lucide-react';
+import { X, FileText, Sparkles, Info, LoaderCircle, Lightbulb } from 'lucide-react'; // Import Lightbulb icon for AI Assist
 import { mockTemplates } from '../../../data/mockData';
 
-const GenerateReportModal = ({ onClose, onProcessReport }) => {
+// Add triggerAIAnalysis to props
+const GenerateReportModal = ({ onClose, onProcessReport, triggerAIAnalysis }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [reportName, setReportName] = useState('');
   const [regulator, setRegulator] = useState('');
@@ -41,6 +42,19 @@ const GenerateReportModal = ({ onClose, onProcessReport }) => {
       regulator: regulator,
       status: 'Draft',
     });
+  };
+
+  // Handler for the new AI Assist button
+  const handleAIAssistClick = () => {
+    if (triggerAIAnalysis) {
+      triggerAIAnalysis({
+        reportName: reportName || 'Untitled Report',
+        templateId: selectedTemplate?.id,
+        templateName: selectedTemplate?.name,
+        regulator: regulator,
+        status: 'Drafting',
+      }, 'ReportDraft'); // analysisType: ReportDraft
+    }
   };
 
   const isFormInvalid = !selectedTemplate || !reportName || !regulator;
@@ -89,11 +103,11 @@ const GenerateReportModal = ({ onClose, onProcessReport }) => {
                 <LoaderCircle className="w-10 h-10 mb-3 text-blue-500 animate-spin" />
                 <p className="text-sm text-gray-600 font-semibold">AI is preparing your draft...</p>
             </div>
-          ) : isProcessed && (
+          ) : selectedTemplate && ( // Only show form if a template is selected (and processed, implied by isProcessing=false)
             <div className="space-y-4 animate-fade-in">
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
-                    <p className="text-sm text-blue-700">
-                        The AI has prepared the following draft. Please verify and confirm.
+                    <p className="text-sm text-blue-700 flex items-center">
+                        <Info size={16} className="mr-2"/> The AI has prepared the following draft. Please verify and confirm.
                     </p>
                 </div>
                 <div>
@@ -114,11 +128,22 @@ const GenerateReportModal = ({ onClose, onProcessReport }) => {
                         onChange={(e) => setRegulator(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                     >
+                        <option value="">Select Regulator</option> {/* Added a default empty option */}
                         <option value="CBN">Central Bank of Nigeria (CBN)</option>
                         <option value="CMA">Capital Markets Authority (CMA)</option>
                         <option value="NDIC">Nigeria Deposit Insurance Corporation (NDIC)</option>
                         <option value="SARB">South African Reserve Bank (SARB)</option>
                     </select>
+                </div>
+                 {/* NEW: AI Assist Button */}
+                <div className="text-right">
+                    <button
+                        onClick={handleAIAssistClick}
+                        disabled={isProcessing || !selectedTemplate || !reportName || !regulator} // Disable if not ready for analysis
+                        className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-500 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center ml-auto text-sm"
+                    >
+                        <Lightbulb size={16} className="mr-2"/> Get AI Insights
+                    </button>
                 </div>
             </div>
           )}

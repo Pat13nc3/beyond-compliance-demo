@@ -24,10 +24,72 @@ export const initialPriorityActions = [
     { id: 'act3', type: 'ACTION', urgency: 'MEDIUM', title: 'VASP License Renewal', details: 'Kenya - CMA license expires in 60 days', cta: 'Start Renewal', jurisdiction: 'Kenya' },
     { id: 'act4', type: 'DEADLINE', urgency: 'URGENT', title: 'SAR Filing', details: 'Due in 5 days', cta: 'Prepare Report', jurisdiction: 'Ghana' },
 ];
+
+// UPDATED: regulatoryPulseData with fullText property
 export const regulatoryPulseData = [
-    { id: 'reg1', type: 'UPDATE', title: 'New CBN Guidelines for PSPs', source: 'CBN', date: '2025-06-20', jurisdiction: 'Nigeria' },
-    { id: 'reg2', type: 'ANALYSIS', title: 'Impact of ODPC Framework Update', source: 'Internal Analysis', date: '2025-06-18', jurisdiction: 'Kenya' },
-    { id: 'reg3', type: 'GUIDE', title: 'New VASP Regulations', source: 'SARB', date: '2025-06-15', jurisdiction: 'South Africa' },
+    {
+        id: 'reg1',
+        type: 'UPDATE',
+        title: 'New CBN Guidelines for PSPs',
+        source: 'CBN',
+        date: '2025-06-20',
+        publishedDate: '2025-06-20', // Ensure consistent date property
+        jurisdiction: 'Nigeria',
+        summary: 'Key updates to operational guidelines and reporting standards for Payment Service Providers in Nigeria.',
+        fullText: `The Central Bank of Nigeria (CBN) has today released updated guidelines aimed at enhancing the regulatory framework for Payment Service Providers (PSPs) operating within the country. These new guidelines, effective immediately, introduce stringent requirements concerning data localization, enhanced fraud detection mechanisms, and revised capital adequacy ratios.
+
+Key changes include:
+1.  **Data Localization**: All PSPs must ensure that customer data is stored and processed exclusively within Nigerian borders. Compliance audits will be intensified to ensure adherence.
+2.  **Fraud Detection and Prevention**: PSPs are now mandated to implement real-time fraud monitoring systems capable of identifying and reporting suspicious transactions exceeding NGN 5,000,000 within 24 hours. Collaboration with the Nigerian Financial Intelligence Unit (NFIU) is paramount.
+3.  **Capital Adequacy**: Minimum capital requirements for various PSP licenses (e.g., PSSP, PTSP) have been reviewed and increased by 15% to bolster financial stability and resilience against economic shocks.
+4.  **Cybersecurity Framework**: New protocols for cybersecurity risk assessment, incident reporting, and mandatory annual penetration testing have been introduced to safeguard digital payment ecosystems.
+5.  **Consumer Protection**: Enhanced provisions for consumer dispute resolution, transparency in fees, and clear complaint mechanisms are now enforceable. PSPs must provide clear communication channels and resolution timelines.
+
+PSPs are advised to review the full document available on the CBN official website and ensure compliance within 90 days to avoid penalties.`
+    },
+    {
+        id: 'reg2',
+        type: 'ANALYSIS',
+        title: 'Impact of ODPC Framework Update',
+        source: 'Internal Analysis',
+        date: '2025-06-18',
+        publishedDate: '2025-06-18', // Ensure consistent date property
+        jurisdiction: 'Kenya',
+        summary: 'An internal analysis report on the implications of the latest Office of the Data Protection Commissioner (ODPC) framework update on data handling practices.',
+        fullText: `Our internal compliance team has completed a comprehensive analysis of the recent amendments to the ODPC framework in Kenya, particularly focusing on its impact on our data handling and privacy protocols.
+
+Key findings and implications include:
+1.  **Expanded Definition of Personal Data**: The update broadens the scope of what constitutes 'personal data', requiring a re-evaluation of data classification across our systems.
+2.  **Enhanced Consent Requirements**: Stricter consent mechanisms are now required for data processing, especially for sensitive personal data. Our current consent flows will need revision to ensure explicit, informed, and unambiguous consent.
+3.  **Data Retention Policies**: New guidelines on data retention periods for various data types have been introduced. This necessitates an update to our existing data lifecycle management policies to align with the stipulated maximum retention periods.
+4.  **Cross-Border Data Transfer**: Stricter conditions apply to cross-border data transfers, requiring robust safeguards and adherence to specific legal instruments for transfers outside Kenya.
+5.  **Increased Penalties**: The framework introduces significantly higher penalties for non-compliance, emphasizing the critical need for proactive adherence.
+
+Recommended actions from this analysis include:
+* Update internal data privacy policy (Section 3 & 4).
+* Conduct a data mapping exercise to identify all personal data touchpoints.
+* Implement mandatory staff training on new consent requirements.`
+    },
+    {
+        id: 'reg3',
+        type: 'GUIDE',
+        title: 'New VASP Regulations',
+        source: 'SARB',
+        date: '2025-06-15',
+        publishedDate: '2025-06-15', // Ensure consistent date property
+        jurisdiction: 'South Africa',
+        summary: 'South African Reserve Bank (SARB) issues new regulations for Virtual Asset Service Providers (VASPs).',
+        fullText: `The South African Reserve Bank (SARB) has published its final regulatory framework for Virtual Asset Service Providers (VASPs). These regulations aim to bring digital asset activities under closer supervision to mitigate risks associated with money laundering, terrorist financing, and consumer protection.
+
+Key provisions of the new VASP regulations include:
+1.  **Mandatory Registration/Licensing**: All entities providing VASP services (e.g., crypto exchanges, digital asset custodians, and issuers of stablecoins) must register with the Financial Sector Conduct Authority (FSCA) by [Date - e.g., 2025-12-31].
+2.  **AML/CFT Compliance**: VASPs are now explicitly designated as accountable institutions under the Financial Intelligence Centre Act (FICA). This means they must implement robust Anti-Money Laundering and Counter-Financing of Terrorism (AML/CFT) measures, including customer due diligence (CDD), suspicious transaction reporting (STR), and record-keeping.
+3.  **Risk-Based Approach**: VASPs are required to adopt a risk-based approach to AML/CFT, assessing and mitigating risks specific to their operations and customer base.
+4.  **Operational Resilience**: Guidelines on operational resilience, including cybersecurity standards, business continuity planning, and outsourcing arrangements, are also covered.
+5.  **Consumer Protection**: Requirements related to transparency, disclosure, and dispute resolution mechanisms for consumers engaging with VASPs.
+
+VASPs currently operating in South Africa are advised to immediately review these regulations and initiate the registration process to ensure continuous legal operation.`
+    },
 ];
 
 export const kpiData = [
@@ -53,7 +115,7 @@ export const fraudData = [
     { name: 'Sun', transactions: 3490, flagged: 43 },
 ];
 
-export const kycChartData = [ // Renamed from kycData to avoid conflict
+export const kycChartData = [
     { name: 'Verified', value: 400, fill: 'url(#greenGradient)' },
     { name: 'Pending', value: 150, fill: 'url(#goldGradient)' },
     { name: 'Rejected', value: 50, fill: 'url(#redGradient)' },
@@ -92,9 +154,110 @@ export const gapAssessmentData = [
 
 // --- Data for Compliance Reporting Page ---
 export const mockTemplates = [
-    { id: 'tpl1', name: 'Suspicious Activity Report (SAR)', type: 'SAR', category: 'Templates', description: 'Standard template for SARs.', content: 'SAR Content...' },
-    { id: 'tpl2', name: 'Currency Transaction Report (CTR)', type: 'CTR', category: 'Templates', description: 'For cash transactions over $10,000.', content: 'CTR Content...' },
-    { id: 'tpl3', name: 'Annual Compliance Review', type: 'Annual Review', category: 'Templates', description: 'Template for the annual internal audit.', content: 'Annual Review Content...' }
+    {
+        id: 'tpl1',
+        name: 'Suspicious Activity Report (SAR)',
+        type: 'SAR',
+        category: 'Templates',
+        description: 'Standard template for Suspicious Activity Reports (SARs) as per regulatory guidelines.',
+        content: `SAR Draft - Automatically Generated
+
+    REPORT ID: SAR-[ReportID]
+    DATE: [CurrentDate]
+
+    1. SUSPECT INFORMATION:
+       Name: [AI-Identified Suspect Name]
+       Account Number: [AI-Identified Account]
+       Nationality: [AI-Identified Nationality]
+
+    2. TRANSACTION DETAILS:
+       Date/Time: [AI-Identified Transaction Timestamp]
+       Amount: [AI-Identified Transaction Amount]
+       Currency: [AI-Identified Transaction Currency]
+       Type: [AI-Identified Transaction Type] (e.g., Wire Transfer, Deposit)
+       Description: [AI-Summarized Transaction Purpose]
+       Reason for Suspicion: [AI-Assessed Reason for Suspicion]
+
+    3. NARRATIVE:
+       Based on automated monitoring, a series of transactions involving [AI-Identified Suspect Name] exhibited characteristics consistent with money laundering indicators. Specifically, [AI-Generated Narrative]. Further manual investigation is recommended.
+
+    4. SUPPORTING DOCUMENTATION:
+       [Placeholder for automatically linked transaction records, KYC documents]
+
+    --- END OF DRAFT ---`
+    },
+    {
+        id: 'tpl2',
+        name: 'Currency Transaction Report (CTR)',
+        type: 'CTR',
+        category: 'Templates',
+        description: 'For cash transactions exceeding the regulatory threshold ($10,000 equivalent).',
+        content: `CTR Draft - Automatically Generated
+
+    REPORT ID: CTR-[ReportID]
+    DATE: [CurrentDate]
+
+    1. REPORTING INSTITUTION INFORMATION:
+       Name: Innovate Inc.
+       Regulator: CBN (Simulated)
+       Reporting Year: [CurrentYear]
+
+    2. TRANSACTION DETAILS:
+       Transaction Date: [AI-Identified Transaction Date]
+       Transaction Amount: [AI-Identified Transaction Amount]
+       Currency: [AI-Identified Transaction Currency]
+       Type: [AI-Identified Transaction Type]
+       Branch/Location: [AI-Identified Branch/Location]
+
+    3. INDIVIDUAL/ENTITY CONDUCTING TRANSACTION:
+       Name: [AI-Identified Customer Name]
+       Account: [AI-Identified Customer Account]
+       Identification: [AI-Identified ID Type & Number]
+       Purpose: [AI-Summarized Purpose of Transaction]
+
+    4. FUNDS INFORMATION:
+       Source of Funds: [AI-Identified Source of Funds] (e.g., Business Income, Salary, Loan)
+       Destination of Funds: [AI-Identified Destination of Funds]
+
+    --- END OF DRAFT ---`
+    },
+    {
+        id: 'tpl3',
+        name: 'Annual Compliance Review',
+        type: 'Annual Review',
+        category: 'Templates',
+        description: 'Template for the annual internal compliance audit and self-assessment.',
+        content: `Annual Compliance Review Draft - AI Assisted
+
+    REPORT ID: ACR-[CurrentYear]-Draft
+    REPORTING PERIOD: January 1, [CurrentYear] - December 31, [CurrentYear]
+
+    1. REGISTRATION WITH THE CENTRE (Regulation 5):
+       - Status: [AI-Assessed Status]
+       - Comments: [AI-Assessed Registration Comments]
+
+    2. RISK ASSESSMENT (Regulation 7):
+       - Status: [AI-Assessed Status]
+       - Comments: [AI-Assessed Risk Assessment Comments]
+
+    3. INTERNAL CONTROL OBLIGATIONS (Regulation 11):
+       - Status: [AI-Assessed Status]
+       - Comments: [AI-Assessed Internal Control Comments]
+
+    4. CUSTOMER DUE DILIGENCE (Regulation 14):
+       - Status: [AI-Assessed Status]
+       - Comments: [AI-Assessed CDD Comments]
+
+    5. REPORTING OF SUSPICIOUS ACTIVITIES (Regulation 38):
+       - Status: [AI-Assessed Status]
+       - Comments: [AI-Assessed Suspicious Activity Comments]
+
+    6. RECORD KEEPING (Regulation 42):
+       - Status: [AI-Assessed Status]
+       - Comments: [AI-Assessed Record Keeping Comments]
+       
+    --- END OF DRAFT ---`
+    }
 ];
 
 export const mockReports = [
@@ -166,7 +329,7 @@ export const mockDataSources = [
     {
         id: 'src-chainalysis-kyt',
         name: 'Chainalysis KYT',
-        type: 'API',
+        type: 'Blockchain Analytics',
         status: 'Connected',
         dataQuality: 99.8,
         recordsSynced: 2300,
@@ -339,15 +502,15 @@ export const mockTransactionData = {
   headers: ['transaction_id', 'amount', 'currency', 'timestamp', 'transactionType', 'senderAccount', 'receiverAccount', 'senderCountry', 'receiverCountry', 'fraudScore', 'amlFlag'],
   rows: [
     ['TXN001', 1200, 'USD', '2025-07-19', 'Payment', 'ACC001', 'ACC002', 'USA', 'CAN', 15.2, false],
-    ['TXN002', 15000, 'USD', '2025-07-19', 'Transfer', 'ACC003', 'ACC004', 'IRN', 'GBR', 95.1, true], // High value, flagged country
+    ['TXN002', 15000, 'USD', '2025-07-19', 'Transfer', 'ACC003', 'ACC004', 'IRN', 'GBR', 95.1, true],
     ['TXN003', 500, 'EUR', '2025-07-20', 'Withdrawal', 'ACC005', 'N/A', 'DEU', 'DEU', 5.0, false],
     ['TXN004', 20000, 'NGN', '2025-07-20', 'Deposit', 'N/A', 'ACC006', 'NGA', 'NGA', 22.8, false],
     ['TXN005', 800, 'USD', '2025-07-21', 'Payment', 'ACC007', 'ACC008', 'USA', 'MEX', 10.1, false],
     ['TXN006', 7500, 'USD', '2025-07-21', 'Transfer', 'ACC009', 'ACC010', 'USA', 'USA', 30.7, false],
-    ['TXN007', 11000, 'GBP', '2025-07-22', 'Payment', 'ACC011', 'ACC012', 'PRK', 'JPN', 88.3, true], // High value, flagged country
+    ['TXN007', 11000, 'GBP', '2025-07-22', 'Payment', 'ACC011', 'ACC012', 'PRK', 'JPN', 88.3, true],
     ['TXN008', 300, 'CAD', '2025-07-22', 'Deposit', 'N/A', 'ACC013', 'CAN', 'CAN', 2.1, false],
     ['TXN009', 9000, 'USD', '2025-07-22', 'Withdrawal', 'ACC014', 'N/A', 'USA', 'USA', 18.9, false],
-    ['TXN010', 10500, 'JPY', '2025-07-23', 'Transfer', 'ACC015', 'ACC016', 'JPN', 'CHN', 70.0, true], // High value
+    ['TXN010', 10500, 'JPY', '2025-07-23', 'Transfer', 'ACC015', 'ACC016', 'JPN', 'CHN', 70.0, true],
     ['TXN011', 200, 'CHF', '2025-07-23', 'Payment', 'ACC017', 'ACC018', 'SWI', 'FRA', 8.5, false],
     ['TXN012', 3000, 'AUD', '2025-07-24', 'Deposit', 'N/A', 'ACC019', 'AUS', 'NZL', 12.3, false],
   ],
@@ -355,9 +518,9 @@ export const mockTransactionData = {
 
 // --- New processed data for KYC Dashboard ---
 export const processedKycDashboardData = {
-    verificationRate: 95.8, // Example value, align with kpi-verification-rate history
-    rejectionRate: 2.5,     // Example value, align with kri-rejection-rate history
-    avgTurnaroundTime: "22.5 Hours", // Example value, align with kpi-kyc-processing-time history
+    verificationRate: 95.8,
+    rejectionRate: 2.5,
+    avgTurnaroundTime: "22.5 Hours",
     dailyVerificationsData: [
         { day: 'Mon', count: 120 },
         { day: 'Tue', count: 135 },
@@ -371,9 +534,9 @@ export const processedKycDashboardData = {
 
 // --- New processed data for Transaction Monitoring Dashboard ---
 export const processedTransactionDashboardData = {
-    totalTransactions: 18765, // Example value, align with kri-total-transactions history
-    flaggedTransactions: 45, // Example
-    totalValue: "$1.5M", // Example value, align with kri-total-transaction-value history
+    totalTransactions: 18765,
+    flaggedTransactions: 45,
+    totalValue: "$1.5M",
     transactionsByDay: [
         { day: 'Mon', count: 3500, flagged: 20 },
         { day: 'Tue', count: 3800, flagged: 25 },
@@ -695,7 +858,7 @@ export const mockAlerts = [
             { type: 'Transaction', id: 'TXN98765', link: '/transactions/TXN98765' },
             { type: 'Customer', id: 'CUST456', link: '/customers/CUST456' }
         ],
-        eventType: 'Transaction Triggered', // Add eventType for existing mock alerts
+        eventType: 'Transaction Triggered',
         messageTemplate: 'High-risk transaction detected from unverified source. Review transaction {{transaction.id}}.'
     },
     {
@@ -768,6 +931,7 @@ export const mockIntegrations = [
         lastSync: '2h ago',
         dataQuality: 99.8,
         recordsSynced: 2300,
+        lastSync: '2h ago',
         description: 'Integrates with Chainalysis KYT for crypto transaction risk scoring.',
         configuration: { apiEndpoint: 'https://api.chainalysis.com/kyt', licenseKey: '****' },
         linkedDataSources: ['src-chainalysis-kyt']
@@ -825,7 +989,7 @@ export const mockUsers = [
         lastLogin: '2025-07-24',
         createdAt: '2024-01-01',
         twoFactorEnabled: true,
-        title: 'Chief Compliance Officer', // Added title for existing user
+        title: 'Chief Compliance Officer',
     },
     {
         id: 'user-2',
@@ -836,7 +1000,7 @@ export const mockUsers = [
         lastLogin: '2025-07-23',
         createdAt: '2024-03-10',
         twoFactorEnabled: false,
-        title: 'Senior Compliance Analyst', // Added title
+        title: 'Senior Compliance Analyst',
     },
     {
         id: 'user-3',
@@ -847,7 +1011,7 @@ export const mockUsers = [
         lastLogin: '2025-06-15',
         createdAt: '2024-02-01',
         twoFactorEnabled: true,
-        title: 'Financial Data Analyst', // Added title
+        title: 'Financial Data Analyst',
     },
     {
         id: 'user-4',
@@ -858,7 +1022,7 @@ export const mockUsers = [
         lastLogin: '2025-07-22',
         createdAt: '2024-05-01',
         twoFactorEnabled: false,
-        title: 'Internal Auditor', // Added title
+        title: 'Internal Auditor',
     },
 ];
 
@@ -1128,6 +1292,7 @@ export const mockPartners = [
         lastActivity: '2025-06-10'
     },
 ];
+
 // --- Data for AI Agent Feature ---
 
 export const mockAiActivities = [
@@ -1221,5 +1386,30 @@ export const mockAiInsights = [
         linkedEntities: [
             { type: 'Jurisdiction', id: 'Brazil', link: '/risk-assessment?geo=Brazil' }
         ]
+    },
+];
+
+// Mock Partner Tiers (Added this section to align with OrganizationsView.jsx)
+export const mockPartnerTiers = [
+    {
+        id: 'tier1',
+        name: 'Standard Partner',
+        description: 'Basic access level for new partners.',
+        accessLevel: 'Limited Data View',
+        permissions: ['View KYC Records', 'Submit Basic Reports'],
+    },
+    {
+        id: 'tier2',
+        name: 'Premium Partner',
+        description: 'Enhanced access for established and trusted partners.',
+        accessLevel: 'Full Data Access',
+        permissions: ['View KYC Records', 'View Transaction Data', 'Generate Compliance Reports', 'Access Audit Logs'],
+    },
+    {
+        id: 'tier3',
+        name: 'Strategic Partner',
+        description: 'Highest access level for key strategic alliances.',
+        accessLevel: 'Admin Access',
+        permissions: ['View All Data', 'Manage Integrations', 'Receive Real-time Alerts'],
     },
 ];

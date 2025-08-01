@@ -1,37 +1,36 @@
 // src/features/settings/index.jsx
-
-import React, { useState } from 'react';
-// REMOVED: icons now only used in extracted components are removed here from this file
-import { Users, Bell, Shield, Key } from 'lucide-react'; 
-// REMOVED: ActionMenu from here as it's only used in UsersAndRolesView now
-// import ActionMenu from '../../components/ui/ActionMenu.jsx'; 
+import React, { useState, useMemo } from 'react';
+import { Users, Bell, Shield, Key, Building2, User2, Settings as SettingsIcon } from 'lucide-react';
+import UsersAndRolesView from './components/UsersAndRolesView';
+import NotificationsView from './components/NotificationsView';
+import PasswordManagementView from './components/PasswordManagementView';
+import SystemConfigView from './components/SystemConfigView';
+import OrganizationsView from './components/OrganizationsView';
 import EditUserModal from './modals/EditUserModal.jsx';
 import InviteUserModal from './modals/InviteUserModal.jsx';
 import CreateAlertModal from './modals/CreateAlertModal.jsx';
 import CreateRoleModal from './modals/CreateRoleModal.jsx';
 import UserActivityLogModal from './modals/UserActivityLogModal.jsx';
+import AddOrganizationModal from './modals/AddOrganizationModal.jsx';
 import Toast from '../../components/ui/Toast.jsx';
-import SystemConfigView from './components/SystemConfigView.jsx';
-import PasswordManagementView from './components/PasswordManagementView.jsx';
-// NEW: Import extracted components
-import UsersAndRolesView from './components/UsersAndRolesView.jsx';
-import NotificationsView from './components/NotificationsView.jsx';
 
-import { mockUsers as initialMockUsers, mockRoles as initialMockRoles, mockAlerts as initialMockAlerts } from '../../data/mockData.js';
+import { mockUsers as initialMockUsers, mockRoles as initialMockRoles, mockAlerts as initialMockAlerts, mockPartners as initialMockPartners } from '../../data/mockData.js';
 
 
 // --- MAIN SETTINGS PAGE ---
 const Settings = () => {
-    const [activeTab, setActiveTab] = useState('users'); // Default to users for initial view after this feature
+    const [activeTab, setActiveTab] = useState('users-roles'); 
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
     const [isCreateAlertModalOpen, setIsCreateAlertModalOpen] = useState(false);
     const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState(false);
+    const [isAddOrganizationModalOpen, setIsAddOrganizationModalOpen] = useState(false);
     const [isUserActivityLogModalOpen, setIsUserActivityLogModalOpen] = useState(false);
 
     const [users, setUsers] = useState(initialMockUsers);
     const [roles, setRoles] = useState(initialMockRoles);
     const [alerts, setAlerts] = useState(initialMockAlerts);
+    const [organizations, setOrganizations] = useState(initialMockPartners);
 
     const [systemConfig, setSystemConfig] = useState({
         defaultCurrency: 'USD',
@@ -50,10 +49,10 @@ const Settings = () => {
         historyCount: 5,
     });
 
-
     const [userToEdit, setUserToEdit] = useState(null);
     const [alertToEdit, setAlertToEdit] = useState(null);
     const [roleToEdit, setRoleToEdit] = useState(null);
+    const [organizationToEdit, setOrganizationToEdit] = useState(null);
     const [userForActivityLog, setUserForActivityLog] = useState(null);
 
     const [toastMessage, setToastMessage] = useState('');
@@ -137,6 +136,31 @@ const Settings = () => {
         setIsCreateAlertModalOpen(true);
     };
 
+    // --- Organization Management Handlers ---
+    const handleAddOrganization = (newOrg) => {
+        setOrganizations(prev => [...prev, { ...newOrg, id: `org-${Date.now()}` }]);
+        setIsAddOrganizationModalOpen(false);
+        setToastMessage(`Organization "${newOrg.name}" added successfully! An invitation has been sent to ${newOrg.representativeEmail}.`);
+    };
+
+    const handleEditOrganization = (updatedOrg) => {
+        setOrganizations(prev => prev.map(org => org.id === updatedOrg.id ? updatedOrg : org));
+        setIsAddOrganizationModalOpen(false);
+        setOrganizationToEdit(null);
+        setToastMessage(`Organization "${updatedOrg.name}" updated successfully!`);
+    };
+
+    const handleDeleteOrganization = (orgId) => {
+      if (window.confirm('Are you sure you want to delete this organization?')) {
+          setOrganizations(prev => prev.filter(org => org.id !== orgId));
+          setToastMessage('Organization deleted successfully!');
+      }
+    };
+    
+    const handleSendInvite = (organization) => {
+        setToastMessage(`Invitation sent to ${organization.representativeEmail} for organization "${organization.name}".`);
+    };
+    
     // --- System Configuration Handler ---
     const handleSaveConfig = (newConfig) => {
         setSystemConfig(newConfig);
@@ -149,102 +173,137 @@ const Settings = () => {
         setToastMessage('Password policy saved successfully!');
     };
 
+    // Define the navigation items
+    const navItems = useMemo(() => [
+        { id: 'users-roles', name: 'Users & Roles', icon: Users },
+        { id: 'organizations', name: 'Organizations', icon: Building2 },
+        { id: 'notifications', name: 'Notifications', icon: Bell },
+        { id: 'password-mgmt', name: 'Password Management', icon: Key },
+        { id: 'system-config', name: 'System Configuration', icon: SettingsIcon },
+    ], []);
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'users-roles':
+                return (
+                    <UsersAndRolesView
+                        users={users}
+                        roles={roles}
+                        onInvite={() => setIsInviteModalOpen(true)}
+                        onEditUser={handleEditUserClick}
+                        onDeactivateUser={handleDeactivateUser}
+                        onCreateRole={() => setIsCreateRoleModalOpen(true)}
+                        onViewUserActivityLog={handleViewUserActivityLog}
+                    />
+                );
+            case 'organizations':
+                return (
+                    <OrganizationsView
+                        organizations={organizations}
+                        onAddOrganization={() => { setOrganizationToEdit(null); setIsAddOrganizationModalOpen(true); }}
+                        onEditOrganization={(org) => { setOrganizationToEdit(org); setIsAddOrganizationModalOpen(true); }}
+                        onDeleteOrganization={handleDeleteOrganization}
+                        onSendInvite={handleSendInvite}
+                    />
+                );
+            case 'notifications':
+                return (
+                    <NotificationsView
+                        alerts={alerts}
+                        onCreateAlert={() => { setIsCreateAlertModalOpen(true); setAlertToEdit(null); }}
+                        onToggleAlertStatus={handleToggleAlertStatus}
+                        onEditAlert={handleEditAlertClick}
+                    />
+                );
+            case 'password-mgmt':
+                return (
+                    <PasswordManagementView
+                        onSavePolicy={handleSavePasswordPolicy}
+                        initialPolicy={passwordPolicy}
+                    />
+                );
+            case 'system-config':
+                return (
+                    <SystemConfigView
+                        onSaveConfig={handleSaveConfig}
+                        initialConfig={systemConfig}
+                    />
+                );
+            default:
+                return null;
+        }
+    };
 
     return (
-        <div className="p-6 bg-gray-900 min-h-screen text-white">
-            <div className="max-w-7xl mx-auto">
-                <div className="space-y-6 animate-fade-in">
-                    <div>
-                        <h2 className="text-3xl font-bold text-gray-100">Platform Settings</h2>
-                        <p className="text-gray-400">Manage user access, roles, and system notifications.</p>
-                    </div>
-                    <div className="flex border-b border-gray-700">
-                        <button onClick={() => setActiveTab('users')} className={`py-2 px-4 flex items-center text-lg font-semibold ${activeTab === 'users' ? 'border-b-2 border-blue-600 text-blue-400' : 'text-gray-400'}`}>
-                            <Users size={20} className="mr-2"/> Users & Roles
-                        </button>
-                        <button onClick={() => setActiveTab('notifications')} className={`py-2 px-4 flex items-center text-lg font-semibold ${activeTab === 'notifications' ? 'border-b-2 border-blue-600 text-blue-400' : 'text-gray-400'}`}>
-                            <Bell size={20} className="mr-2"/> Notifications
-                        </button>
-                        <button onClick={() => setActiveTab('systemConfig')} className={`py-2 px-4 flex items-center text-lg font-semibold ${activeTab === 'systemConfig' ? 'border-b-2 border-blue-600 text-blue-400' : 'text-gray-400'}`}>
-                            <Shield size={20} className="mr-2"/> System Configuration
-                        </button>
-                        <button onClick={() => setActiveTab('passwordManagement')} className={`py-2 px-4 flex items-center text-lg font-semibold ${activeTab === 'passwordManagement' ? 'border-b-2 border-blue-600 text-blue-400' : 'text-gray-400'}`}>
-                            <Key size={20} className="mr-2"/> Password Management
-                        </button>
-                    </div>
-                    <div>
-                        {activeTab === 'users' && (
-                            <UsersAndRolesView
-                                users={users}
-                                roles={roles}
-                                onInvite={() => setIsInviteModalOpen(true)}
-                                onEditUser={handleEditUserClick}
-                                onDeactivateUser={handleDeactivateUser}
-                                onCreateRole={() => setIsCreateRoleModalOpen(true)}
-                                onViewUserActivityLog={handleViewUserActivityLog}
-                            />
-                        )}
-                        {activeTab === 'notifications' && (
-                            <NotificationsView
-                                alerts={alerts}
-                                onCreateAlert={() => { setIsCreateAlertModalOpen(true); setAlertToEdit(null); }}
-                                onToggleAlertStatus={handleToggleAlertStatus}
-                                onEditAlert={handleEditAlertClick}
-                            />
-                        )}
-                        {activeTab === 'systemConfig' && (
-                            <SystemConfigView
-                                onSaveConfig={handleSaveConfig}
-                                initialConfig={systemConfig}
-                            />
-                        )}
-                        {activeTab === 'passwordManagement' && (
-                            <PasswordManagementView
-                                onSavePolicy={handleSavePasswordPolicy}
-                                initialPolicy={passwordPolicy}
-                            />
-                        )}
-                    </div>
+        <div className="p-6 space-y-6 animate-fade-in">
+            <div className="flex justify-between items-start">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
+                    <p className="text-gray-500">Manage your system configurations, users, and organizational partners.</p>
                 </div>
-
-                {/* Modals */}
-                {isInviteModalOpen && (
-                    <InviteUserModal
-                        onClose={() => setIsInviteModalOpen(false)}
-                        onSave={handleInviteUser}
-                        roles={roles}
-                    />
-                )}
-                {isEditUserModalOpen && (
-                    <EditUserModal
-                        user={userToEdit}
-                        onClose={() => setIsEditUserModalOpen(false)}
-                        onSave={handleSaveUser}
-                        roles={roles}
-                    />
-                )}
-                {isCreateAlertModalOpen && (
-                    <CreateAlertModal
-                        onClose={() => { setIsCreateAlertModalOpen(false); setAlertToEdit(null); }}
-                        onSave={handleCreateAlert}
-                        initialData={alertToEdit}
-                    />
-                )}
-                {isCreateRoleModalOpen && (
-                    <CreateRoleModal
-                        onClose={() => setIsCreateRoleModalOpen(false)}
-                        onSave={handleCreateRole}
-                    />
-                )}
-                {isUserActivityLogModalOpen && (
-                    <UserActivityLogModal
-                        user={userForActivityLog}
-                        onClose={() => { setIsUserActivityLogModalOpen(false); setUserForActivityLog(null); }}
-                    />
-                )}
-
-                {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage('')} />}
             </div>
+            <div className="flex bg-white rounded-xl shadow-lg overflow-hidden">
+                <nav className="flex-none w-64 p-6 border-r border-gray-200 space-y-2">
+                    {navItems.map(item => (
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveTab(item.id)}
+                            className={`w-full text-left px-4 py-3 rounded-lg flex items-center transition-colors
+                                ${activeTab === item.id ? 'bg-blue-100 text-blue-800 font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                        >
+                            {React.createElement(item.icon, { size: 20, className: 'mr-3' })}
+                            {item.name}
+                        </button>
+                    ))}
+                </nav>
+                <div className="flex-grow p-6">
+                    {renderContent()}
+                </div>
+            </div>
+
+            {/* Modals */}
+            {isInviteModalOpen && (
+                <InviteUserModal
+                    onClose={() => setIsInviteModalOpen(false)}
+                    onSave={handleInviteUser}
+                    roles={roles}
+                />
+            )}
+            {isEditUserModalOpen && (
+                <EditUserModal
+                    user={userToEdit}
+                    onClose={() => setIsEditUserModalOpen(false)}
+                    onSave={handleSaveUser}
+                    roles={roles}
+                />
+            )}
+            {isCreateAlertModalOpen && (
+                <CreateAlertModal
+                    onClose={() => { setIsCreateAlertModalOpen(false); setAlertToEdit(null); }}
+                    onSave={handleCreateAlert}
+                    initialData={alertToEdit}
+                />
+            )}
+            {isCreateRoleModalOpen && (
+                <CreateRoleModal
+                    onClose={() => setIsCreateRoleModalOpen(false)}
+                    onSave={handleCreateRole}
+                />
+            )}
+            {isUserActivityLogModalOpen && (
+                <UserActivityLogModal
+                    user={userForActivityLog}
+                    onClose={() => { setIsUserActivityLogModalOpen(false); setUserForActivityLog(null); }}
+                />
+            )}
+            {isAddOrganizationModalOpen && (
+                <AddOrganizationModal
+                    onClose={() => { setIsAddOrganizationModalOpen(false); setOrganizationToEdit(null); }}
+                    onSave={organizationToEdit ? handleEditOrganization : handleAddOrganization}
+                    organization={organizationToEdit}
+                />
+            )}
+            {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage('')} />}
         </div>
     );
 };

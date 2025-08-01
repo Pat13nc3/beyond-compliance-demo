@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Link, Shield, TrendingUp } from 'lucide-react';
+// Import all necessary icons, including Scale for IndicatorCard
+import { Plus, Link, Shield, TrendingUp, Zap, Database, Settings, Scale } from 'lucide-react'; 
 
 import DataSourceCard from './components/DataSourceCard.jsx';
 import FileAnalysisCard from './components/FileAnalysisCard.jsx';
@@ -15,14 +16,13 @@ import AuditLogModal from './modals/AuditLogModal.jsx';
 import SettingsModal from './modals/SettingsModal.jsx';
 import AddIndicatorModal from './modals/AddIndicatorModal.jsx';
 import ManageIndicatorModal from './modals/ManageIndicatorModal.jsx';
-import EtlProcessDetailsModal from './modals/EtlProcessDetailsModal.jsx'; // CORRECTED IMPORT PATH
+import EtlProcessDetailsModal from './modals/EtlProcessDetailsModal.jsx'; 
 import { mockDataSources, mockIndicators, mockUserAccessData, mockTransactionData, mockEtlProcesses, filesPendingAnalysis } from '../../data/mockData.js';
 import Toast from '../../components/ui/Toast.jsx';
 import ConfirmationModal from '../../components/modals/ConfirmationModal.jsx';
 import UploadModal from '../library/modals/UploadModal';
 
 
-// This was in your original code, simulating API calls
 const simulateApiCall = (sourceType) => new Promise((resolve, reject) => {
     setTimeout(() => {
         if (Math.random() < 0.05) {
@@ -38,7 +38,7 @@ const simulateApiCall = (sourceType) => new Promise((resolve, reject) => {
     }, 1500);
 });
 
-// This was in your original code, the IndicatorCard component
+
 const IndicatorCard = ({ indicator, onManage }) => {
     const isKri = indicator.type === 'KRI';
     const borderColor = isKri ? 'border-red-500' : 'border-green-500';
@@ -46,15 +46,28 @@ const IndicatorCard = ({ indicator, onManage }) => {
     const linkedSourcesCount = indicator.linkedSourceIds?.length || 0;
 
     return (
-        <div className={`bg-gray-800 p-5 rounded-lg shadow-lg text-white border border-gray-700 hover:${borderColor} transition-all duration-300`}>
-            <div className="flex justify-between items-start mb-3">
-                <h4 className="font-bold text-gray-100">{indicator.name}</h4>
-                <span className={`px-2 py-1 text-xs rounded-full font-semibold flex items-center gap-2 ${isKri ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300'}`}>
-                    {icon} {indicator.type}
-                </span>
+        <div className={`bg-gray-800 p-5 rounded-lg shadow-lg text-white border border-gray-700 hover:${borderColor} transition-all duration-300 transform hover:-translate-y-1`}>
+            <div>
+                <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center">
+                        {/* CORRECTED: Use Scale icon for IndicatorCard to avoid 'source is not defined' error */}
+                        <div className="bg-gray-700 p-3 rounded-lg mr-4">
+                            <Scale size={20} className="text-blue-400" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-gray-100">{indicator.name}</h4>
+                            <p className="text-xs text-gray-400">{indicator.type}</p>
+                        </div>
+                    </div>
+                    {/* Placeholder for status info if needed for indicators */}
+                </div>
+                <div className="space-y-3 text-sm mb-4">
+                    <div className="flex justify-between"><span className="text-gray-400">Data Quality Score</span><span className="font-semibold text-green-400">N/A</span></div>
+                    <div className="flex justify-between"><span className="text-gray-400">Last Sync</span><span className="font-semibold text-gray-200">N/A</span></div>
+                    <div className="flex justify-between"><span className="text-gray-400">Records Synced</span><span className="font-semibold text-gray-200">N/A</span></div>
+                </div>
+                {/* Chart placeholder removed for simplicity here, as it's not directly part of indicator */}
             </div>
-            <p className="text-sm text-gray-400 mb-4 h-10">{indicator.description}</p>
-            <div className="text-xs text-gray-500 mb-4 font-mono">CATEGORY: {indicator.category.toUpperCase()}</div>
             <div className="flex items-center justify-between pt-4 border-t border-gray-700 text-sm">
                 <div className="flex items-center space-x-4">
                     <span className="flex items-center text-gray-300"><Link size={14} className="mr-2"/> {linkedSourcesCount} Sources</span>
@@ -68,7 +81,8 @@ const IndicatorCard = ({ indicator, onManage }) => {
     );
 };
 
-const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context, onCleanContext }) => {
+
+const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context, onCleanContext, triggerAIAnalysis }) => { // Receive triggerAIAnalysis
     const navigate = useNavigate();
     const [dataSources, setDataSources] = useState(mockDataSources);
     const [indicatorLibrary, setIndicatorLibrary] = useState(mockIndicators);
@@ -81,15 +95,15 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
     const [logModalSource, setLogModalSource] = useState(null);
     const [settingsModalSource, setSettingsModalSource] = useState(null);
     const [manageIndicatorModal, setManageIndicatorModal] = useState(null);
-    // Corrected state for Workbench visibility and context
     const [workbenchContext, setWorkbenchContext] = useState(null);
-    const [showWorkbench, setShowWorkbench] = useState(false); // New state to control Workbench visibility
+    const [showWorkbench, setShowWorkbench] = useState(false);
 
     const [toastMessage, setToastMessage] = useState('');
     const [activeTab, setActiveTab] = useState('Data Sources');
     const [confirmationModal, setConfirmationModal] = useState(null);
-    const [detailedRecordsFilters, setDetailedRecordsFilters] = useState({});
     const [etlDetailsModalData, setEtlDetailsModalData] = useState(null);
+    const [detailedRecordsFilters, setDetailedRecordsFilters] = useState(context?.detailedRecordsFilters || {}); // Initialize here
+
 
     // Effect to handle context from external navigation (e.g., from Dashboard)
     useEffect(() => {
@@ -105,8 +119,6 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
             if (context.sourceId) {
                 const source = dataSources.find(s => s.id === context.sourceId);
                 if (source) {
-                    // If sourceId context is passed, potentially navigate to workbench or show details
-                    // For now, let's assume it wants to show details
                     handleShowDetails(source.id);
                 } else {
                     setToastMessage(`Source with ID '${context.sourceId}' not found.`);
@@ -117,6 +129,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
             }
         }
     }, [context, dataSources, onCleanContext]);
+
 
     const filteredDataSources = useMemo(() => {
         if (jurisdiction === 'Global') {
@@ -133,7 +146,6 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
     }, [filesToAnalyze, jurisdiction]);
 
 
-    // Modified handleAddDataSource to set workbenchContext and showWorkbench
     const handleAddDataSource = (sourceData) => {
         const base = {
             id: `src-${Date.now()}`, name: sourceData.name, type: sourceData.type,
@@ -143,29 +155,24 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
         setDataSources(current => [...current, { ...base, status: 'Pending', dataQuality: 0, recordsSynced: 0, lastSync: 'Never', chartData: [], syncHistory: [], credentials: sourceData.credentials }]);
         setIsAddDataSourceModalOpen(false);
         setToastMessage(`Data source '${sourceData.name}' added successfully.`);
-        // Immediately transition to Workbench for new data sources
-        if (sourceData.type !== 'File Upload') { // Assuming file uploads handled by separate UploadModal flow
+        if (sourceData.type !== 'File Upload') {
             setWorkbenchContext({ dataSourceId: base.id, isNew: true });
             setShowWorkbench(true);
         }
     };
 
-    // Modified onFileImportSuccess to set workbenchContext and showWorkbench
     const onFileImportSuccess = (newFile) => {
       setFilesToAnalyze((prev) => [...prev, newFile]);
       setIsUploadModalOpen(false);
-      // Immediately transition to Workbench for new file uploads
       setWorkbenchContext({ fileId: newFile.id, isNew: true });
       setShowWorkbench(true);
     };
 
-    // MODIFIED LINE: Changed parameter from fileId to fileObject and extracted fileObject.id
     const handleMapData = (fileObject) => {
       setWorkbenchContext({ fileId: fileObject.id });
       setShowWorkbench(true);
     };
 
-    // New helper for DataSourceCard's onMapData to ensure consistency
     const handleMapDataForSource = (dataSourceId) => {
         setWorkbenchContext({ dataSourceId: dataSourceId });
         setShowWorkbench(true);
@@ -204,12 +211,11 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
 
     const handleShowLogs = (sourceId) => setLogModalSource(dataSources.find(s => s.id === sourceId));
 
-    // Corrected onClose for SettingsModal to use setSettingsModalSource
     const handleShowSettings = (sourceId) => setSettingsModalSource(dataSources.find(s => s.id === sourceId));
     const handleSaveSettings = (sourceId, updatedSettings) => {
         setDataSources(current => current.map(s => (s.id === sourceId ? { ...s, ...updatedSettings } : s)));
         setToastMessage('Settings saved successfully.');
-        setSettingsModalSource(null); // Close the modal after saving
+        setSettingsModalSource(null);
     };
     const handleDeleteSource = (sourceId) => {
         setConfirmationModal({
@@ -219,7 +225,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                 setDataSources(current => current.filter(s => s.id !== sourceId));
                 setToastMessage('Data source deleted successfully.');
                 setConfirmationModal(null);
-                setSettingsModalSource(null); // Close the modal after deleting
+                setSettingsModalSource(null);
             },
             onCancel: () => setConfirmationModal(null)
         });
@@ -234,7 +240,6 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
         setToastMessage('Indicator links updated.');
     };
 
-    // Modified handleStartAnalysis to set workbenchContext and showWorkbench
     const handleStartAnalysis = (fileToAnalyze) => {
         let relevantIndicator;
         if (fileToAnalyze.name.includes('User Access Reviews')) {
@@ -259,7 +264,6 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
         setToastMessage(`File ID "${fileId}" was successfully promoted.`);
     };
 
-    // Modified handleDataFlowDiagramNodeClick to set workbenchContext and showWorkbench
     const handleDataFlowDiagramNodeClick = (nodeId, nodeName, nodeType) => {
         setDetailedRecordsFilters({});
         const sourceIdMap = {
@@ -377,7 +381,10 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                         )}
 
                         {activeTab === 'Detailed Records' && (
-                            <DetailedRecordsTable initialFilters={detailedRecordsFilters} />
+                            <DetailedRecordsTable
+                                initialFilters={detailedRecordsFilters}
+                                triggerAIAnalysis={triggerAIAnalysis} // Pass triggerAIAnalysis here
+                            />
                         )}
 
                         {activeTab === 'KPI & KRI Library' && (

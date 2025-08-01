@@ -1,9 +1,8 @@
 // src/features/dataManagement/modals/RecordDetailsModal.jsx
 
 import React from 'react';
-import { X, CheckCircle, XCircle, Clock, Save } from 'lucide-react'; // Added Save for generic action
+import { X, CheckCircle, XCircle, Clock, Save } from 'lucide-react';
 
-// Add onUpdateRecordStatus as a prop
 const RecordDetailsModal = ({ record, onClose, onUpdateRecordStatus }) => {
     if (!record) return null;
 
@@ -12,13 +11,18 @@ const RecordDetailsModal = ({ record, onClose, onUpdateRecordStatus }) => {
             case 'Approved':
             case 'Success':
             case 'Active':
+            case 'No Match': // Added for Sanctions Check
                 return 'bg-green-700 text-green-100';
             case 'Pending':
             case 'In Review':
+            case 'Potential Match': // Added for Sanctions Check
+            case 'Flagged': // Added for AML Alert
+            case 'Under Review': // Added for AML Alert
                 return 'bg-yellow-700 text-yellow-100';
             case 'Rejected':
             case 'Failed':
             case 'Inactive':
+            case 'Confirmed Hit': // Added for Sanctions Check
                 return 'bg-red-700 text-red-100';
             default:
                 return 'bg-gray-700 text-gray-300';
@@ -109,7 +113,10 @@ const RecordDetailsModal = ({ record, onClose, onUpdateRecordStatus }) => {
                         {record.details && Object.entries(record.details).map(([key, value]) => (
                             <div key={key}>
                                 <p className="text-gray-400 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</p>
-                                <p className="text-base">{value}</p>
+                                {/* CORRECTED: Stringify object values before rendering */}
+                                <p className="text-base">
+                                    {typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)}
+                                </p>
                             </div>
                         ))}
                         {!record.details && <p className="text-gray-400 md:col-span-2">No additional details available.</p>}
@@ -117,7 +124,7 @@ const RecordDetailsModal = ({ record, onClose, onUpdateRecordStatus }) => {
                 </div>
 
                 <div className="flex justify-end p-5 border-t border-gray-700 bg-gray-700 space-x-3">
-                    {renderActionButtons()} {/* Render the dynamic action buttons */}
+                    {renderActionButtons()}
                     <button onClick={onClose} className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
                         Close
                     </button>
