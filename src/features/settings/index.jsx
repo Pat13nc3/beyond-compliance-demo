@@ -235,21 +235,21 @@ const Settings = () => {
     };
 
     return (
-        <div className="p-6 space-y-6 animate-fade-in">
+        <div className="p-6 space-y-6 animate-fade-in theme-bg-page min-h-screen">
             <div className="flex justify-between items-start">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
-                    <p className="text-gray-500">Manage your system configurations, users, and organizational partners.</p>
+                    <h1 className="text-3xl font-bold theme-text-primary">Settings</h1>
+                    <p className="theme-text-secondary">Manage your system configurations, users, and organizational partners.</p>
                 </div>
             </div>
-            <div className="flex bg-white rounded-xl shadow-lg overflow-hidden">
-                <nav className="flex-none w-64 p-6 border-r border-gray-200 space-y-2">
+            <div className="flex theme-bg-card rounded-xl shadow-lg overflow-hidden">
+                <nav className="flex-none w-64 p-6 border-r theme-border-color space-y-2">
                     {navItems.map(item => (
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`w-full text-left px-4 py-3 rounded-lg flex items-center transition-colors
-                                ${activeTab === item.id ? 'bg-blue-100 text-blue-800 font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                                ${activeTab === item.id ? 'bg-blue-100 dark:bg-gray-700 text-blue-800 dark:text-yellow-400 font-semibold' : 'theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                         >
                             {React.createElement(item.icon, { size: 20, className: 'mr-3' })}
                             {item.name}

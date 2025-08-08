@@ -30,18 +30,18 @@ const IntegrationCard = ({ integration, onConnectToggle, onViewDetails, onAddInt
     };
 
     return (
-        <div className="bg-gray-900 p-4 rounded-lg shadow-md flex flex-col justify-between">
+        <div className="theme-bg-card p-4 rounded-lg shadow-md flex flex-col justify-between border theme-border-color">
             <div>
                 <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-bold text-lg text-gray-100">{integration.name}</h4>
+                    <h4 className="font-bold text-lg theme-text-primary">{integration.name}</h4>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center ${getStatusClasses(integration.status)}`}>
                         {getStatusIcon(integration.status)} {integration.status}
                     </span>
                 </div>
-                <p className="text-sm text-gray-400 mb-2">{integration.type}</p>
-                <p className="text-xs text-gray-500 line-clamp-2">{integration.description}</p>
+                <p className="text-sm theme-text-secondary mb-2">{integration.type}</p>
+                <p className="text-xs theme-text-primary line-clamp-2">{integration.description}</p>
             </div>
-            <div className="mt-4 pt-3 border-t border-gray-700 text-xs text-gray-400">
+            <div className="mt-4 pt-3 border-t theme-border-color text-xs theme-text-secondary">
                 <p className="flex items-center mb-1">
                     <Clock size={12} className="mr-1" /> Last Sync: {integration.lastSync || 'N/A'}
                 </p>
@@ -73,9 +73,9 @@ const IntegrationCard = ({ integration, onConnectToggle, onViewDetails, onAddInt
 // Integrations component receives integrations data and handlers from parent
 const Integrations = ({ integrations, onConnectToggle, onViewDetails, onAddIntegration }) => {
     return (
-        <div className="p-6 bg-[#1e252d] rounded-xl shadow-lg text-white">
+        <div className="p-6 theme-bg-card rounded-xl shadow-lg theme-text-primary">
             <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-[#c0933e]">Platform Integrations</h3>
+                <h3 className="text-xl font-semibold theme-text-highlight-color">Platform Integrations</h3>
                 <button
                     onClick={onAddIntegration} // This will trigger adding a new integration
                     className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center text-sm"
@@ -95,7 +95,7 @@ const Integrations = ({ integrations, onConnectToggle, onViewDetails, onAddInteg
                         />
                     ))
                 ) : (
-                    <p className="col-span-full text-gray-400 text-center py-8">
+                    <p className="col-span-full theme-text-secondary text-center py-8">
                         No integrations configured yet. Click "Add New Integration" to get started.
                     </p>
                 )}

@@ -82,31 +82,31 @@ const CreateAlertModal = ({ onClose, onSave, initialData = null }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-lg text-white">
-                <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
-                    <h3 className="text-2xl font-bold text-[#c0933e]">{initialData?.id ? 'Edit Alert' : 'Create New Alert'}</h3>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white">
+            <div className="theme-bg-card rounded-2xl shadow-2xl p-6 w-full max-w-lg theme-text-primary">
+                <div className="flex justify-between items-center mb-4 border-b theme-border-color pb-3">
+                    <h3 className="text-2xl font-bold theme-text-highlight-color">{initialData?.id ? 'Edit Alert' : 'Create New Alert'}</h3>
+                    <button onClick={onClose} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={24} />
                     </button>
                 </div>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Alert Name</label>
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Alert Name</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="e.g., High-Risk Transaction Alert"
-                            className="w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-white focus:ring-[#c0933e] focus:border-[#c0933e]"
+                            className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary focus:ring-yellow-500 focus:border-yellow-500"
                         />
                     </div>
                     {/* NEW: Trigger Event Type Dropdown */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Trigger Event Type</label>
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Trigger Event Type</label>
                         <select
                             value={eventType}
                             onChange={(e) => setEventType(e.target.value)}
-                            className="w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-white focus:ring-[#c0933e] focus:border-[#c0933e]"
+                            className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary focus:ring-yellow-500 focus:border-yellow-500"
                         >
                             {availableEventTypes.map(type => (
                                 <option key={type} value={type}>{type}</option>
@@ -114,20 +114,20 @@ const CreateAlertModal = ({ onClose, onSave, initialData = null }) => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Message Template</label>
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Message Template</label>
                         <textarea
                             value={messageTemplate}
                             onChange={(e) => setMessageTemplate(e.target.value)}
                             placeholder={eventTypePlaceholders[eventType]} // Dynamic placeholder based on event type
-                            className="w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-white focus:ring-[#c0933e] focus:border-[#c0933e] h-32"
+                            className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary focus:ring-yellow-500 focus:border-yellow-500 h-32"
                         />
-                        <p className="text-xs text-gray-400 mt-1">
-                            Use placeholders specific to the event (e.g., <code className="bg-gray-700 text-gray-200 p-1 rounded">{'{{task.title}}'}</code> for "Task Assignment").
+                        <p className="text-xs theme-text-secondary mt-1">
+                            Use placeholders specific to the event (e.g., <code className="bg-gray-100 dark:bg-gray-700 theme-text-primary p-1 rounded">{'{{task.title}}'}</code> for "Task Assignment").
                         </p>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Delivery Channels</label>
-                        <div className="flex flex-wrap gap-4 p-3 bg-gray-700 rounded-md">
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Delivery Channels</label>
+                        <div className="flex flex-wrap gap-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
                             {availableChannels.map(channel => (
                                 <label key={channel} className="flex items-center cursor-pointer">
                                     <input
@@ -136,14 +136,14 @@ const CreateAlertModal = ({ onClose, onSave, initialData = null }) => {
                                         onChange={() => handleChannelChange(channel)}
                                         className="h-4 w-4 text-blue-600 rounded border-gray-600 focus:ring-blue-500 bg-gray-900"
                                     />
-                                    <span className="ml-2 text-gray-200">{channel}</span>
+                                    <span className="ml-2 theme-text-primary">{channel}</span>
                                 </label>
                             ))}
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-end pt-6 mt-6 border-t border-gray-700">
-                    <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700 mr-2">
+                <div className="flex justify-end pt-6 mt-6 border-t theme-border-color">
+                    <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700 text-white mr-2">
                         Cancel
                     </button>
                     <button

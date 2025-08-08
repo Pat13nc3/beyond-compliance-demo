@@ -13,7 +13,9 @@ import {
     Cpu,
     Settings as SettingsIcon,
     Bot, // AI Agent icon
-    Minus // Using Minus for a simple separator, or can be a custom div
+    GanttChart, // Used for Task Management
+    ChevronLeft, // Icon for collapsing sidebar
+    ChevronRight, // Icon for expanding sidebar
 } from 'lucide-react';
 
 const NavItem = ({ icon, text, active, onClick, isSidebarOpen, isSeparator = false }) => {
@@ -22,9 +24,9 @@ const NavItem = ({ icon, text, active, onClick, isSidebarOpen, isSeparator = fal
         return (
             <li className="my-4">
                 {isSidebarOpen ? (
-                    <div className="border-t border-gray-700 mx-4"></div>
+                    <div className="border-t theme-border-color mx-4"></div>
                 ) : (
-                    <div className="border-t border-gray-700 my-2"></div>
+                    <div className="border-t theme-border-color my-2"></div>
                 )}
             </li>
         );
@@ -32,9 +34,12 @@ const NavItem = ({ icon, text, active, onClick, isSidebarOpen, isSeparator = fal
     return (
         <li
             onClick={onClick}
-            className={`flex items-center p-3 my-1 rounded-lg cursor-pointer transition-colors ${
-                active ? 'bg-[#c0933e] text-gray-900 font-bold' : 'text-gray-400 hover:bg-gray-700 hover:text-white'
-            }`}
+            className={`flex items-center p-3 my-1 rounded-lg cursor-pointer transition-colors
+                ${active
+                    ? 'bg-blue-600 dark:bg-[#c0933e] text-white dark:text-black font-bold'
+                    : 'bg-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`
+            }
         >
             {icon}
             {isSidebarOpen && <span className="ml-4 transition-opacity duration-300">{text}</span>}
@@ -46,26 +51,28 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
     const navItems = [
         { id: 'Dashboard', icon: <LayoutDashboard size={20} />, text: 'Dashboard' },
         { id: 'ComplianceReporting', icon: <FileText size={20} />, text: 'Compliance Reporting' },
-        { id: 'AIAgent', icon: <Bot size={20} />, text: 'AI Agent' }, // Moved AI Agent here
+        { id: 'AIAgent', icon: <Bot size={20} />, text: 'AI Agent' },
+        { id: 'TaskManagement', icon: <GanttChart size={20} />, text: 'Task Management' },
         { id: 'DataManagement', icon: <Database size={20} />, text: 'Data Management' },
         { id: 'Library', icon: <Book size={20} />, text: 'Library' },
         { id: 'RiskAssessment', icon: <Shield size={20} />, text: 'Risk Assessment' },
         { id: 'Licensing', icon: <Award size={20} />, text: 'Licensing' },
         { id: 'RegulatoryUpdates', icon: <Rss size={20} />, text: 'Regulatory Updates' },
-        // Visual Separator
-        { id: 'separator-1', isSeparator: true },
         { id: 'Manage', icon: <Cpu size={20} />, text: 'Manage' },
         { id: 'Settings', icon: <SettingsIcon size={20} />, text: 'Settings' },
     ];
 
     return (
         <div
-            className={`bg-[#1e252d] flex flex-col transition-all duration-300 ease-in-out ${
-                isSidebarOpen ? 'w-64' : 'w-20'
+            className={`theme-bg-page flex flex-col transition-all duration-300 ease-in-out ${
+                isSidebarOpen ? 'w-[280px]' : 'w-20'
             }`}
         >
-            <div className="flex items-center justify-center h-20 border-b border-gray-700">
-                <h1 className={`text-2xl font-bold text-[#c0933e] transition-opacity duration-300 whitespace-nowrap ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="flex items-center justify-start py-4 pl-4"> {/* Removed h-20, changed justify-center to justify-start, added py-4 pl-4 */}
+                <h1
+                    className={`text-lg font-medium uppercase theme-text-secondary whitespace-nowrap`}
+                    style={{ fontFamily: 'var(--sidebar-header-font-family)' }}
+                >
                     Beyond Compliance
                 </h1>
             </div>
@@ -77,13 +84,24 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
                             icon={item.icon}
                             text={item.text}
                             active={activeTab === item.id}
-                            onClick={() => !item.isSeparator && setActiveTab(item.id)} // Prevent clicking separator
+                            onClick={() => !item.isSeparator && setActiveTab(item.id)}
                             isSidebarOpen={isSidebarOpen}
                             isSeparator={item.isSeparator}
                         />
                     ))}
                 </ul>
             </nav>
+            {/* The EMTECH branding section remains */}
+            <div className="flex-shrink-0 p-4 border-t theme-border-color flex justify-center items-center">
+                {isSidebarOpen ? (
+                    <div>
+                        <p className="text-sm theme-text-secondary">Powered by</p>
+                        <p className="text-2xl font-bold theme-text-primary">EM<span className="theme-text-highlight-color">TECH</span></p>
+                    </div>
+                ) : (
+                    <p className="text-2xl font-bold theme-text-primary">E<span className="theme-text-highlight-color">M</span></p>
+                )}
+            </div>
         </div>
     );
 };

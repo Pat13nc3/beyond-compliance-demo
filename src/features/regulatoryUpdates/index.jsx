@@ -25,14 +25,14 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnaly
     // const handleConfirmAnalysis = (analysisResult) => { ... };
 
     return (
-        <div className="p-6">
+        <div className="p-6 theme-bg-page min-h-screen">
             <div className="space-y-6 animate-fade-in">
                 <div>
-                    <h2 className="text-3xl font-bold text-gray-800">Regulatory Updates</h2>
-                    <p className="text-gray-500">Monitor and manage the lifecycle of evolving regulatory information.</p>
+                    <h2 className="text-3xl font-bold theme-text-primary">Regulatory Updates</h2>
+                    <p className="theme-text-secondary">Monitor and manage the lifecycle of evolving regulatory information.</p>
                 </div>
                 
-                <div className="bg-white p-4 rounded-lg shadow-md">
+                <div className="theme-bg-card p-4 rounded-lg shadow-md">
                     <div className="flex justify-between items-center mb-4">
                         <div className="flex space-x-4">
                             {/* Filter dropdowns can be added here */}
@@ -40,11 +40,11 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnaly
                     </div>
                     <div className="space-y-4">
                         {updates.map(update => (
-                            <div key={update.id} className="p-4 border rounded-lg flex justify-between items-center">
+                            <div key={update.id} className="p-4 border theme-border-color rounded-lg flex justify-between items-center">
                                 <div>
-                                    <h4 className="font-bold text-lg">{update.title}</h4>
-                                    <p className="text-sm text-gray-600">{update.source} - Published: {update.publishedDate}</p>
-                                    <p className="text-sm mt-2">{update.summary}</p>
+                                    <h4 className="font-bold text-lg theme-text-primary">{update.title}</h4>
+                                    <p className="text-sm theme-text-secondary">{update.source} - Published: {update.publishedDate}</p>
+                                    <p className="text-sm mt-2 theme-text-primary">{update.summary}</p>
                                 </div>
                                 <div className="flex space-x-2">
                                     <button onClick={() => handleViewDetails(update)} className="text-blue-600 flex items-center"><Eye size={16} className="mr-1"/> View Details</button>

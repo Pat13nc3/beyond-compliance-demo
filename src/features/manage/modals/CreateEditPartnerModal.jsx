@@ -70,32 +70,32 @@ const CreateEditPartnerModal = ({ onClose, onSave, initialData = null }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-lg text-white">
-                <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
-                    <h3 className="text-2xl font-bold text-[#c0933e]">
+            <div className="theme-bg-card rounded-2xl shadow-2xl p-6 w-full max-w-lg theme-text-primary">
+                <div className="flex justify-between items-center mb-4 border-b theme-border-color pb-3">
+                    <h3 className="text-2xl font-bold theme-text-highlight-color">
                         {isEditing ? 'Edit Partner' : 'Add New Partner'}
                     </h3>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white">
+                    <button onClick={onClose} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={24} />
                     </button>
                 </div>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Partner Name</label>
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Partner Name</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="e.g., First National Bank"
-                            className="w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-white focus:ring-[#c0933e] focus:border-[#c0933e]"
+                            className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary focus:ring-yellow-500 focus:border-yellow-500"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Partner Type</label>
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Partner Type</label>
                         <select
                             value={type}
                             onChange={(e) => setType(e.target.value)}
-                            className="w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-white focus:ring-[#c0933e] focus:border-[#c0933e]"
+                            className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary focus:ring-yellow-500 focus:border-yellow-500"
                         >
                             {partnerTypes.map(pType => (
                                 <option key={pType} value={pType}>{pType}</option>
@@ -103,11 +103,11 @@ const CreateEditPartnerModal = ({ onClose, onSave, initialData = null }) => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Status</label>
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
-                            className="w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-white focus:ring-[#c0933e] focus:border-[#c0933e]"
+                            className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary focus:ring-yellow-500 focus:border-yellow-500"
                         >
                             {partnerStatuses.map(pStatus => (
                                 <option key={pStatus} value={pStatus}>{pStatus}</option>
@@ -115,8 +115,8 @@ const CreateEditPartnerModal = ({ onClose, onSave, initialData = null }) => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Shared Data Categories</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 bg-gray-700 rounded-md max-h-48 overflow-y-auto custom-scrollbar">
+                        <label className="block text-sm font-medium theme-text-secondary mb-2">Shared Data Categories</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md max-h-48 overflow-y-auto custom-scrollbar">
                             {availableDataCategories.map(category => (
                                 <label key={category} className="flex items-center cursor-pointer">
                                     <input
@@ -125,14 +125,14 @@ const CreateEditPartnerModal = ({ onClose, onSave, initialData = null }) => {
                                         onChange={() => handleSharedDataChange(category)}
                                         className="h-4 w-4 text-blue-600 rounded border-gray-600 focus:ring-blue-500 bg-gray-900"
                                     />
-                                    <span className="ml-2 text-sm text-gray-300">{category}</span>
+                                    <span className="ml-2 text-sm theme-text-primary">{category}</span>
                                 </label>
                             ))}
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-end pt-6 mt-6 border-t border-gray-700">
-                    <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700 mr-2">
+                <div className="flex justify-end pt-6 mt-6 border-t theme-border-color">
+                    <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700 text-white mr-2">
                         Cancel
                     </button>
                     <button type="button" onClick={handleSave} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-blue-500 flex items-center">

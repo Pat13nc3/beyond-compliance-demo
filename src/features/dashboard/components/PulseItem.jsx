@@ -4,27 +4,26 @@ import React from 'react';
 import { Newspaper, Lightbulb } from 'lucide-react';
 
 const PulseItem = ({ pulse, onClick }) => {
-    // Defensive check: If 'pulse' prop is undefined or null, prevent rendering and crashing
     if (!pulse) {
         console.warn("PulseItem received an undefined or null 'pulse' prop. Skipping render.");
-        return null; // Return null to prevent the component from trying to access properties of undefined
+        return null;
     }
 
     const icons = {
-        UPDATE: <Newspaper size={20} className="text-gray-400" />,
+        UPDATE: <Newspaper size={20} className="theme-text-secondary" />,
         ANALYSIS: <Lightbulb size={20} className="text-yellow-400" />
     };
 
     return (
         <button
             onClick={() => onClick(pulse)}
-            className="w-full text-left border-b border-gray-700 pb-3 hover:bg-gray-800 p-2 rounded-md transition-colors"
+            className="w-full text-left border-b theme-border-color pb-3 hover:bg-gray-700 p-2 rounded-md transition-colors"
         >
             <div className="flex items-start">
                 <div className="mr-3 mt-1">{icons[pulse.type]}</div>
                 <div>
-                    <p className="font-semibold text-white">{pulse.title}</p>
-                    <p className="text-xs text-gray-500">{pulse.source} - {pulse.date}</p>
+                    <p className="font-semibold theme-text-primary">{pulse.title}</p>
+                    <p className="text-xs theme-text-secondary">{pulse.source} - {pulse.date}</p>
                 </div>
             </div>
         </button>

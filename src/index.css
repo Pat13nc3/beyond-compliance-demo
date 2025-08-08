@@ -1,41 +1,136 @@
-/* src/index.css */
+    /* src/index.css */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
 
-/* Ensure html and body fill the screen perfectly and remove default margins */
-html, body {
-  height: 100%; /* Ensure they take full height of their parent (viewport) */
-  min-height: 100vh; /* Ensure they take at least viewport height */
-  margin: 0; /* REMOVE default browser margins */
-  padding: 0; /* REMOVE default browser padding */
-  background-color: #1a202c; /* Ensure a consistent dark background at the highest level (Tailwind's bg-gray-900 is #1a202c) */
-  color: #e2e8f0; /* Default text color for dark mode */
-}
+    /* Define CSS variables for light and dark themes */
+    :root {
+      --background-light: #F3F4F6;
+      --background-dark: #1C2024;
+      --text-primary-light: #1F2937;
+      --text-primary-dark: #E5E7EB;
+      --text-secondary-light: #6B7280;
+      --text-secondary-dark: #9CA3AF;
 
-/* Optional: Custom scrollbar styling */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px; /* Width for vertical scrollbar */
-  height: 8px; /* Height for horizontal scrollbar */
-}
+      --background-card-light: #FFFFFF;
+      --background-card-dark: #22262B;
+      
+      /* NEW: Define a slightly different background for nested cards/elements */
+      --background-card-alt-light: #F9FAFB; /* Lighter than main card in light mode */
+      --background-card-alt-dark: #2A3035; /* Slightly lighter than main card in dark mode */
+      
+      --highlight-color-dark: #c0933e;
+      --highlight-color-light: #1A73E8;
+      --danger-color: #f87171;
+      --light-danger-color: #B91C1C;
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #2d3748; /* Dark track */
-  border-radius: 10px;
-}
+      /* NEW: Custom font family for the sidebar header */
+      --sidebar-header-font-family: 'Avenir', 'Inter', 'Helvetica Neue', sans-serif;
+    }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #4a5568; /* Darker thumb */
-  border-radius: 10px;
-}
+    /* Apply light theme by default, or if data-theme="light" is set */
+    [data-theme='light'],
+    :root {
+      --background-page: var(--background-light);
+      --text-primary: var(--text-primary-light);
+      --text-secondary: var(--text-secondary-light);
+      --background-card: var(--background-card-light);
+      --border-color: var(--border-color-light);
+      --highlight-color: var(--highlight-color-light); /* Use blue for light theme */
+      --background-card-alt: var(--background-card-alt-light); /* Assign alt background for light theme */
+    }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #616e7f; /* Even darker on hover */
-}
+    /* Apply dark theme when data-theme="dark" is set */
+    [data-theme='dark'] {
+      --background-page: var(--background-dark);
+      --text-primary: var(--text-primary-dark);
+      --text-secondary: var(--text-secondary-dark);
+      --background-card: var(--background-card-dark);
+      --border-color: var(--border-color-dark);
+      --highlight-color: var(--highlight-color-dark); /* Use gold for dark theme */
+      --background-card-alt: var(--background-card-alt-dark); /* Assign alt background for dark theme */
+    }
 
-/* For Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #4a5568 #2d3748;
-}
+
+    /* Global base styles using CSS variables */
+    html, body {
+      height: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-page);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Re-usable utility classes for consistency across components */
+    .theme-bg-page {
+      background-color: var(--background-page);
+    }
+
+    .theme-bg-card {
+      background-color: var(--background-card);
+    }
+
+    /* NEW: Add theme-bg-card-alt utility class */
+    .theme-bg-card-alt {
+      background-color: var(--background-card-alt);
+    }
+
+    .theme-text-primary {
+      color: var(--text-primary);
+    }
+
+    .theme-text-secondary {
+      color: var(--text-secondary);
+    }
+
+    .theme-border-color {
+      border-color: var(--border-color);
+    }
+
+    /* Updated highlight and new danger classes */
+    .theme-text-highlight-color {
+        color: var(--highlight-color);
+    }
+
+    .theme-bg-highlight-color {
+        background-color: var(--highlight-color);
+    }
+
+    .theme-text-danger-color {
+        color: var(--danger-color);
+    }
+
+    [data-theme='light'] .theme-text-danger-color {
+        color: var(--light-danger-color);
+    }
+
+
+    /* Optional: Custom scrollbar styling for both themes */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px; /* Width for vertical scrollbar */
+      height: 8px; /* Height for horizontal scrollbar */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: var(--background-card); /* Dark track */
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--text-secondary); /* Darker thumb */
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #616e7f; /* Even darker on hover */
+    }
+
+    /* For Firefox */
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: var(--text-secondary) var(--background-card);
+    }
+    

@@ -1,6 +1,6 @@
 // src/features/dataManagement/components/DetailedRecordsTable.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import RecordDetailsModal from '../modals/RecordDetailsModal.jsx';
 import {
     CheckCircle,
@@ -10,17 +10,9 @@ import {
     Filter,
     ArrowUp,
     ArrowDown,
-    Lightbulb // Import Lightbulb icon for AI Assist button
+    Lightbulb
 } from 'lucide-react';
 
-/**
- * generateDummyData Function
- *
- * This function creates an array of dummy data records for demonstration purposes.
- * It includes various types (KYC, User, Payment, AML Alert, Sanctions Check) with different sources, statuses,
- * and detailed information for drill-down.
- * In a real application, this data would be fetched from a backend API or Firestore.
- */
 const generateDummyData = () => {
     const data = [];
     const types = ['KYC', 'User', 'Payment', 'AML Alert', 'Sanctions Check'];
@@ -113,7 +105,7 @@ const generateDummyData = () => {
                 resolution: status,
             };
         }
-        
+
         data.push({
             id: i,
             date: date,
@@ -128,13 +120,6 @@ const generateDummyData = () => {
     return data;
 };
 
-/**
- * DetailedRecordsTable Component
- *
- * Props:
- * - initialFilters: An optional object to set initial filter states when the component mounts.
- * - triggerAIAnalysis: Function passed from App.jsx to trigger AI analysis
- */
 const DetailedRecordsTable = ({ initialFilters = {}, triggerAIAnalysis }) => {
     const [allData, setAllData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -146,7 +131,6 @@ const DetailedRecordsTable = ({ initialFilters = {}, triggerAIAnalysis }) => {
     const [sortBy, setSortBy] = useState('date');
     const [sortOrder, setSortOrder] = useState('desc');
 
-    // Define filter options for dropdowns
     const dataTypeOptions = ['All', 'KYC', 'User', 'Payment', 'AML Alert', 'Sanctions Check'];
     const sourceOptions = ['All', 'Stripe', 'Visa', 'Mastercard', 'Internal', 'Manual', 'SmileID', 'Onfido', 'TransactionMonitor', 'WatchlistScreen'];
 
@@ -259,71 +243,80 @@ const DetailedRecordsTable = ({ initialFilters = {}, triggerAIAnalysis }) => {
     };
 
     return (
-        <div className="p-6 bg-gray-900 min-h-screen text-white">
+        <div className="p-6 theme-bg-page min-h-screen theme-text-primary">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-4xl font-extrabold text-gray-100 mb-8 text-center">Detailed Data Records</h1>
+                <h1 className="text-4xl font-extrabold theme-text-primary mb-8 text-center">Detailed Data Records</h1>
 
-                {/* Filters Section */}
-                <div className="mb-8 p-6 bg-gray-800 rounded-lg shadow-inner border border-gray-700">
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-                        <h2 className="text-2xl font-semibold text-gray-200 mb-4 md:mb-0">Data Filters</h2>
-                        {/* CHANGED: Data Type Filter to Dropdown */}
-                        <div className="relative flex items-center"> {/* Added flex and items-center for icon alignment */}
+                {/* Filters Section Refactored */}
+                <div className="mb-8 p-6 theme-bg-card rounded-lg shadow-inner border theme-border-color">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                        <h2 className="text-2xl font-semibold theme-text-primary">Filters & Search</h2>
+                        <button
+                            onClick={handleAnalyzeWithAI}
+                            disabled={filteredData.length === 0}
+                            className="bg-purple-600 text-black dark:text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-purple-500 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Lightbulb size={16} className="mr-2"/> Analyze with AI
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="relative">
+                            <label htmlFor="dataType" className="block text-sm font-medium theme-text-secondary mb-1">Data Type</label>
                             <select
+                                id="dataType"
                                 value={currentDataTypeFilter}
                                 onChange={(e) => setCurrentDataTypeFilter(e.target.value)}
-                                className="appearance-none bg-gray-700 text-white border border-gray-600 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                                // Explicitly style the select and its options for consistent visibility
+                                className="w-full px-4 py-2 border theme-border-color rounded-md bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-yellow-500 focus:border-yellow-500 [&_option]:bg-white dark:[&_option]:bg-gray-800 [&_option]:text-black dark:[&_option]:text-white"
                             >
                                 {dataTypeOptions.map(option => (
                                     <option key={option} value={option}>{option === 'All' ? 'All Data Types' : option}</option>
                                 ))}
                             </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.096 6.924 4.682 8.338z"/></svg>
-                            </div>
                         </div>
-                    </div>
-
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-                        <h3 className="text-xl font-medium text-gray-300 mb-4 md:mb-0">Source Filters</h3>
-                        {/* CHANGED: Source Filter to Dropdown */}
-                        <div className="relative flex items-center"> {/* Added flex and items-center for icon alignment */}
+                        <div className="relative">
+                            <label htmlFor="sourceFilter" className="block text-sm font-medium theme-text-secondary mb-1">Source</label>
                             <select
+                                id="sourceFilter"
                                 value={currentSourceFilter}
                                 onChange={(e) => setCurrentSourceFilter(e.target.value)}
-                                className="appearance-none bg-gray-700 text-white border border-gray-600 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                                // Explicitly style the select and its options for consistent visibility
+                                className="w-full px-4 py-2 border theme-border-color rounded-md bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-yellow-500 focus:border-yellow-500 [&_option]:bg-white dark:[&_option]:bg-gray-800 [&_option]:text-black dark:[&_option]:text-white"
                             >
                                 {sourceOptions.map(option => (
                                     <option key={option} value={option}>{option === 'All' ? 'All Sources' : option}</option>
                                 ))}
                             </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.096 6.924 4.682 8.338z"/></svg>
-                            </div>
+                        </div>
+                        <div className="relative">
+                            <label htmlFor="timePeriod" className="block text-sm font-medium theme-text-secondary mb-1">Time Period</label>
+                            <select
+                                id="timePeriod"
+                                value={currentTimeFilter}
+                                onChange={(e) => setCurrentTimeFilter(e.target.value)}
+                                // Explicitly style the select and its options for consistent visibility
+                                className="w-full px-4 py-2 border theme-border-color rounded-md bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-yellow-500 focus:border-yellow-500 [&_option]:bg-white dark:[&_option]:bg-gray-800 [&_option]:text-black dark:[&_option]:text-white"
+                            >
+                                <option value="All">All Time</option>
+                                <option value="Year">Last Year</option>
+                                <option value="Month">Last Month</option>
+                                <option value="Week">Last Week</option>
+                            </select>
                         </div>
                     </div>
-
-                    <div className="flex flex-col md:flex-row justify-between items-center">
-                        <h3 className="text-xl font-medium text-gray-300 mb-4 md:mb-0">Time Aggregation</h3>
-                        {/* KEPT: Time Aggregation as buttons */}
-                        <div className="flex flex-wrap gap-4">
-                            <button onClick={() => setCurrentTimeFilter('All')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'All' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>All Time</button>
-                            <button onClick={() => setCurrentTimeFilter('Year')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'Year' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>Last Year</button>
-                            <button onClick={() => setCurrentTimeFilter('Month')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'Month' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>Last Month</button>
-                            <button onClick={() => setCurrentTimeFilter('Week')} className={`px-6 py-3 rounded-full shadow-md transition duration-300 ${currentTimeFilter === 'Week' ? 'bg-[#c0933e] text-[#1e252d] font-semibold focus:outline-none focus:ring-2 focus:ring-[#c0933e]' : 'bg-gray-700 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75'}`}>Last Week</button>
-                        </div>
-                    </div>
+                    
                     <div className="mt-6">
                         <label htmlFor="search" className="sr-only">Search Records</label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                <Search className="h-5 w-5 theme-text-secondary" aria-hidden="true" />
                             </div>
                             <input
                                 type="text"
                                 id="search"
                                 name="search"
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md leading-5 bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+                                className="block w-full pl-10 pr-3 py-2 border theme-border-color rounded-md leading-5 bg-gray-100 dark:bg-gray-800 theme-text-primary placeholder-theme-text-secondary focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
                                 placeholder="Search records..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -332,63 +325,57 @@ const DetailedRecordsTable = ({ initialFilters = {}, triggerAIAnalysis }) => {
                     </div>
                 </div>
 
-                {/* Data Display Section */}
-                <div className="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
+                <div className="theme-bg-card rounded-lg shadow-xl p-6 border theme-border-color">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-3xl font-bold text-gray-100">
-                            {currentDataTypeFilter !== 'All' ? currentDataTypeFilter + ' ' : 'All '}Data Records
-                            <span className="text-gray-400 text-lg ml-2">({filteredData.length} records)</span>
+                        <h2 className="text-3xl font-bold theme-text-primary">
+                            Data Records
+                            <span className="theme-text-secondary text-lg ml-2">({filteredData.length} records)</span>
                         </h2>
-                        {/* Analyze with AI Button */}
-                        <button
-                            onClick={handleAnalyzeWithAI}
-                            disabled={filteredData.length === 0} // Disable if no data to analyze
-                            // Removed temporary diagnostic style, assuming it will render correctly now
-                            className="bg-purple-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-purple-500 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Lightbulb size={16} className="mr-2"/> Analyze with AI
-                        </button>
                     </div>
-                    <div className="overflow-x-auto rounded-lg shadow-md border border-gray-700">
-                        <table className="min-w-full divide-y divide-gray-700">
-                            <thead className="bg-gray-700">
+                    <div className="overflow-x-auto rounded-lg shadow-md border theme-border-color">
+                        <table className="min-w-full divide-y theme-border-color">
+                            <thead className="bg-gray-100 dark:bg-gray-700">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white" onClick={() => handleSort('date')}>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium theme-text-secondary uppercase tracking-wider cursor-pointer hover:theme-text-primary" onClick={() => handleSort('date')}>
                                         <div className="flex items-center">Date {renderSortIcon('date')}</div>
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white" onClick={() => handleSort('type')}>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium theme-text-secondary uppercase tracking-wider cursor-pointer hover:theme-text-primary" onClick={() => handleSort('type')}>
                                         <div className="flex items-center">Type {renderSortIcon('type')}</div>
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white" onClick={() => handleSort('source')}>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium theme-text-secondary uppercase tracking-wider cursor-pointer hover:theme-text-primary" onClick={() => handleSort('source')}>
                                         <div className="flex items-center">Source {renderSortIcon('source')}</div>
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Description</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white" onClick={() => handleSort('value')}>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium theme-text-secondary uppercase tracking-wider">Description</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium theme-text-secondary uppercase tracking-wider cursor-pointer hover:theme-text-primary" onClick={() => handleSort('value')}>
                                         <div className="flex items-center">Value {renderSortIcon('value')}</div>
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:text-white" onClick={() => handleSort('status')}>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium theme-text-secondary uppercase tracking-wider cursor-pointer hover:theme-text-primary" onClick={() => handleSort('status')}>
                                         <div className="flex items-center">Status {renderSortIcon('status')}</div>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-gray-800 divide-y divide-gray-700">
+                            <tbody className="divide-y theme-border-color">
                                 {filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">No records found for the selected filters.</td>
+                                        <td colSpan="6" className="px-6 py-4 text-center theme-text-secondary">No records found for the selected filters.</td>
                                     </tr>
                                 ) : (
                                     filteredData.map(record => (
-                                        <tr key={record.id} className="hover:bg-gray-700 transition duration-150 ease-in-out cursor-pointer" onClick={() => setSelectedRecord(record)}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{record.date.toLocaleDateString()} {record.date.toLocaleTimeString()}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{record.type}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{record.source}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-200 truncate max-w-xs">{record.description}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{record.value}</td>
+                                        <tr 
+                                            key={record.id} 
+                                            className={`transition duration-150 ease-in-out cursor-pointer theme-bg-card hover:bg-gray-100 dark:hover:bg-gray-700`}
+                                            onClick={() => setSelectedRecord(record)}
+                                        >
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{record.date.toLocaleDateString()} {record.date.toLocaleTimeString()}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{record.type}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{record.source}</td>
+                                            <td className="px-6 py-4 text-sm theme-text-primary truncate max-w-xs">{record.description}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{record.value}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                    record.status === 'Approved' || record.status === 'Success' || record.status === 'No Match' ? 'bg-green-900 text-green-300' :
-                                                    record.status === 'Pending' || record.status === 'Under Review' || record.status === 'Potential Match' ? 'bg-yellow-900 text-yellow-300' :
-                                                    'bg-red-900 text-red-300'
+                                                    record.status === 'Approved' || record.status === 'Success' || record.status === 'No Match' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                                                    record.status === 'Pending' || record.status === 'Under Review' || record.status === 'Potential Match' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
                                                 }`}>
                                                     {record.status}
                                                 </span>
@@ -402,7 +389,6 @@ const DetailedRecordsTable = ({ initialFilters = {}, triggerAIAnalysis }) => {
                 </div>
             </div>
 
-            {/* Record Details Modal */}
             {selectedRecord && (
                 <RecordDetailsModal record={selectedRecord} onClose={() => setSelectedRecord(null)} />
             )}

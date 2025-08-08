@@ -63,17 +63,17 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 animate-fade-in">
-      <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg text-white"> {/* Changed from bg-white */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-700"> {/* Added border-gray-700 */}
-          <h2 className="text-xl font-bold text-[#c0933e]">{title}</h2> {/* Applied yellow accent color */}
-          <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700"> {/* Adjusted hover bg */}
-            <X size={20} className="text-gray-400" /> {/* Adjusted icon color */}
+      <div className="theme-bg-card rounded-xl shadow-2xl w-full max-w-lg theme-text-primary">
+        <div className="flex justify-between items-center p-4 border-b theme-border-color">
+          <h2 className="text-xl font-bold theme-text-highlight-color">{title}</h2>
+          <button onClick={onClose} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
+            <X size={20} className="theme-text-secondary" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">Organization Name</label> {/* Adjusted text color */}
+            <label htmlFor="name" className="block text-sm font-medium theme-text-secondary mb-1">Organization Name</label>
             <input
               type="text"
               id="name"
@@ -81,18 +81,18 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
               value={formState.name}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white" /* Adjusted input style */
+              className="w-full px-3 py-2 border theme-border-color rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 theme-bg-card theme-text-primary"
             />
           </div>
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-300 mb-1">Organization Type</label> {/* Adjusted text color */}
+            <label htmlFor="type" className="block text-sm font-medium theme-text-secondary mb-1">Organization Type</label>
             <select
               id="type"
               name="type"
               value={formState.type}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white" /* Adjusted select style */
+              className="w-full px-3 py-2 border theme-border-color rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 theme-bg-card theme-text-primary"
             >
               <option value="Bank Partner">Bank Partner</option>
               <option value="Legal Firm">Legal Firm</option>
@@ -101,7 +101,7 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
             </select>
           </div>
           <div>
-            <label htmlFor="representativeEmail" className="block text-sm font-medium text-gray-300 mb-1">Representative Email</label> {/* Adjusted text color */}
+            <label htmlFor="representativeEmail" className="block text-sm font-medium theme-text-secondary mb-1">Representative Email</label>
             <input
               type="email"
               id="representativeEmail"
@@ -109,26 +109,26 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
               value={formState.representativeEmail}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white" /* Adjusted input style */
+              className="w-full px-3 py-2 border theme-border-color rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 theme-bg-card theme-text-primary"
             />
           </div>
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-1">Status</label> {/* Adjusted text color */}
+            <label htmlFor="status" className="block text-sm font-medium theme-text-secondary mb-1">Status</label>
             <select
               id="status"
               name="status"
               value={formState.status}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white" /* Adjusted select style */
+              className="w-full px-3 py-2 border theme-border-color rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 theme-bg-card theme-text-primary"
             >
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-300 mb-2">Shared Data Permissions</h3> {/* Adjusted text color */}
-            <div className="grid grid-cols-2 gap-2 p-3 bg-gray-700 rounded-md max-h-48 overflow-y-auto custom-scrollbar"> {/* Adjusted background and added scrollbar */}
+            <h3 className="text-sm font-medium theme-text-secondary mb-2">Shared Data Permissions</h3>
+            <div className="grid grid-cols-2 gap-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md max-h-48 overflow-y-auto custom-scrollbar">
               <label className="inline-flex items-center">
                 <input
                   type="checkbox"
@@ -136,9 +136,9 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
                   value="KYC Records (Limited)"
                   checked={formState.sharedData.includes('KYC Records (Limited)')}
                   onChange={handleSharedDataChange}
-                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900" /* Adjusted checkbox style */
+                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900"
                 />
-                <span className="ml-2 text-sm text-gray-300">KYC Records (Limited)</span> {/* Adjusted text color */}
+                <span className="ml-2 text-sm theme-text-primary">KYC Records (Limited)</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -147,9 +147,9 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
                   value="Transaction Data (Filtered)"
                   checked={formState.sharedData.includes('Transaction Data (Filtered)')}
                   onChange={handleSharedDataChange}
-                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900" /* Adjusted checkbox style */
+                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900"
                 />
-                <span className="ml-2 text-sm text-gray-300">Transaction Data (Filtered)</span> {/* Adjusted text color */}
+                <span className="ml-2 text-sm theme-text-primary">Transaction Data (Filtered)</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -158,9 +158,9 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
                   value="Compliance Reports"
                   checked={formState.sharedData.includes('Compliance Reports')}
                   onChange={handleSharedDataChange}
-                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900" /* Adjusted checkbox style */
+                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900"
                 />
-                <span className="ml-2 text-sm text-gray-300">Compliance Reports</span> {/* Adjusted text color */}
+                <span className="ml-2 text-sm theme-text-primary">Compliance Reports</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -169,23 +169,23 @@ const AddOrganizationModal = ({ onClose, onSave, organization }) => {
                   value="Audit Logs"
                   checked={formState.sharedData.includes('Audit Logs')}
                   onChange={handleSharedDataChange}
-                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900" /* Adjusted checkbox style */
+                  className="rounded text-blue-600 border-gray-600 focus:ring-blue-500 bg-gray-900"
                 />
-                <span className="ml-2 text-sm text-gray-300">Audit Logs</span> {/* Adjusted text color */}
+                <span className="ml-2 text-sm theme-text-primary">Audit Logs</span>
               </label>
             </div>
           </div>
-          <div className="flex justify-end pt-4 border-t border-gray-700"> {/* Adjusted border-t color */}
+          <div className="flex justify-end pt-4 border-t theme-border-color">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 mr-2" /* Adjusted button style */
+              className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 mr-2"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-[#c0933e] text-[#1e252d] font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 flex items-center" /* Adjusted button style */
+              className="theme-bg-highlight-color text-black font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 flex items-center"
             >
               {isEditing ? <Save size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />}
               {buttonText}

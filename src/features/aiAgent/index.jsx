@@ -174,10 +174,10 @@ const AIAgent = () => {
     };
 
     return (
-        <div className="p-6 bg-gray-900 h-full text-white flex flex-col">
+        <div className="p-6 theme-bg-page h-full theme-text-primary flex flex-col">
             <div className="max-w-7xl mx-auto flex flex-col h-full w-full">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-3xl font-bold text-[#c0933e]">
+                    <h2 className="text-[32px] leading-[40px] font-bold theme-text-highlight-color">
                         <Bot size={32} className="inline-block mr-3 text-gray-400" /> Regulatory AI Agent
                     </h2>
                     <button
@@ -192,25 +192,25 @@ const AIAgent = () => {
                     <nav className="-mb-px flex space-x-4">
                         <button
                             onClick={() => setActiveView('overview')}
-                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'overview' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}
+                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'overview' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'text-gray-400 hover:text-white'}`}
                         >
                             <LayoutDashboard size={18} className="inline-block mr-2" /> Overview
                         </button>
                         <button
                             onClick={() => setActiveView('configuration')}
-                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'configuration' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}
+                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'configuration' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'text-gray-400 hover:text-white'}`}
                         >
                             <Settings size={18} className="inline-block mr-2" /> Configuration
                         </button>
                         <button
                             onClick={() => setActiveView('activities')}
-                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'activities' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}
+                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'activities' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'text-gray-400 hover:text-white'}`}
                         >
                             <Activity size={18} className="inline-block mr-2" /> Activity Log
                         </button>
                         <button
                             onClick={() => setActiveView('insights')}
-                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'insights' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}
+                            className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeView === 'insights' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'text-gray-400 hover:text-white'}`}
                         >
                             <Lightbulb size={18} className="inline-block mr-2" /> Insights
                         </button>

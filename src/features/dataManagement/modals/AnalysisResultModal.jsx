@@ -1,33 +1,16 @@
 import React from 'react';
 import { X, CheckCircle, AlertTriangle, ArrowRight, Edit } from 'lucide-react';
 
-/**
- * AnalysisResultModal Component
- *
- * This modal displays the results of a data analysis, showing the count of compliant
- * and non-compliant records. It also lists the specific non-compliant rows with
- * their reasons, and provides an option to "Isolate & Review Errors" for remediation.
- *
- * Props:
- * - result: An object containing the analysis outcome:
- * - compliantCount: Number of compliant records.
- * - nonCompliantCount: Number of non-compliant records.
- * - nonCompliantRows: An array of objects, each detailing a non-compliant row
- * (rowNumber, reason, rowData).
- * - onClose: Function to call to close the modal.
- * - onPromote: Function to call to promote the data to the library (if all compliant).
- * - onReview: Function to call to initiate the review/remediation process for non-compliant rows.
- */
 const AnalysisResultModal = ({ result, onClose, onPromote, onReview }) => {
     const { compliantCount, nonCompliantCount, nonCompliantRows } = result;
     const canPromote = nonCompliantCount === 0;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 animate-fade-in">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 w-full max-w-3xl transform transition-all animate-slide-up">
+            <div className="theme-bg-card rounded-lg shadow-2xl p-8 w-full max-w-3xl transform transition-all animate-slide-up">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Analysis Complete</h2>
-                    <button onClick={onClose} className="text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">
+                    <h2 className="text-2xl font-bold theme-text-primary">Analysis Complete</h2>
+                    <button onClick={onClose} className="theme-text-secondary hover:theme-text-primary">
                         <X size={24} />
                     </button>
                 </div>
@@ -46,12 +29,12 @@ const AnalysisResultModal = ({ result, onClose, onPromote, onReview }) => {
                     </div>
                     {nonCompliantCount > 0 && (
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Items Requiring Attention</h3>
+                            <h3 className="text-lg font-semibold theme-text-primary mb-2">Items Requiring Attention</h3>
                             <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                                 {nonCompliantRows.map(item => (
                                     <div key={item.rowNumber} className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-red-400">
-                                        <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">Row {item.rowNumber}: <span className="text-red-600 dark:text-red-400">{item.reason}</span></p>
-                                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate">Data: {item.rowData.join(', ')}</p>
+                                        <p className="font-semibold text-sm theme-text-primary">Row {item.rowNumber}: <span className="text-red-600 dark:text-red-400">{item.reason}</span></p>
+                                        <p className="text-xs theme-text-secondary truncate">Data: {item.rowData.join(', ')}</p>
                                     </div>
                                 ))}
                             </div>

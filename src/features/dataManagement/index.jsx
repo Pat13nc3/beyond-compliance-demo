@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Import all necessary icons, including Scale for IndicatorCard
-import { Plus, Link, Shield, TrendingUp, Zap, Database, Settings, Scale } from 'lucide-react'; 
+import { Plus, Link, Shield, TrendingUp, Zap, Database, Settings, Scale } from 'lucide-react';
 
 import DataSourceCard from './components/DataSourceCard.jsx';
 import FileAnalysisCard from './components/FileAnalysisCard.jsx';
@@ -16,7 +15,7 @@ import AuditLogModal from './modals/AuditLogModal.jsx';
 import SettingsModal from './modals/SettingsModal.jsx';
 import AddIndicatorModal from './modals/AddIndicatorModal.jsx';
 import ManageIndicatorModal from './modals/ManageIndicatorModal.jsx';
-import EtlProcessDetailsModal from './modals/EtlProcessDetailsModal.jsx'; 
+import EtlProcessDetailsModal from './modals/EtlProcessDetailsModal.jsx';
 import { mockDataSources, mockIndicators, mockUserAccessData, mockTransactionData, mockEtlProcesses, filesPendingAnalysis } from '../../data/mockData.js';
 import Toast from '../../components/ui/Toast.jsx';
 import ConfirmationModal from '../../components/modals/ConfirmationModal.jsx';
@@ -46,31 +45,28 @@ const IndicatorCard = ({ indicator, onManage }) => {
     const linkedSourcesCount = indicator.linkedSourceIds?.length || 0;
 
     return (
-        <div className={`bg-gray-800 p-5 rounded-lg shadow-lg text-white border border-gray-700 hover:${borderColor} transition-all duration-300 transform hover:-translate-y-1`}>
+        <div className={`theme-bg-card p-5 rounded-lg shadow-lg theme-text-primary border theme-border-color hover:${borderColor} transition-all duration-300 transform hover:-translate-y-1`}>
             <div>
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center">
-                        {/* CORRECTED: Use Scale icon for IndicatorCard to avoid 'source is not defined' error */}
-                        <div className="bg-gray-700 p-3 rounded-lg mr-4">
-                            <Scale size={20} className="text-blue-400" />
+                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg mr-4">
+                            <Scale size={20} className="text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h4 className="font-bold text-gray-100">{indicator.name}</h4>
-                            <p className="text-xs text-gray-400">{indicator.type}</p>
+                            <h4 className="font-bold theme-text-primary">{indicator.name}</h4>
+                            <p className="text-xs theme-text-secondary">{indicator.type}</p>
                         </div>
                     </div>
-                    {/* Placeholder for status info if needed for indicators */}
                 </div>
                 <div className="space-y-3 text-sm mb-4">
-                    <div className="flex justify-between"><span className="text-gray-400">Data Quality Score</span><span className="font-semibold text-green-400">N/A</span></div>
-                    <div className="flex justify-between"><span className="text-gray-400">Last Sync</span><span className="font-semibold text-gray-200">N/A</span></div>
-                    <div className="flex justify-between"><span className="text-gray-400">Records Synced</span><span className="font-semibold text-gray-200">N/A</span></div>
+                    <div className="flex justify-between"><span className="theme-text-secondary">Data Quality Score</span><span className="font-semibold text-green-400">N/A</span></div>
+                    <div className="flex justify-between"><span className="theme-text-secondary">Last Sync</span><span className="font-semibold theme-text-primary">N/A</span></div>
+                    <div className="flex justify-between"><span className="theme-text-secondary">Records Synced</span><span className="font-semibold theme-text-primary">N/A</span></div>
                 </div>
-                {/* Chart placeholder removed for simplicity here, as it's not directly part of indicator */}
             </div>
-            <div className="flex items-center justify-between pt-4 border-t border-gray-700 text-sm">
+            <div className="flex items-center justify-between pt-4 border-t theme-border-color text-sm">
                 <div className="flex items-center space-x-4">
-                    <span className="flex items-center text-gray-300"><Link size={14} className="mr-2"/> {linkedSourcesCount} Sources</span>
+                    <span className="flex items-center theme-text-secondary"><Link size={14} className="mr-2"/> {linkedSourcesCount} Sources</span>
                     <span className={`font-semibold ${isKri ? 'text-red-400' : 'text-green-400'}`}>
                         {isKri ? 'Threshold:' : 'Target:'} {indicator.targetValue} {indicator.targetUnit}
                     </span>
@@ -82,7 +78,7 @@ const IndicatorCard = ({ indicator, onManage }) => {
 };
 
 
-const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context, onCleanContext, triggerAIAnalysis }) => { // Receive triggerAIAnalysis
+const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context, onCleanContext, triggerAIAnalysis }) => {
     const navigate = useNavigate();
     const [dataSources, setDataSources] = useState(mockDataSources);
     const [indicatorLibrary, setIndicatorLibrary] = useState(mockIndicators);
@@ -102,10 +98,9 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
     const [activeTab, setActiveTab] = useState('Data Sources');
     const [confirmationModal, setConfirmationModal] = useState(null);
     const [etlDetailsModalData, setEtlDetailsModalData] = useState(null);
-    const [detailedRecordsFilters, setDetailedRecordsFilters] = useState(context?.detailedRecordsFilters || {}); // Initialize here
+    const [detailedRecordsFilters, setDetailedRecordsFilters] = useState(context?.detailedRecordsFilters || {});
 
 
-    // Effect to handle context from external navigation (e.g., from Dashboard)
     useEffect(() => {
         if (context) {
             if (context.initialTab) {
@@ -322,6 +317,12 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
         if (activeTab === 'KPI & KRI Library') return <button onClick={() => setIsAddIndicatorModalOpen(true)} className="bg-purple-600 text-white font-bold py-2 px-4 rounded-md hover:bg-purple-700 flex items-center"><Plus size={20} className="mr-2" /> Create Indicator</button>;
         return null;
     };
+    
+    // Function to handle navigating back from Workbench
+    const handleBackFromWorkbench = () => {
+        setShowWorkbench(false);
+        setWorkbenchContext(null);
+    };
 
     return (
         <>
@@ -330,19 +331,20 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                     fileId={workbenchContext?.fileId}
                     dataSourceId={workbenchContext?.dataSourceId}
                     isNew={workbenchContext?.isNew}
-                    onPromoteToLibrary={onPromoteToLibrary} 
+                    onPromoteToLibrary={onPromoteToLibrary}
+                    onBack={handleBackFromWorkbench}
                 />
             ) : (
-                <div className="p-6 bg-gray-900 min-h-screen text-white font-inter">
+                <div className="p-6 theme-bg-page min-h-screen theme-text-primary font-inter">
                     <div className="max-w-7xl mx-auto">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-3xl font-bold text-blue-400">Data Management</h2>
+                            <h2 className="text-3xl font-bold text-blue-600 dark:text-blue-400">Data Management</h2>
                             {renderHeaderButton()}
                         </div>
-                        <div className="border-b border-gray-700 mb-6">
+                        <div className="border-b theme-border-color mb-6">
                             <nav className="-mb-px flex space-x-8">
                                 {['Data Sources', 'Detailed Records', 'KPI & KRI Library', 'Data Flow'].map(tab => (
-                                    <button key={tab} onClick={() => setActiveTab(tab)} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === tab ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-white'}`}>
+                                    <button key={tab} onClick={() => setActiveTab(tab)} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === tab ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' : 'theme-text-secondary hover:text-blue-600 dark:hover:text-blue-400'}`}>
                                         {tab}
                                     </button>
                                 ))}
@@ -353,7 +355,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                         {activeTab === 'Data Sources' && (
                             <div className="space-y-8">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-300 mb-4">Files Pending Analysis</h3>
+                                    <h3 className="text-lg font-semibold theme-text-secondary mb-4">Files Pending Analysis</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {filteredFilesToAnalyze.map(file => (
                                             <FileAnalysisCard key={file.id} file={file} onMap={handleMapData} onDelete={() => { /* Implement delete logic for files */ }} onAnalyze={handleStartAnalysis}/>
@@ -361,7 +363,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-300 mb-4">Connected Data Sources</h3>
+                                    <h3 className="text-lg font-semibold theme-text-secondary mb-4">Connected Data Sources</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {filteredDataSources.map(source => (
                                           <DataSourceCard
@@ -372,7 +374,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                                             onShowDetails={handleShowDetails}
                                             onShowLogs={handleShowLogs}
                                             onShowSettings={handleShowSettings}
-                                            onMapData={handleMapDataForSource} // Use the new helper function
+                                            onMapData={handleMapDataForSource}
                                           />
                                         ))}
                                     </div>
@@ -383,7 +385,7 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
                         {activeTab === 'Detailed Records' && (
                             <DetailedRecordsTable
                                 initialFilters={detailedRecordsFilters}
-                                triggerAIAnalysis={triggerAIAnalysis} // Pass triggerAIAnalysis here
+                                triggerAIAnalysis={triggerAIAnalysis}
                             />
                         )}
 

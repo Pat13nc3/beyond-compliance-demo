@@ -76,7 +76,8 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
     if (!jurisdiction || jurisdiction === 'Global') {
       return reportingEvents;
     }
-    return reportingEvents.filter(event => event.jurisdiction === filteredEvents);
+    // FIX: Corrected the comparison from filteredEvents to jurisdiction
+    return reportingEvents.filter(event => event.jurisdiction === jurisdiction);
   }, [jurisdiction]);
 
   const dynamicReportStatusData = useMemo(() => {
@@ -112,10 +113,9 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
     } else if (fileName.includes('ACR') || fileName.includes('Annual Compliance')) {
         template = mockTemplates.find(t => t.type === 'Annual Review');
     }
-  
+
     if (template) {
         let content = template.content;
-        // Replace placeholders with generic info to simulate data extraction
         content = content.replace(/\[CurrentDate\]/g, new Date().toLocaleDateString());
         content = content.replace(/\[CurrentYear\]/g, new Date().getFullYear());
         content = content.replace(/\[ReportID\]/g, 'UPLOAD-' + Date.now());
@@ -127,6 +127,8 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
         content = content.replace(/\[AI-Identified Transaction Currency\]/g, '[Transaction Currency from AI]');
         content = content.replace(/\[AI-Identified Transaction Type\]/g, '[Transaction Type from AI]');
         content = content.replace(/\[AI-Summarized Transaction Purpose\]/g, '[Summarized Transaction Purpose from AI]');
+        content = content.replace(/\[AI-Assessed Reason for Suspicion\]/g, '[AI-Assessed Reason for Suspicion]');
+        content = content.replace(/\[AI-Generated Narrative\]/g, '[AI-Generated Narrative]');
         content = content.replace(/\[AI-Assessed Status\]/g, '[Status from AI]');
         content = content.replace(/\[AI-Assessed Registration Comments\]/g, 'Registration comments from AI');
         content = content.replace(/\[AI-Assessed Risk Assessment Comments\]/g, 'Risk assessment comments from AI');
@@ -137,8 +139,7 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
         content = content.replace('[describe specific behavior, e.g., "multiple incoming small deposits followed by a large outbound transfer to a jurisdiction known for illicit finance"]', 'AI-generated narrative based on file content.');
         return { content, type: template.type };
     }
-  
-    // Fallback for unrecognized files
+
     return { content: `This is simulated content for the uploaded file: "${fileName}".\n\nThe AI has extracted key details and is ready for you to review and create a draft.`, type: 'Uploaded' };
   };
 
@@ -146,12 +147,10 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
     let generatedContent = '';
     let reportType = newReportData.template?.type || 'Uploaded';
     let linkedDataDescription = `Data used for ${newReportData.name} (simulated)`;
-    let linkedDataFilters = { type: 'All', period: 'Month' }; // Default filters
+    let linkedDataFilters = { type: 'All', period: 'Month' };
 
-    // Handle reports generated from a template
     if (newReportData.template) {
         generatedContent = newReportData.template.content || "No content available for this draft.";
-        // Simulate dynamic content generation based on report type
         switch (newReportData.template.type) {
             case 'SAR':
                 const sarTransaction = mockTransactionData.rows.find(row => row.amlFlag === true);
@@ -179,13 +178,13 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
                         .replace(/\[AI-Identified Transaction Amount\]/g, ctrTransaction.amount)
                         .replace(/\[AI-Identified Transaction Currency\]/g, ctrTransaction.currency)
                         .replace(/\[AI-Identified Transaction Type\]/g, ctrTransaction.transactionType === 'Deposit' ? 'Cash Deposit' : 'Cash Withdrawal')
-                        .replace(/\[AI-Identified Branch\/Location\]/g, 'Main Branch, Lagos') // Simulated
-                        .replace(/\[AI-Identified Customer Name\]/g, 'John Doe') // Simulated
-                        .replace(/\[AI-Identified Customer Account\]/g, 'ACC12345') // Simulated
-                        .replace(/\[AI-Identified ID Type & Number\]/g, 'NIN: 1234567890') // Simulated
-                        .replace(/\[AI-Summarized Purpose of Transaction\]/g, 'Capital Injection for Business') // Simulated
-                        .replace(/\[AI-Identified Source of Funds\]/g, 'Personal Savings') // Simulated
-                        .replace(/\[AI-Identified Destination of Funds\]/g, 'Company Operating Account'); // Simulated
+                        .replace(/\[AI-Identified Branch\/Location\]/g, 'Main Branch, Lagos')
+                        .replace(/\[AI-Identified Customer Name\]/g, 'John Doe')
+                        .replace(/\[AI-Identified Customer Account\]/g, 'ACC12345')
+                        .replace(/\[AI-Identified ID Type & Number\]/g, 'NIN: 1234567890')
+                        .replace(/\[AI-Summarized Purpose of Transaction\]/g, 'Capital Injection for Business')
+                        .replace(/\[AI-Identified Source of Funds\]/g, 'Personal Savings')
+                        .replace(/\[AI-Identified Destination of Funds\]/g, 'Company Operating Account');
                     linkedDataDescription = `Relevant data includes high-value transaction ${ctrTransaction.transaction_id}`;
                     linkedDataFilters = { type: 'Transaction', id: ctrTransaction.transaction_id };
                 }
@@ -206,14 +205,15 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
                 generatedContent = newReportData.template.content
                   .replace(/\[AI-Assessed Status\]/g, complianceStatus)
                   .replace(/\[AI-Assessed Internal Control Comments\]/g, comment);
-                  
+
                 generatedContent = generatedContent
                   .replace(/\[AI-Assessed Registration Comments\]/g, 'Registration comments from AI')
                   .replace(/\[AI-Assessed Risk Assessment Comments\]/g, 'Risk assessment comments from AI')
+                  .replace(/\[AI-Assessed Internal Control Comments\]/g, 'Internal control comments from AI')
                   .replace(/\[AI-Assessed CDD Comments\]/g, 'Customer Due Diligence comments from AI')
                   .replace(/\[AI-Assessed Suspicious Activity Comments\]/g, 'Suspicious Activity comments from AI')
                   .replace(/\[AI-Assessed Record Keeping Comments\]/g, 'Record Keeping comments from AI');
-                
+
                 linkedDataDescription = `Compliance status derived from user access data analysis.`;
                 linkedDataFilters = { type: 'User Access', status: 'Flagged' };
                 break;
@@ -221,7 +221,6 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
                 break;
         }
     } else if (newReportData.file) {
-        // Handle reports uploaded from a file
         const fileExtractionResult = simulateFileContentExtraction(newReportData.file.name);
         generatedContent = fileExtractionResult.content;
         reportType = fileExtractionResult.type;
@@ -237,7 +236,7 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
       type: reportType,
       regulator: newReportData.regulator,
       jurisdiction: jurisdiction === 'Global' ? 'Global' : jurisdiction,
-      content: generatedContent, // Use dynamically generated content
+      content: generatedContent,
       linkedDataDescription: linkedDataDescription,
       linkedDataFilters: linkedDataFilters
     };
@@ -340,19 +339,19 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
   };
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in relative">
+    <div className="p-6 space-y-6 animate-fade-in relative theme-bg-page theme-text-primary">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Compliance Reporting</h1>
-          <p className="text-gray-500">Manage, generate, and file all your regulatory reports.</p>
+          <h1 className="text-3xl font-bold theme-text-primary">Compliance Reporting</h1>
+          <p className="theme-text-secondary">Manage, generate, and file all your regulatory reports.</p>
         </div>
       </div>
 
-      <div className="border-b border-gray-200">
+      <div className="border-b theme-border-color">
         <nav className="-mb-px flex space-x-6">
-          <button onClick={() => setActiveTab('overview')} className={`py-3 px-1 inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap ${activeTab === 'overview' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-blue-600'}`}><LayoutGrid size={16}/>Overview</button>
-          <button onClick={() => setActiveTab('calendar')} className={`py-3 px-1 inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap ${activeTab === 'calendar' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-blue-600'}`}><CalendarDays size={16}/>Calendar</button>
-          <button onClick={() => setActiveTab('smartFiling')} className={`py-3 px-1 inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap ${activeTab === 'smartFiling' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-blue-600'}`}><Sparkles size={16}/>Smart Filing</button>
+          <button onClick={() => setActiveTab('overview')} className={`py-3 px-1 inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap ${activeTab === 'overview' ? 'text-blue-600 border-b-2 border-blue-600' : 'theme-text-secondary hover:text-blue-600'}`}><LayoutGrid size={16}/>Overview</button>
+          <button onClick={() => setActiveTab('calendar')} className={`py-3 px-1 inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap ${activeTab === 'calendar' ? 'text-blue-600 border-b-2 border-blue-600' : 'theme-text-secondary hover:text-blue-600'}`}><CalendarDays size={16}/>Calendar</button>
+          <button onClick={() => setActiveTab('smartFiling')} className={`py-3 px-1 inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap ${activeTab === 'smartFiling' ? 'text-blue-600 border-b-2 border-blue-600' : 'theme-text-secondary hover:text-blue-600'}`}><Sparkles size={16}/>Smart Filing</button>
         </nav>
       </div>
 

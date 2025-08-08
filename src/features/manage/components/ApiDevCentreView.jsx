@@ -105,37 +105,37 @@ const ApiDevCentreView = ({ onSaveApiSettings, initialApiSettings = {}, setToast
     };
 
     return (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md text-white space-y-6 flex-1 flex flex-col h-full"> 
-            <h3 className="text-xl font-semibold text-[#c0933e] mb-4 flex items-center">
-                <Code size={24} className="mr-3 text-gray-400" /> API & Developer Centre
+        <div className="theme-bg-card p-6 rounded-lg shadow-md theme-text-primary space-y-6 flex-1 flex flex-col h-full"> 
+            <h3 className="text-xl font-semibold theme-text-highlight-color mb-4 flex items-center">
+                <Code size={24} className="mr-3 theme-text-secondary" /> API & Developer Centre
             </h3>
 
             {/* General API Information */}
-            <div className="space-y-4 pb-6 border-b border-gray-700">
-                <h4 className="text-lg font-medium text-gray-200 flex items-center"><Globe size={18} className="mr-2 text-gray-400" /> General API Settings</h4>
+            <div className="space-y-4 pb-6 border-b theme-border-color">
+                <h4 className="text-lg font-medium theme-text-primary flex items-center"><Globe size={18} className="mr-2 theme-text-secondary" /> General API Settings</h4>
                 <div>
-                    <label htmlFor="baseUrl" className="block text-sm font-medium text-gray-300 mb-2">API Base URL</label>
+                    <label htmlFor="baseUrl" className="block text-sm font-medium theme-text-secondary mb-2">API Base URL</label>
                     <input
                         type="text"
                         id="baseUrl"
                         name="baseUrl"
                         value={baseUrl}
                         onChange={(e) => setBaseUrl(e.target.value)}
-                        className="w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-white focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary focus:ring-blue-500 focus:border-blue-500"
                         readOnly
                     />
                 </div>
                 <div>
-                    <label htmlFor="docsUrl" className="block text-sm font-medium text-gray-300 mb-2">API Documentation</label>
-                    <a href={docsUrl} target="_blank" rel="noopener noreferrer" className="block w-full p-2 border border-gray-700 rounded-md bg-gray-700 text-blue-400 hover:underline">
+                    <label htmlFor="docsUrl" className="block text-sm font-medium theme-text-secondary mb-2">API Documentation</label>
+                    <a href={docsUrl} target="_blank" rel="noopener noreferrer" className="block w-full p-2 border theme-border-color rounded-md theme-bg-card text-blue-400 hover:underline">
                         {docsUrl}
                     </a>
                 </div>
             </div>
 
             {/* API Key Management */}
-            <div className="space-y-4 pb-6 border-b border-gray-700">
-                <h4 className="text-lg font-medium text-gray-200 flex items-center"><Key size={18} className="mr-2 text-gray-400" /> API Keys</h4>
+            <div className="space-y-4 pb-6 border-b theme-border-color">
+                <h4 className="text-lg font-medium theme-text-primary flex items-center"><Key size={18} className="mr-2 theme-text-secondary" /> API Keys</h4>
                 <button
                     onClick={handleGenerateNewKey}
                     className="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-500 flex items-center text-sm"
@@ -144,28 +144,28 @@ const ApiDevCentreView = ({ onSaveApiSettings, initialApiSettings = {}, setToast
                 </button>
                 <div className="mt-4 space-y-3">
                     {apiKeys.length === 0 ? (
-                        <p className="text-gray-400">No API keys generated yet.</p>
+                        <p className="theme-text-secondary">No API keys generated yet.</p>
                     ) : (
                         apiKeys.map(key => (
-                            <div key={key.id} className="bg-gray-700 p-3 rounded-md flex items-center justify-between">
+                            <div key={key.id} className="bg-gray-100 dark:bg-gray-700 p-3 rounded-md flex items-center justify-between">
                                 <div>
-                                    <p className="font-semibold text-gray-200">{key.name}</p>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="font-semibold theme-text-primary">{key.name}</p>
+                                    <p className="text-sm theme-text-secondary">
                                         {key.key.substring(0, 10)}...{key.key.substring(key.key.length - 3)}
                                         <button
                                             onClick={() => handleCopyKey(key.key)}
-                                            className="ml-2 p-1 rounded-md text-gray-400 hover:bg-gray-600"
+                                            className="ml-2 p-1 rounded-md theme-text-secondary hover:bg-gray-200 dark:hover:bg-gray-600"
                                             title="Copy API Key"
                                         >
                                             <Copy size={14} />
                                         </button>
                                     </p>
-                                    <p className="text-xs text-gray-500">Created: {key.created} | Last Used: {key.lastUsed} | Status: {key.status}</p>
+                                    <p className="text-xs theme-text-secondary">Created: {key.created} | Last Used: {key.lastUsed} | Status: {key.status}</p>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <button
                                         onClick={() => handleToggleApiKeyStatus(key.id, key.status)}
-                                        className="p-1 rounded-full text-gray-400 hover:bg-gray-600"
+                                        className="p-1 rounded-full theme-text-secondary hover:bg-gray-200 dark:hover:bg-gray-600"
                                         title={key.status === 'Active' ? 'Deactivate API Key' : 'Activate API Key'}
                                     >
                                         {key.status === 'Active' ? <ToggleLeft size={20} /> : <ToggleRight size={20} />}
@@ -173,7 +173,7 @@ const ApiDevCentreView = ({ onSaveApiSettings, initialApiSettings = {}, setToast
                                     </button>
                                     <button
                                         onClick={() => handleEditApiKey(key)}
-                                        className="p-1 rounded-full text-gray-400 hover:bg-gray-600"
+                                        className="p-1 rounded-full theme-text-secondary hover:bg-gray-200 dark:hover:bg-gray-600"
                                         title="Edit API Key"
                                     >
                                         <Edit size={20} />
@@ -193,8 +193,8 @@ const ApiDevCentreView = ({ onSaveApiSettings, initialApiSettings = {}, setToast
             </div>
 
             {/* Webhook Management */}
-            <div className="space-y-4 pb-6 border-b border-gray-700">
-                <h4 className="text-lg font-medium text-gray-200 flex items-center"><Zap size={18} className="mr-2 text-gray-400" /> Webhooks</h4>
+            <div className="space-y-4 pb-6 border-b theme-border-color">
+                <h4 className="text-lg font-medium theme-text-primary flex items-center"><Zap size={18} className="mr-2 theme-text-secondary" /> Webhooks</h4>
                 <button
                     onClick={handleAddWebhook}
                     className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center text-sm"
@@ -203,24 +203,24 @@ const ApiDevCentreView = ({ onSaveApiSettings, initialApiSettings = {}, setToast
                 </button>
                 <div className="mt-4 space-y-3">
                     {webhooks.length === 0 ? (
-                        <p className="text-gray-400">No webhooks configured yet.</p>
+                        <p className="theme-text-secondary">No webhooks configured yet.</p>
                     ) : (
                         webhooks.map(hook => (
-                            <div key={hook.id} className="bg-gray-700 p-3 rounded-md flex items-center justify-between">
+                            <div key={hook.id} className="bg-gray-100 dark:bg-gray-700 p-3 rounded-md flex items-center justify-between">
                                 <div>
-                                    <label htmlFor={`webhook-name-${hook.id}`} className="font-semibold text-gray-200 sr-only">Webhook Name</label>
-                                    <p className="font-semibold text-gray-200">
+                                    <label htmlFor={`webhook-name-${hook.id}`} className="font-semibold theme-text-primary sr-only">Webhook Name</label>
+                                    <p className="font-semibold theme-text-primary">
                                         {hook.name}
                                     </p>
-                                    <label htmlFor={`webhook-url-${hook.id}`} className="text-sm text-gray-400 sr-only">Webhook URL</label>
-                                    <p className="text-sm text-gray-400 line-clamp-1">{hook.url}</p>
-                                    <label htmlFor={`webhook-events-${hook.id}`} className="text-xs text-gray-500 sr-only">Webhook Events</label>
-                                    <p className="text-xs text-gray-500">Events: {Array.isArray(hook.events) ? hook.events.join(', ') : hook.events} | Status: {hook.status}</p>
+                                    <label htmlFor={`webhook-url-${hook.id}`} className="text-sm theme-text-secondary sr-only">Webhook URL</label>
+                                    <p className="text-sm theme-text-secondary line-clamp-1">{hook.url}</p>
+                                    <label htmlFor={`webhook-events-${hook.id}`} className="text-xs theme-text-secondary sr-only">Webhook Events</label>
+                                    <p className="text-xs theme-text-secondary">Events: {Array.isArray(hook.events) ? hook.events.join(', ') : hook.events} | Status: {hook.status}</p>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <button
                                         onClick={() => handleToggleWebhookStatus(hook.id)}
-                                        className="p-1 rounded-full text-gray-400 hover:bg-gray-600"
+                                        className="p-1 rounded-full theme-text-secondary hover:bg-gray-200 dark:hover:bg-gray-600"
                                         title={hook.status === 'Active' ? 'Deactivate Webhook' : 'Activate Webhook'}
                                     >
                                         {hook.status === 'Active' ? <ToggleLeft size={20} /> : <ToggleRight size={20} />}
@@ -228,7 +228,7 @@ const ApiDevCentreView = ({ onSaveApiSettings, initialApiSettings = {}, setToast
                                     </button>
                                     <button
                                         onClick={() => handleEditWebhook(hook)}
-                                        className="p-1 rounded-full text-gray-400 hover:bg-gray-600"
+                                        className="p-1 rounded-full theme-text-secondary hover:bg-gray-200 dark:hover:bg-gray-600"
                                         title="Edit Webhook"
                                     >
                                         <Edit size={20} />
@@ -240,7 +240,7 @@ const ApiDevCentreView = ({ onSaveApiSettings, initialApiSettings = {}, setToast
                 </div>
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-gray-700 mt-6">
+            <div className="flex justify-end pt-4 border-t theme-border-color mt-6">
                 <button
                     onClick={handleSaveSettings}
                     className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-blue-500 flex items-center"

@@ -1,3 +1,5 @@
+// src/features/riskAssessment/modals/RiskDrilldownModal.jsx
+
 import React from 'react';
 import { X } from 'lucide-react';
 
@@ -37,29 +39,29 @@ const RiskDrilldownModal = ({ riskPillar, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="bg-[#1e252d] rounded-2xl shadow-2xl p-6 w-full max-w-2xl text-white">
-                <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
-                    <h3 className="text-2xl font-bold text-[#c0933e]">Drill-Down: {riskPillar.name}</h3>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white">
+            <div className="theme-bg-card rounded-2xl shadow-2xl p-6 w-full max-w-2xl theme-text-primary">
+                <div className="flex justify-between items-center mb-4 border-b theme-border-color pb-3">
+                    <h3 className="text-2xl font-bold theme-text-highlight-color">Drill-Down: {riskPillar.name}</h3>
+                    <button onClick={onClose} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={24} />
                     </button>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="min-w-full">
                         <thead>
-                            <tr className="border-b border-gray-700">
-                                <th className="text-left py-3 px-4 text-sm font-medium uppercase">Metric ID</th>
-                                <th className="text-left py-3 px-4 text-sm font-medium uppercase">Metric Name</th>
-                                <th className="text-left py-3 px-4 text-sm font-medium uppercase">Value</th>
-                                <th className="text-left py-3 px-4 text-sm font-medium uppercase">Risk Level</th>
+                            <tr className="border-b theme-border-color">
+                                <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Metric ID</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Metric Name</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Value</th>
+                                <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Risk Level</th>
                             </tr>
                         </thead>
                         <tbody>
                             {data.map(metric => (
-                                <tr key={metric.id} className="border-b border-gray-800 hover:bg-gray-900">
-                                    <td className="py-3 px-4 text-gray-400">{metric.id}</td>
-                                    <td className="py-3 px-4 font-semibold">{metric.metric}</td>
-                                    <td className="py-3 px-4">{metric.value}</td>
+                                <tr key={metric.id} className="border-b theme-border-color hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <td className="py-3 px-4 theme-text-secondary">{metric.id}</td>
+                                    <td className="py-3 px-4 font-semibold theme-text-primary">{metric.metric}</td>
+                                    <td className="py-3 px-4 theme-text-primary">{metric.value}</td>
                                     <td className="py-3 px-4">
                                         <span className={`text-xs font-semibold px-2 py-1 rounded-full text-white ${statusColors[metric.status]}`}>
                                             {metric.status}
@@ -69,7 +71,7 @@ const RiskDrilldownModal = ({ riskPillar, onClose }) => {
                             ))}
                              {data.length === 0 && (
                                 <tr>
-                                    <td colSpan="4" className="text-center py-8 text-gray-500">No detailed metrics available for this category.</td>
+                                    <td colSpan="4" className="text-center py-8 theme-text-secondary">No detailed metrics available for this category.</td>
                                 </tr>
                             )}
                         </tbody>

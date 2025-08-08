@@ -13,25 +13,24 @@ const HeadquartersView = ({ structure }) => {
   );
 
   return (
-    // UPDATED: Switched to dark theme to match other components
-    <div className="bg-[#1e252d] p-6 rounded-xl shadow-lg text-white h-full">
-      <h2 className="text-xl font-semibold text-[#c0933e] mb-4">Corporate Structure</h2>
+    <div className="theme-bg-card p-6 rounded-xl shadow-lg theme-text-primary h-full">
+      <h2 className="text-xl font-semibold mb-4 theme-text-highlight-color">Corporate Structure</h2>
       <div className="space-y-3">
-        {/* Parent Company */}
-        <div className="p-3 border border-gray-700 rounded-lg bg-gray-800/50">
-            <p className="font-bold text-gray-100">{structure.parent.name}</p>
+        {/* Main parent company card background */}
+        <div className="p-3 border theme-border-color rounded-lg theme-bg-card-alt"> {/* Changed bg-gray-800/50 to theme-bg-card-alt */}
+            <p className="font-bold theme-text-primary">{structure.parent.name}</p>
             <div className="flex justify-between items-center mt-1">
-                <p className="text-sm text-gray-400">{structure.parent.location}</p>
+                <p className="text-sm theme-text-secondary">{structure.parent.location}</p>
                 {getStatus(structure.parent.status)}
             </div>
         </div>
-        {/* Subsidiaries */}
         <div className="space-y-2 pt-2">
           {structure.subsidiaries.map((sub) => (
-            <div key={sub.id} className="p-3 border border-gray-700 rounded-lg ml-4 bg-gray-800/30">
-              <p className="font-semibold text-gray-200">{sub.name}</p>
+            // Subsidiary card background
+            <div key={sub.id} className="p-3 border theme-border-color rounded-lg ml-4 theme-bg-card-alt"> {/* Changed bg-gray-800/30 to theme-bg-card-alt */}
+              <p className="font-semibold theme-text-primary">{sub.name}</p>
               <div className="flex justify-between items-center mt-1">
-                <p className="text-sm text-gray-400">{sub.location}</p>
+                <p className="text-sm theme-text-secondary">{sub.location}</p>
                 {getStatus(sub.status)}
               </div>
             </div>

@@ -1,3 +1,5 @@
+// src/features/licensing/index.jsx
+
 import React, { useState } from "react";
 import { Award, Plus, MoreVertical, Search, CheckCircle, Clock, AlertTriangle, Edit, Trash2, Eye, RefreshCw } from "lucide-react";
 import ApplyLicenseModal from "./modals/ApplyLicenseModal.jsx";
@@ -45,51 +47,49 @@ const Licensing = () => {
     }
 
     return (
-        // --- THIS IS THE FIX ---
-        // We've wrapped everything in a div with p-6 (padding)
-        <div className="p-6">
+        <div className="p-6 theme-bg-page min-h-screen">
             <div className="space-y-6 animate-fade-in">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-800">License Management</h2>
-                        <p className="text-gray-500">Track and manage your licenses and registrations across all jurisdictions.</p>
+                        <h2 className="text-3xl font-bold theme-text-primary">License Management</h2>
+                        <p className="theme-text-secondary">Track and manage your licenses and registrations across all jurisdictions.</p>
                     </div>
                     <button onClick={() => setIsApplyModalOpen(true)} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center">
                         <Plus size={20} className="mr-2"/> Apply for New License
                     </button>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="theme-bg-card p-6 rounded-lg shadow-md">
                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-semibold">My Licenses</h3>
+                        <h3 className="text-xl font-semibold theme-text-primary">My Licenses</h3>
                         <div className="relative">
-                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input type="text" placeholder="Search licenses..." className="bg-gray-100 border border-gray-300 rounded-md pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 theme-text-secondary" />
+                            <input type="text" placeholder="Search licenses..." className="theme-bg-page border theme-border-color rounded-md pl-10 pr-4 py-2 text-sm theme-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="min-w-full">
                             <thead>
-                                <tr className="border-b">
-                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">License Name</th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Jurisdiction</th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Status</th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase text-gray-500">Expiry Date</th>
-                                    <th className="text-right py-3 px-4 text-sm font-medium uppercase text-gray-500">Actions</th>
+                                <tr className="border-b theme-border-color">
+                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">License Name</th>
+                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Jurisdiction</th>
+                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Status</th>
+                                    <th className="text-left py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Expiry Date</th>
+                                    <th className="text-right py-3 px-4 text-sm font-medium uppercase theme-text-secondary">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {licenses.map(license => (
-                                    <tr key={license.id} className="border-b hover:bg-gray-50">
-                                        <td className="px-4 py-4 font-medium">{license.name}</td>
-                                        <td className="px-4 py-4 text-gray-600">{license.jurisdiction}</td>
+                                    <tr key={license.id} className="border-b theme-border-color hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <td className="px-4 py-4 font-medium theme-text-primary">{license.name}</td>
+                                        <td className="px-4 py-4 theme-text-secondary">{license.jurisdiction}</td>
                                         <td className="px-4 py-4">
                                             <div className="flex items-center">
                                                 {getStatusIcon(license.status)}
-                                                <span className="ml-2">{license.status}</span>
+                                                <span className="ml-2 theme-text-primary">{license.status}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-gray-600">{license.expiry}</td>
+                                        <td className="px-4 py-4 theme-text-secondary">{license.expiry}</td>
                                         <td className="px-4 py-4 text-right">
                                             <ActionMenu items={[
                                                 { label: 'View Project', action: () => handleViewProject(license), icon: Eye },

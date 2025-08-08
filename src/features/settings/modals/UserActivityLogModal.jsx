@@ -27,31 +27,31 @@ const UserActivityLogModal = ({ user, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-2xl text-white">
-                <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
-                    <h3 className="text-2xl font-bold text-[#c0933e]">Activity Log: {user?.name}</h3>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white">
+            <div className="theme-bg-card rounded-2xl shadow-2xl p-6 w-full max-w-2xl theme-text-primary">
+                <div className="flex justify-between items-center mb-4 border-b theme-border-color pb-3">
+                    <h3 className="text-2xl font-bold theme-text-highlight-color">Activity Log: {user?.name}</h3>
+                    <button onClick={onClose} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={24} />
                     </button>
                 </div>
                 <div className="space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
                     {activityLogs.length === 0 ? (
-                        <p className="text-gray-400 text-center py-8">No activity recorded for this user.</p>
+                        <p className="theme-text-secondary text-center py-8">No activity recorded for this user.</p>
                     ) : (
                         activityLogs.map(log => (
-                            <div key={log.id} className="flex items-start space-x-3 p-3 bg-gray-700 rounded-md">
-                                {log.icon && <log.icon size={20} className="text-gray-400 mt-0.5" />}
+                            <div key={log.id} className="flex items-start space-x-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
+                                {log.icon && <log.icon size={20} className="theme-text-secondary mt-0.5" />}
                                 <div>
-                                    <p className="text-sm font-semibold text-gray-200">{log.event}</p>
-                                    <p className="text-xs text-gray-400">{log.details}</p>
-                                    <p className="text-xs text-gray-500 mt-1"><Clock size={12} className="inline-block mr-1"/>{log.timestamp}</p>
+                                    <p className="text-sm font-semibold theme-text-primary">{log.event}</p>
+                                    <p className="text-xs theme-text-secondary">{log.details}</p>
+                                    <p className="text-xs theme-text-secondary mt-1"><Clock size={12} className="inline-block mr-1"/>{log.timestamp}</p>
                                 </div>
                             </div>
                         ))
                     )}
                 </div>
-                <div className="flex justify-end pt-6 mt-6 border-t border-gray-700">
-                    <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700">
+                <div className="flex justify-end pt-6 mt-6 border-t theme-border-color">
+                    <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700 text-white">
                         Close
                     </button>
                 </div>

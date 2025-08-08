@@ -1,6 +1,7 @@
 // src/App.jsx
 
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 
@@ -17,11 +18,11 @@ import Settings from './features/settings';
 
 // AI Agent feature
 import AIAgent from './features/aiAgent';
+// NEW: Task Management Feature
+import TaskManagement from './features/taskManagement';
 
 // Global UI Components
 import Toast from './components/ui/Toast';
-
-// CORRECTED: Import AIAnalysisResultModal from its actual location within aiAgent/modals
 import AIAnalysisResultModal from './features/aiAgent/modals/AIAnalysisResultModal';
 
 
@@ -31,6 +32,7 @@ const App = () => {
     const [pageContext, setPageContext] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [activeJurisdiction, setActiveJurisdiction] = useState('Global');
+    const [theme, setTheme] = useState('dark'); // Initial theme is dark
 
     const [libraryEvidence, setLibraryEvidence] = useState([
       { name: 'Q1 Board Meeting Minutes.pdf', status: 'New', id: 'evid-1' }
@@ -38,10 +40,12 @@ const App = () => {
 
     const [toastMessage, setToastMessage] = useState('');
 
-    // State for AI Analysis Result Modal
     const [isAIAnalysisResultModalOpen, setIsAIAnalysisResultModalOpen] = useState(false);
     const [aiAnalysisResultContent, setAiAnalysisResultContent] = useState({});
 
+    const toggleTheme = () => {
+        setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
+    };
 
     const handlePromoteToLibrary = (fileToPromote) => {
         const newEvidence = {
@@ -61,10 +65,8 @@ const App = () => {
         setPageContext(null);
     };
 
-    // Function to trigger AI analysis and show result modal
     const triggerAIAnalysis = (contextData, analysisType) => {
         console.log(`AI Analysis requested for type: ${analysisType}`, contextData);
-        // Simulate AI analysis and generate result
         let summary = "";
         let keyPoints = [];
         let recommendedActions = [];
@@ -84,7 +86,6 @@ const App = () => {
                 ];
                 break;
             case 'ReportCompliance':
-                // NEW: AI analysis for compliance check
                 summary = `Simulated AI compliance check for the report draft "${contextData.reportName || 'Untitled Report'}" completed.`;
                 keyPoints = [
                     "Identified a potential conflict with the CBN PSP Framework regarding data localization (Section 4.1).",
@@ -98,7 +99,6 @@ const App = () => {
                 ];
                 break;
             case 'UploadedDocumentAnalysis':
-                // NEW: AI analysis for uploaded documents
                 summary = `Simulated AI analysis of document "${contextData.documentName || 'Untitled Document'}" completed successfully.`;
                 keyPoints = [
                     "Extracted key entities and report headers from the document.",
@@ -197,7 +197,7 @@ const App = () => {
             context: pageContext,
             onCleanContext: handleCleanContext,
             jurisdiction: activeJurisdiction,
-            triggerAIAnalysis: triggerAIAnalysis, // Pass triggerAIAnalysis to relevant pages
+            triggerAIAnalysis: triggerAIAnalysis,
         };
 
         switch (activeTab) {
@@ -205,11 +205,8 @@ const App = () => {
                 return <ActionOrientedDashboard {...pageProps} />;
             case 'ComplianceReporting':
                 return <ComplianceReporting {...pageProps} />;
-
-            case 'Data Management':
-            case 'DataManagement': // Fallback for consistency
+            case 'DataManagement':
                 return <DataManagement {...pageProps} onPromoteToLibrary={handlePromoteToLibrary} jurisdiction={activeJurisdiction} onNavigate={handleNavigate} />;
-
             case 'Library':
                 return <Library {...pageProps} evidence={libraryEvidence} />;
             case 'RiskAssessment':
@@ -224,13 +221,15 @@ const App = () => {
                 return <Settings {...pageProps} />;
             case 'AIAgent':
                 return <AIAgent {...pageProps} />;
+            case 'TaskManagement':
+                return <TaskManagement {...pageProps} />;
             default:
                 return <ActionOrientedDashboard {...pageProps} />;
         }
     };
 
     return (
-        <div className="flex h-screen bg-gray-900 text-white">
+        <div className="flex h-screen overflow-hidden" data-theme={theme}>
             <Sidebar
                 activeTab={activeTab}
                 setActiveTab={handleNavigate}
@@ -245,13 +244,14 @@ const App = () => {
                     setUserMode={setUserMode}
                     activeJurisdiction={activeJurisdiction}
                     setActiveJurisdiction={setActiveJurisdiction}
+                    theme={theme}
+                    toggleTheme={toggleTheme}
                 />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 h-full">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto theme-bg-page">
                     {renderContent()}
                 </main>
             </div>
 
-            {/* AI Analysis Result Modal - Managed Globally by App.jsx */}
             {isAIAnalysisResultModalOpen && (
                 <AIAnalysisResultModal
                     title={aiAnalysisResultContent.title}

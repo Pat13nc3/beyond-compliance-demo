@@ -1,3 +1,5 @@
+// src/features/library/index.jsx
+
 import React, { useState, useEffect } from 'react';
 import {
     BookOpenCheck, FileSignature, Archive, FileClock, FileText,
@@ -13,26 +15,26 @@ const CategoryAccordion = ({ name, icon: Icon, items, onEditItem, isSelectionMod
     const [isOpen, setIsOpen] = useState(true);
 
     return (
-        <div className="border border-gray-700 rounded-lg"> 
+        <div className="border theme-border-color rounded-lg">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex justify-between items-center p-4 bg-gray-800 hover:bg-gray-700"
+                className="w-full flex justify-between items-center p-4 theme-bg-card hover:bg-gray-100 dark:hover:bg-gray-700"
             >
                 <div className="flex items-center">
-                    <Icon className="mr-3 text-gray-400" size={20} /> 
-                    <span className="font-semibold text-white">{name}</span> 
+                    <Icon className="mr-3 theme-text-secondary" size={20} />
+                    <span className="font-semibold theme-text-primary">{name}</span>
                 </div>
                 <div className="flex items-center">
-                    <span className="text-sm text-gray-300 bg-gray-600 rounded-full px-2 py-0.5">{items.length}</span>
-                    {isOpen ? <ChevronUp size={20} className="ml-4 text-gray-400"/> : <ChevronDown size={20} className="ml-4 text-gray-400"/>}
+                    <span className="text-sm theme-text-secondary bg-gray-200 dark:bg-gray-600 rounded-full px-2 py-0.5">{items.length}</span>
+                    {isOpen ? <ChevronUp size={20} className="ml-4 theme-text-secondary"/> : <ChevronDown size={20} className="ml-4 theme-text-secondary"/>}
                 </div>
             </button>
             {isOpen && (
-                <div className="p-4 border-t border-gray-700">
+                <div className="p-4 border-t theme-border-color">
                     <ul className="space-y-2">
                         {items.length > 0 ? items.map(item => (
-                            <li key={item.id} className="flex justify-between items-center p-2 rounded-md hover:bg-gray-700">
-                                <span className="text-sm text-gray-200">{item.name}</span>
+                            <li key={item.id} className="flex justify-between items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <span className="text-sm theme-text-primary">{item.name}</span>
                                 <div className="flex items-center space-x-2">
                                     {isSelectionMode && name === 'Templates' ? (
                                         <button onClick={() => onUseTemplate(item)} className="bg-blue-600 text-white font-bold py-1 px-3 rounded-md hover:bg-blue-500 text-xs">
@@ -42,13 +44,13 @@ const CategoryAccordion = ({ name, icon: Icon, items, onEditItem, isSelectionMod
                                         <ActionMenu
                                             items={[
                                                 { label: "Edit Details", action: () => onEditItem(item), icon: Edit },
-                                                { label: "Delete", action: () => alert("Delete: " + item.name), icon: Trash2, color: "text-red-500" }
+                                                { label: "Delete", action: () => alert("Delete: " + item.name), icon: Trash2, color: "theme-text-danger-color" }
                                             ]}
                                         />
                                     )}
                                 </div>
                             </li>
-                        )) : <li className="text-sm text-gray-500 italic">No items in this category.</li>} 
+                        )) : <li className="text-sm theme-text-secondary italic">No items in this category.</li>}
                     </ul>
                 </div>
             )}
@@ -59,8 +61,8 @@ const CategoryAccordion = ({ name, icon: Icon, items, onEditItem, isSelectionMod
 // Section component for grouping asset categories
 const AssetSection = ({ title, categories, onEditItem, onUseTemplate, isSelectionMode }) => {
     return (
-        <div className="bg-[#1e252d] rounded-xl shadow-md p-6">
-            <h3 className="text-xl font-semibold mb-4 text-[#c0933e]">{title}</h3> 
+        <div className="theme-bg-card rounded-xl shadow-md p-6">
+            <h3 className="text-xl font-semibold mb-4 theme-text-highlight-color">{title}</h3>
             <div className="space-y-4">
                 {categories.map(category => (
                     <CategoryAccordion
@@ -161,15 +163,15 @@ const Library = ({ context, onNavigate, evidence }) => {
     const allCategories = [...assets.knowledgeAssets, ...assets.documentationAssets];
 
     return (
-        <div className="p-6 bg-gray-900 min-h-screen">
+        <div className="p-6 theme-bg-page min-h-screen">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-white">Library</h2>
+                <h2 className="text-3xl font-bold theme-text-primary">Library</h2>
                 <div className="flex space-x-3">
                     <div className="relative">
-                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input type="text" placeholder="Search in library..." className="bg-gray-800 border border-gray-600 rounded-md pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 theme-text-secondary" />
+                        <input type="text" placeholder="Search in library..." className="theme-bg-card border theme-border-color rounded-md pl-10 pr-4 py-2 text-sm theme-text-primary focus:outline-none focus:ring-2 focus:ring-yellow-500" />
                     </div>
-                    <button onClick={() => setIsUploadModalOpen(true)} className="bg-yellow-500 text-gray-900 font-bold py-2 px-4 rounded-md hover:bg-yellow-400 flex items-center">
+                    <button onClick={() => setIsUploadModalOpen(true)} className="theme-bg-highlight-color text-black font-bold py-2 px-4 rounded-md hover:bg-opacity-90 flex items-center"> {/* Updated classes here */}
                         <Upload className="mr-2 h-5 w-5" /> Upload New
                     </button>
                 </div>

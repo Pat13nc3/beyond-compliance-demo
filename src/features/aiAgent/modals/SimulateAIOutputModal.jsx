@@ -1,7 +1,7 @@
 // src/features/manage/modals/SimulateAIOutputModal.jsx
 
 import React from 'react';
-import { X, Download, FileText, BarChart2, Lightbulb, Bot } from 'lucide-react'; // Added Bot icon for Digital Asset Alert
+import { X, Download, FileText, BarChart2, Lightbulb, Bot } from 'lucide-react';
 
 const SimulateAIOutputModal = ({ onClose, actionType, outputData = {} }) => {
     // Define mock content based on action type
@@ -10,7 +10,7 @@ const SimulateAIOutputModal = ({ onClose, actionType, outputData = {} }) => {
             case 'Generate Report Template':
                 return {
                     title: 'Generated Report Template: SAR Filing',
-                    icon: <FileText size={24} className="text-gray-400" />,
+                    icon: <FileText size={24} className="theme-text-secondary" />,
                     content: `
 **Suspicious Activity Report (SAR) - Draft Template**
 
@@ -48,7 +48,7 @@ const SimulateAIOutputModal = ({ onClose, actionType, outputData = {} }) => {
             case 'Generate Risk Assessment':
                 return {
                     title: 'Generated Risk Assessment: Client Portfolio',
-                    icon: <BarChart2 size={24} className="text-gray-400" />,
+                    icon: <BarChart2 size={24} className="theme-text-secondary" />,
                     content: `
 **Automated Risk Assessment Summary - Client ID: [Client ID / Portfolio Name]**
 
@@ -78,7 +78,7 @@ const SimulateAIOutputModal = ({ onClose, actionType, outputData = {} }) => {
             case 'Provide Recommendation':
                 return {
                     title: 'AI-Powered Recommendation: Policy Update',
-                    icon: <Lightbulb size={24} className="text-gray-400" />,
+                    icon: <Lightbulb size={24} className="theme-text-secondary" />,
                     content: `
 **Recommendation for Policy Update: Digital Asset Custody**
 
@@ -109,7 +109,7 @@ const SimulateAIOutputModal = ({ onClose, actionType, outputData = {} }) => {
             default:
                 return {
                     title: 'AI Output Simulation',
-                    icon: <Bot size={24} className="text-gray-400" />,
+                    icon: <Bot size={24} className="theme-text-secondary" />,
                     content: 'No specific content for this action type. This is a generic AI output simulation.',
                     filename: 'AI_Output_Simulation.docx'
                 };
@@ -130,46 +130,37 @@ const SimulateAIOutputModal = ({ onClose, actionType, outputData = {} }) => {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url); // Clean up the URL
-
-        // Show a toast notification for download
-        // This relies on the parent (Manage/index.jsx) having a setToastMessage prop,
-        // or we can pass it directly to this modal if needed.
-        // For now, using window.alert as a placeholder for the toast until integrated
-        window.alert(`Simulating download of "${modalContent.filename}". (File would be downloaded in a real system)`);
-
-        // If you want a proper toast, the parent Manage/index.jsx needs to pass setToastMessage as a prop
-        // props.setToastMessage(`Simulating download of "${modalContent.filename}".`);
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-3xl text-white">
-                <div className="flex justify-between items-start mb-4 border-b border-gray-700 pb-3">
+            <div className="theme-bg-card rounded-2xl shadow-2xl p-6 w-full max-w-3xl theme-text-primary">
+                <div className="flex justify-between items-start mb-4 border-b theme-border-color pb-3">
                     <div className="flex items-center">
                         {modalContent.icon}
-                        <h3 className="text-2xl font-bold text-[#c0933e] ml-3">{modalContent.title}</h3>
+                        <h3 className="text-[24px] leading-[32px] font-bold theme-text-highlight-color ml-3">{modalContent.title}</h3>
                     </div>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white">
+                    <button onClick={onClose} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={24} />
                     </button>
                 </div>
-                <div className="space-y-4 text-gray-300 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
+                <div className="space-y-4 theme-text-secondary max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
                     {/* Render content with improved styling */}
-                    <div className="prose prose-invert max-w-none text-gray-300"> {/* Using Tailwind Typography 'prose' for better markdown-like rendering */}
-                        <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-700 p-4 rounded-md">
+                    <div className="prose prose-invert max-w-none theme-text-primary">
+                        <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-100 dark:bg-gray-700 p-4 rounded-md">
                             {modalContent.content}
                         </pre>
                     </div>
                 </div>
-                <div className="flex justify-end pt-6 mt-6 border-t border-gray-700 space-x-2">
+                <div className="flex justify-end pt-6 mt-6 border-t theme-border-color space-x-2">
                     <button
                         type="button"
                         onClick={handleDownload}
-                        className="bg-green-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-green-500 flex items-center"
+                        className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-blue-500 flex items-center"
                     >
                         <Download size={16} className="mr-2"/> Download
                     </button>
-                    <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700">
+                    <button type="button" onClick={onClose} className="bg-gray-200 dark:bg-gray-700 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 theme-text-primary">
                         Close
                     </button>
                 </div>

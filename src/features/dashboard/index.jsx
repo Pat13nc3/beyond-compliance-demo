@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { LayoutDashboard, UserCheck, Activity, SlidersHorizontal, Share2 } from 'lucide-react';
-
 // Component Imports
 import ActionItem from './components/ActionItem';
 import PulseItem from './components/PulseItem';
@@ -12,14 +11,12 @@ import WelcomeSignage from './components/WelcomeSignage';
 import HeadquartersView from './components/HeadquartersView';
 import BuildTeamCard from './components/BuildTeamCard';
 import ControlHotspotAnalysis from './components/ControlHotspotAnalysis';
-
 // Modal Imports
 import SubmitEvidenceModal from '../../components/modals/SubmitEvidenceModal.jsx';
 import AnalyticsCenterModal from './modals/AnalyticsCenterModal.jsx';
 import CustomizeDashboardModal from './modals/CustomizeDashboardModal.jsx';
 import ExportDashboardModal from './modals/ExportDashboardModal.jsx';
-import InviteUserModal from '../settings/modals/InviteUserModal'; // Ensure this path is correct
-
+import InviteUserModal from '../settings/modals/InviteUserModal';
 // Data Imports
 import {
     initialPriorityActions,
@@ -27,8 +24,8 @@ import {
     currentUser,
     companyStructure,
     controlHotspotData,
-    mockRoles // IMPORT mockRoles HERE
-} from '../../data/mockData'; //
+    mockRoles
+} from '../../data/mockData';
 
 const initialLayout = [
     { id: 'welcome', name: 'Welcome Banner', visible: true, fullWidth: true },
@@ -41,7 +38,6 @@ const initialLayout = [
 
 const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
     const [dashboardLayout, setDashboardLayout] = useState([]);
-
     useEffect(() => {
         const savedLayout = localStorage.getItem('dashboard-layout');
         if (savedLayout) {
@@ -79,13 +75,13 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
     const handleHotspotClick = (item) => {
         console.log("Hotspot clicked (handleHotspotClick in index.jsx):", item.id, item.cta);
         switch (item.id) {
-            case 'CTRL-01': // KYC Verification: "Review Records"
+            case 'CTRL-01':
                 onNavigate('Data Management', { initialTab: 'Detailed Records', detailedRecordsFilters: { type: 'KYC', status: 'Pending' } });
                 break;
-            case 'CTRL-02': // Transaction Monitoring Rules: "Adjust Rules"
+            case 'CTRL-02':
                 onNavigate('Manage', { initialTab: 'Rules Engine' });
                 break;
-            case 'CTRL-03': // Sanctions Screening: "View Details"
+            case 'CTRL-03':
                 onNavigate('Data Management', { initialTab: 'Data Sources', sourceId: 'src-chainalysis-kyt' });
                 break;
             default:
@@ -123,8 +119,8 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
         switch (item.id) {
             case 'welcome': return <WelcomeSignage user={currentUser} />;
             case 'actions': return (
-                <div className="bg-[#1e252d] p-6 rounded-xl shadow-lg text-white">
-                    <h3 className="text-xl font-semibold mb-4 text-[#c0933e]">Priority Actions</h3>
+                <div className="theme-bg-card p-6 rounded-xl shadow-lg theme-text-primary">
+                    <h3 className="text-[20px] leading-[28px] font-semibold mb-4 theme-text-highlight-color">Priority Actions</h3>
                     <div className="space-y-4">
                         {filteredActions.map(act => (
                             <ActionItem
@@ -140,8 +136,8 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
             case 'team': return <BuildTeamCard onInvite={() => setModals(prev => ({ ...prev, inviteUser: true }))} />;
             case 'hotspots': return <ControlHotspotAnalysis data={controlHotspotData} onActionClick={handleHotspotClick} />;
             case 'pulse': return (
-                <div className="bg-[#1e252d] p-6 rounded-xl shadow-lg text-white flex flex-col h-full">
-                    <h3 className="text-xl font-semibold mb-4 text-[#c0933e]">Regulatory Pulse</h3>
+                <div className="theme-bg-card p-6 rounded-xl shadow-lg theme-text-primary flex flex-col h-full">
+                    <h3 className="text-[20px] leading-[28px] font-semibold mb-4 theme-text-highlight-color">Regulatory Pulse</h3>
                     <div className="space-y-4 flex-grow">{filteredPulse.map(p => <PulseItem key={p.id} pulse={p} onClick={handlePulseClick} />)}</div>
                 </div>
             );
@@ -150,15 +146,15 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
     };
 
     return (
-        <div id="dashboard-content" className="space-y-6 animate-fade-in p-6">
+        <div id="dashboard-content" className="space-y-6 animate-fade-in p-6 theme-bg-page theme-text-primary">
             <div className="flex justify-between items-center">
-                <div className="bg-gray-800 rounded-lg p-1 flex space-x-1">
-                    <button onClick={() => setActiveDashboard('overview')} className={`flex-1 justify-center flex items-center space-x-2 py-2 px-4 text-sm font-bold rounded-md transition-colors ${activeDashboard === 'overview' ? 'bg-[#c0933e] text-[#1e252d]' : 'text-gray-400 hover:bg-gray-700'}`}><LayoutDashboard size={16} /><span>Main Overview</span></button>
-                    <button onClick={() => setActiveDashboard('kyc')} className={`flex-1 justify-center flex items-center space-x-2 py-2 px-4 text-sm font-bold rounded-md transition-colors ${activeDashboard === 'kyc' ? 'bg-[#c0933e] text-[#1e252d]' : 'text-gray-400 hover:bg-gray-700'}`}><UserCheck size={16} /><span>KYC Dashboard</span></button>
-                    <button onClick={() => setActiveDashboard('transactions')} className={`flex-1 justify-center flex items-center space-x-2 py-2 px-4 text-sm font-bold rounded-md transition-colors ${activeDashboard === 'transactions' ? 'bg-[#c0933e] text-[#1e252d]' : 'text-gray-400 hover:bg-gray-700'}`}><Activity size={16} /><span>Transaction Monitoring</span></button>
+                <div className="theme-bg-card rounded-lg p-1 flex space-x-1">
+                    <button onClick={() => setActiveDashboard('overview')} className={`flex-1 justify-center flex items-center space-x-2 py-2 px-4 text-sm font-bold rounded-md transition-colors ${activeDashboard === 'overview' ? 'theme-bg-highlight-color text-black' : 'bg-transparent text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}><LayoutDashboard size={16} /><span>Main Overview</span></button>
+                    <button onClick={() => setActiveDashboard('kyc')} className={`flex-1 justify-center flex items-center space-x-2 py-2 px-4 text-sm font-bold rounded-md transition-colors ${activeDashboard === 'kyc' ? 'theme-bg-highlight-color text-black' : 'bg-transparent text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}><UserCheck size={16} /><span>KYC Dashboard</span></button>
+                    <button onClick={() => setActiveDashboard('transactions')} className={`flex-1 justify-center flex items-center space-x-2 py-2 px-4 text-sm font-bold rounded-md transition-colors ${activeDashboard === 'transactions' ? 'theme-bg-highlight-color text-black' : 'bg-transparent text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}><Activity size={16} /><span>Transaction Monitoring</span></button>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <button onClick={() => setModals(prev => ({ ...prev, customize: true }))} className="bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-600 flex items-center text-sm"><SlidersHorizontal size={16} className="mr-2"/> Customize</button>
+                    <button onClick={() => setModals(prev => ({ ...prev, customize: true }))} className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center text-sm"><SlidersHorizontal size={16} className="mr-2"/> Customize</button>
                     <button onClick={() => setModals(prev => ({ ...prev, export: true }))} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center text-sm"><Share2 size={16} className="mr-2"/> Export / Share</button>
                 </div>
             </div>
@@ -175,21 +171,18 @@ const ActionOrientedDashboard = ({ onNavigate, jurisdiction }) => {
 
             {activeDashboard === 'kyc' && <KycDashboard />}
             {activeDashboard === 'transactions' && <TransactionMonitoringDashboard jurisdiction={jurisdiction} />}
-            
+
             {modals.submitEvidence && <SubmitEvidenceModal action={selectedAction} onClose={() => setModals(prev => ({ ...prev, submitEvidence: false }))} onComplete={() => {}} />}
             {modals.analytics && <AnalyticsCenterModal onClose={() => setModals(prev => ({ ...prev, analytics: false }))} />}
             {modals.customize && <CustomizeDashboardModal items={dashboardLayout} onSave={handleSaveLayout} onClose={() => setModals(prev => ({ ...prev, customize: false }))} />}
             {modals.export && <ExportDashboardModal onClose={() => setModals(prev => ({ ...prev, export: false }))} />}
             {modals.inviteUser && (
-                <InviteUserModal 
-                    roles={mockRoles} // PASSING mockRoles HERE!
-                    onClose={() => setModals(prev => ({ ...prev, inviteUser: false }))} 
-                    // You might also need an onSave handler here if users can be saved from Dashboard
+                <InviteUserModal
+                    roles={mockRoles}
+                    onClose={() => setModals(prev => ({ ...prev, inviteUser: false }))}
                     onSave={(newUser) => {
                         console.log("New user invited from Dashboard:", newUser);
-                        // Implement logic to add user to state or API here
                         setModals(prev => ({ ...prev, inviteUser: false }));
-                        // Optionally, show a toast message: setToastMessage('User invited successfully!');
                     }}
                 />
             )}

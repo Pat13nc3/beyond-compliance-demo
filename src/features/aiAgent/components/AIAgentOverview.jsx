@@ -58,11 +58,11 @@ const AIAgentOverview = ({
     return (
         <div className="space-y-6">
             {/* AI Agent Status & Key Metrics (Condensed) */}
-            <div className="bg-gray-800 p-4 rounded-lg shadow-md text-white flex flex-wrap justify-between items-center gap-4">
+            <div className="theme-bg-card p-4 rounded-lg shadow-md theme-text-primary flex flex-wrap justify-between items-center gap-4">
                 <div className="flex items-center space-x-3">
                     {healthIcon}
                     <div>
-                        <p className="text-sm font-semibold">AI Status:</p>
+                        <p className="text-sm font-semibold theme-text-primary">AI Status:</p>
                         <p className="text-lg font-bold"><span className={healthColor}>{aiHealth}</span></p>
                     </div>
                 </div>
@@ -70,24 +70,24 @@ const AIAgentOverview = ({
                     <div key={metric.id} className="flex items-center space-x-2">
                         <span className={metric.color}>{metric.icon}</span>
                         <div>
-                            <p className="text-sm font-semibold">{metric.label}</p>
-                            <p className="text-base font-bold">{metric.value}</p>
+                            <p className="text-sm font-semibold theme-text-primary">{metric.label}</p>
+                            <p className="text-base font-bold theme-text-primary">{metric.value}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* AI Chat Section - Prominent */}
-            <div className="bg-gray-800 p-6 rounded-lg shadow-md text-white h-[60vh] flex flex-col relative">
-                <h3 className="text-xl font-semibold text-[#c0933e] mb-4 flex items-center">
-                    <Bot size={24} className="mr-3 text-gray-400" /> Chat with AI Agent
+            <div className="theme-bg-card p-6 rounded-lg shadow-md theme-text-primary h-[60vh] flex flex-col relative">
+                <h3 className="text-[20px] leading-[28px] font-semibold theme-text-highlight-color mb-4 flex items-center">
+                    <Bot size={24} className="mr-3 theme-text-secondary" /> Chat with AI Agent
                 </h3>
 
                 {/* Chat Message History */}
                 <div className="flex-grow overflow-y-auto custom-scrollbar p-2 mb-4 space-y-4">
                     {chatMessages.map((msg, index) => (
                         <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[70%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-100'}`}>
+                            <div className={`max-w-[70%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-600 text-white' : 'theme-bg-page theme-text-primary'}`}>
                                 <p className="text-sm">{msg.text}</p>
                             </div>
                         </div>
@@ -96,12 +96,12 @@ const AIAgentOverview = ({
                 </div>
 
                 {/* Chat Input */}
-                <div className="flex flex-col border-t border-gray-700 pt-4">
+                <div className="flex flex-col border-t theme-border-color pt-4">
                     {selectedFileForReview && (
-                        <div className="flex items-center bg-gray-700 text-gray-300 px-3 py-2 rounded-t-lg text-sm mb-1 -mt-4">
+                        <div className="flex items-center theme-bg-card theme-text-secondary px-3 py-2 rounded-t-lg text-sm mb-1 -mt-4">
                             <FileText size={16} className="mr-2 text-blue-400" />
                             <span>{selectedFileForReview.name}</span>
-                            <button onClick={handleClearFile} className="ml-auto text-gray-400 hover:text-white">
+                            <button onClick={handleClearFile} className="ml-auto theme-text-secondary hover:theme-text-primary">
                                 <XCircle size={16} />
                             </button>
                         </div>
@@ -116,7 +116,7 @@ const AIAgentOverview = ({
                         />
                         <label 
                             htmlFor="file-upload-input" 
-                            className="p-3 bg-gray-700 rounded-l-lg text-gray-400 hover:text-white cursor-pointer flex items-center justify-center"
+                            className="p-3 bg-gray-100 dark:bg-gray-700 rounded-l-lg theme-text-secondary hover:theme-text-primary cursor-pointer flex items-center justify-center"
                             title="Upload File for AI Review"
                         >
                             <Upload size={20} />
@@ -128,7 +128,7 @@ const AIAgentOverview = ({
                             value={currentChatInput}
                             onChange={(e) => setCurrentChatInput(e.target.value)}
                             onKeyPress={handleInputKeyPress}
-                            className="flex-grow p-3 bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-r-none"
+                            className="flex-grow p-3 bg-gray-100 dark:bg-gray-700 border theme-border-color theme-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-r-none"
                         />
                         <button
                             onClick={() => onSendChatMessage(currentChatInput)}

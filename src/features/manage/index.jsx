@@ -1,30 +1,25 @@
 // src/features/manage/index.jsx
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, FileText, GanttChart, Workflow, Code, Users } from 'lucide-react'; // Removed Bot icon
+import { Link, FileText, Workflow, Code, Users } from 'lucide-react';
 
 // Component Imports
 import Integrations from './components/Integrations';
 import RulesEngine from './components/RulesEngine';
-import TaskManagementBoard from './components/TaskManagementBoard';
 import WorkflowDesigner from './components/WorkflowDesigner';
-// REMOVED: RegulatoryAIAgentView from here as it is now a top-level feature
 import ApiDevCentreView from './components/ApiDevCentreView';
 import PartnerCollaborationView from './components/PartnerCollaborationView'; 
 
 // Modal Imports
 import CreateRuleModal from './modals/CreateRuleModal';
-import CreateTaskModal from './modals/CreateTaskModal';
 import CreateIntegrationModal from './modals/CreateIntegrationModal';
 import CreateWorkflowModal from './modals/CreateWorkflowModal';
-// REMOVED: ViewAIInsightModal and SimulateAIOutputModal imports as they are now handled by App.jsx
 import CreateEditPartnerModal from './modals/CreateEditPartnerModal'; 
 import Toast from '../../components/ui/Toast';
 import {
     mockUsers,
     mockIntegrations as initialMockIntegrations,
     mockRules as initialMockRules,
-    initialTasks as initialMockTasks,
     mockWorkflows as initialMockWorkflows,
     mockPartners as initialMockPartners 
 } from '../../data/mockData';
@@ -40,19 +35,8 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
     const [rules, setRules] = useState(initialMockRules);
     const [editingRule, setEditingRule] = useState(null);
 
-    const [tasks, setTasks] = useState(initialMockTasks);
-    const [editingTask, setEditingTask] = useState(null);
-
     const [workflows, setWorkflows] = useState(initialMockWorkflows);
     const [editingWorkflow, setEditingWorkflow] = useState(null);
-
-    // REMOVED: AI Agent related states and their setters
-    // const [aiConfig, setAiConfig] = useState(...)
-    // const [selectedInsight, setSelectedInsight] = useState(...)
-    // const [isViewAIInsightModalOpen, setIsViewAIInsightModalOpen] = useState(false);
-    // const [isSimulateAIOutputModalOpen, setIsSimulateAIOutputModalOpen] = useState(false);
-    // const [simulateActionType, setSimulateActionType] = useState('');
-    // const [simulateOutputData, setSimulateOutputData] = useState({});
 
     const [apiSettings, setApiSettings] = useState({
         baseUrl: 'https://api.beyondcompliance.com/v2',
@@ -73,7 +57,6 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
 
 
     const [isCreateRuleModalOpen, setIsCreateRuleModalOpen] = useState(false);
-    const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
     const [isCreateIntegrationModalOpen, setIsCreateIntegrationModalOpen] = useState(false);
     const [isCreateWorkflowModalOpen, setIsCreateWorkflowModalOpen] = useState(false);
 
@@ -130,51 +113,11 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
         );
     };
 
-
-    const handleSaveTask = (taskToSave) => {
-        setTasks(prevTasks => {
-            const updatedTasks = { ...prevTasks };
-
-            if (taskToSave.id) {
-                for (const column in updatedTasks) {
-                    updatedTasks[column] = updatedTasks[column].filter(t => t.id !== taskToSave.id);
-                }
-            }
-
-            if (!updatedTasks[taskToSave.status]) {
-                updatedTasks[taskToSave.status] = [];
-            }
-            updatedTasks[taskToSave.status] = [...updatedTasks[taskToSave.status], taskToSave];
-
-            setToastMessage(`Task "${taskToSave.title}" ${taskToSave.id ? 'updated' : 'created'} successfully!`);
-
-            return updatedTasks;
-        });
-        setIsCreateTaskModalOpen(false);
-        setEditingTask(null);
-    };
-
-    const handleEditTask = (task) => {
-        setEditingTask(task);
-        setIsCreateTaskModalOpen(true);
-    };
-
     const handleTestRule = (rule) => {
         const triggersTask = rule.actions.some(action => action.type === 'Trigger Workflow' || action.type === 'Create Alert');
 
         if (triggersTask) {
-            const newTask = {
-                id: `AUTOTASK-${Date.now()}`,
-                title: `ACTION REQUIRED: Rule "${rule.name}" triggered!`,
-                description: `Automatically generated task due to rule "${rule.name}" being triggered. Review rule conditions and take necessary action.`,
-                priority: 'High',
-                assignedTo: 'Compliance Team',
-                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-                status: 'To Do',
-                generatedByRuleId: rule.id,
-            };
-            handleSaveTask(newTask);
-            setToastMessage(`Rule "${rule.name}" simulated. A new task has been created!`);
+             setToastMessage(`Rule "${rule.name}" simulated. A new task has been created!`);
         } else {
             setToastMessage(`Rule "${rule.name}" simulated. No task was generated by this rule's actions.`);
         }
@@ -241,21 +184,8 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
     };
 
     const handleRunWorkflow = (workflow) => {
-        const firstStepTask = {
-            id: `WF_TASK-${Date.now()}`,
-            title: `Workflow: ${workflow.name} - Step 1: ${workflow.steps[0]?.name || 'Start'}`,
-            description: `Initiated workflow "${workflow.name}". This task represents the first step.`,
-            priority: 'High',
-            assignedTo: 'Compliance Team',
-            dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-            status: 'In Progress',
-            linkedWorkflowId: workflow.id,
-        };
-        handleSaveTask(firstStepTask);
         setToastMessage(`Workflow "${workflow.name}" has been initiated! A new task has been created in your Task Management Board.`);
     };
-
-    // REMOVED: AI Agent handlers (handleSaveAiConfig, handleSimulateAiAction, handleViewInsightClick)
 
     const handleSaveApiSettings = (newApiSettings) => {
         setApiSettings(newApiSettings);
@@ -296,7 +226,6 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
         setToastMessage(`Viewing sharing activity for "${partner.name}" (Activity log modal coming soon!).`);
     };
 
-
     const renderContent = () => {
         switch (activeTab) {
             case 'integrations':
@@ -318,14 +247,6 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                         onTestRule={handleTestRule}
                     />
                 );
-            case 'tasks':
-                return (
-                    <TaskManagementBoard
-                        tasks={tasks}
-                        onCreateTask={() => { setIsCreateTaskModalOpen(true); setEditingTask(null); }}
-                        onEditTask={handleEditTask}
-                    />
-                );
             case 'workflows':
                 return (
                     <WorkflowDesigner
@@ -336,7 +257,6 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                         onRunWorkflow={handleRunWorkflow}
                     />
                 );
-            // REMOVED: AI Agent case from renderContent
             case 'apiDevCentre':
                 return (
                     <ApiDevCentreView
@@ -358,35 +278,31 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                     />
                 );
             default:
-                return <p className="text-center text-gray-400 py-8">Please select a tab.</p>
+                return <p className="text-center theme-text-secondary py-8">Please select a tab.</p>
         }
     };
 
     return (
-        <div className="p-6 bg-gray-900 h-full text-white">
+        <div className="p-6 theme-bg-page h-full theme-text-primary">
             <div className="max-w-7xl mx-auto flex flex-col h-full">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-3xl font-bold">Manage Compliance Operations</h2>
                 </div>
-                <div className="border-b border-gray-700 mb-6 flex-shrink-0">
+                <div className="border-b theme-border-color mb-6 flex-shrink-0">
                     <nav className="-mb-px flex space-x-4">
-                        <button onClick={() => setActiveTab('integrations')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'integrations' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                        <button onClick={() => setActiveTab('integrations')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'integrations' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'theme-text-secondary hover:text-theme-text-primary'}`}>
                             <Link size={18} className="inline-block mr-2" /> Integrations
                         </button>
-                        <button onClick={() => setActiveTab('rules')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'rules' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                        <button onClick={() => setActiveTab('rules')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'rules' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'theme-text-secondary hover:text-theme-text-primary'}`}>
                             <FileText size={18} className="inline-block mr-2" /> Rules Engine
                         </button>
-                        <button onClick={() => setActiveTab('tasks')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'tasks' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
-                            <GanttChart size={18} className="inline-block mr-2" /> Task Management
-                        </button>
-                        <button onClick={() => setActiveTab('workflows')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'workflows' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                        <button onClick={() => setActiveTab('workflows')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'workflows' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'theme-text-secondary hover:text-theme-text-primary'}`}>
                             <Workflow size={18} className="inline-block mr-2" /> Workflows
                         </button>
-                        {/* REMOVED: AI Agent tab button */}
-                        <button onClick={() => setActiveTab('apiDevCentre')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'apiDevCentre' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                        <button onClick={() => setActiveTab('apiDevCentre')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'apiDevCentre' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'theme-text-secondary hover:text-theme-text-primary'}`}>
                             <Code size={18} className="inline-block mr-2" /> API & Dev Centre
                         </button>
-                        <button onClick={() => setActiveTab('partnerCollaboration')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'partnerCollaboration' ? 'text-[#c0933e] border-b-2 border-[#c0933e]' : 'text-gray-400 hover:text-white'}`}>
+                        <button onClick={() => setActiveTab('partnerCollaboration')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'partnerCollaboration' ? 'text-theme-text-highlight-color border-b-2 border-theme-text-highlight-color' : 'theme-text-secondary hover:text-theme-text-primary'}`}>
                             <Users size={18} className="inline-block mr-2" /> Partner Collaboration
                         </button>
                     </nav>
@@ -404,14 +320,6 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                     initialData={editingRule}
                 />
             )}
-            {isCreateTaskModalOpen && (
-                <CreateTaskModal
-                    onClose={() => { setIsCreateTaskModalOpen(false); setEditingTask(null); }}
-                    onSave={handleSaveTask}
-                    initialData={editingTask}
-                    users={mockUsers} // Pass mockUsers directly or fetch if needed
-                />
-            )}
             {isCreateIntegrationModalOpen && (
                 <CreateIntegrationModal
                     onClose={() => { setIsCreateIntegrationModalOpen(false); setEditingIntegration(null); }}
@@ -426,7 +334,6 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                     initialData={editingWorkflow}
                 />
             )}
-            {/* REMOVED: ViewAIInsightModal and SimulateAIOutputModal as they are now handled by App.jsx */}
             {isCreateEditPartnerModalOpen && (
                 <CreateEditPartnerModal
                     onClose={() => { setIsCreateEditPartnerModalOpen(false); setEditingPartner(null); }}

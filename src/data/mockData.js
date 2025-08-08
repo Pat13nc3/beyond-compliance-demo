@@ -5,7 +5,8 @@ export const currentUser = {
     name: "Kene Gold",
     role: "Chief Compliance Officer",
     companyName: "Innovate Inc.",
-    avatarUrl: "https://placehold.co/100x100/E2E8F0/E2E8F0?text=+"
+    avatarUrl: "https://placehold.co/100x100/E2E8F0/E2E8F0?text=+",
+    userRole: "Compliance Admin" // Added userRole for permissions
 };
 
 export const companyStructure = {
@@ -61,7 +62,7 @@ PSPs are advised to review the full document available on the CBN official websi
 Key findings and implications include:
 1.  **Expanded Definition of Personal Data**: The update broadens the scope of what constitutes 'personal data', requiring a re-evaluation of data classification across our systems.
 2.  **Enhanced Consent Requirements**: Stricter consent mechanisms are now required for data processing, especially for sensitive personal data. Our current consent flows will need revision to ensure explicit, informed, and unambiguous consent.
-3.  **Data Retention Policies**: New guidelines on data retention periods for various data types have been introduced. This necessitates an update to our existing data lifecycle management policies to align with the stipulated maximum retention periods.
+3.  **Data Retention Policies**: New guidelines on data retention periods for various data types have been introduced. This necessitates an an update to our existing data lifecycle management policies to align with the stipulated maximum retention periods.
 4.  **Cross-Border Data Transfer**: Stricter conditions apply to cross-border data transfers, requiring robust safeguards and adherence to specific legal instruments for transfers outside Kenya.
 5.  **Increased Penalties**: The framework introduces significantly higher penalties for non-compliance, emphasizing the critical need for proactive adherence.
 
@@ -1210,20 +1211,14 @@ export const mockRules = [
 ];
 
 // Mock data for the tasks
-export const initialTasks = {
-    'To Do': [
-        { id: 'TASK-1', title: 'Review new CBN guidelines for PSPs', description: 'Analyze impact of recent CBN updates on payment service providers.', priority: 'High', dueDate: '2025-08-10', status: 'To Do' },
-        { id: 'TASK-2', title: 'Schedule Q3 internal audit', description: 'Coordinate with internal and external auditors for the third-quarter audit.', priority: 'Medium', dueDate: '2025-08-01', status: 'To Do' },
-        { id: 'TASK-6', title: 'Draft new AML/CFT Policy Addendum', description: 'Incorporate new regulatory requirements for virtual asset service providers.', priority: 'High', assignedTo: 'Jane Smith', dueDate: '2025-09-15', status: 'To Do' },
-    ],
-    'In Progress': [
-        { id: 'TASK-3', title: 'Prepare VASP White Paper draft', description: 'Outline the company\'s approach to virtual asset services and compliance.', priority: 'High', assignedTo: 'Kene Gold', dueDate: '2025-08-20', status: 'In Progress' },
-        { id: 'TASK-4', title: 'Update Data Encryption Policy', description: 'Revise current data encryption standards to meet new industry best practices.', priority: 'Low', assignedTo: 'Mark Davis', dueDate: '2025-07-30', status: 'In Progress' },
-    ],
-    'Done': [
-        { id: 'TASK-5', title: 'Submit Q2 AML Summary', description: 'Quarterly Anti-Money Laundering summary report submitted to regulatory authority.', priority: 'High', assignedTo: 'Sarah Chen', dueDate: '2025-07-15', status: 'Done' },
-    ],
-};
+export const initialTasks = [
+    { id: 'TASK-1', title: 'Review new CBN guidelines for PSPs', description: 'Analyze impact of recent CBN updates on payment service providers.', priority: 'High', dueDate: '2025-08-10', status: 'To Do', assignedTo: 'Kene Gold', createdBy: 'Kene Gold', projectId: 'proj-1', teamId: 'team-bc', labels: ['Regulatory', 'Research'], product: 'Payments' },
+    { id: 'TASK-2', title: 'Schedule Q3 internal audit', description: 'Coordinate with internal and external auditors for the third-quarter audit.', priority: 'Medium', dueDate: '2025-08-01', status: 'To Do', assignedTo: 'Jane Smith', createdBy: 'Kene Gold', projectId: 'proj-1', teamId: 'team-bc', labels: ['Audit'], product: 'Core Banking' },
+    { id: 'TASK-6', title: 'Draft new AML/CFT Policy Addendum', description: 'Incorporate new regulatory requirements for virtual asset service providers.', priority: 'High', assignedTo: 'Jane Smith', createdBy: 'Jane Smith', dueDate: '2025-09-15', status: 'To Do', projectId: 'proj-1', teamId: 'team-bc', labels: ['Policy', 'Regulatory'], product: 'Digital Assets' },
+    { id: 'TASK-3', title: 'Prepare VASP White Paper draft', description: 'Outline the company\'s approach to virtual asset services and compliance.', priority: 'High', assignedTo: 'Kene Gold', createdBy: 'Kene Gold', dueDate: '2025-08-20', status: 'In Progress', projectId: 'proj-1', teamId: 'team-bc', labels: ['Licensing'], product: 'Digital Assets' },
+    { id: 'TASK-4', title: 'Update Data Encryption Policy', description: 'Revise current data encryption standards to meet new industry best practices.', priority: 'Low', assignedTo: 'Mark Davis', createdBy: 'Jane Smith', dueDate: '2025-07-30', status: 'In Progress', projectId: 'proj-1', teamId: 'team-bc', labels: ['Policy', 'Technical'], product: 'Data Management' },
+    { id: 'TASK-5', title: 'Submit Q2 AML Summary', description: 'Quarterly Anti-Money Laundering summary report submitted to regulatory authority.', priority: 'High', assignedTo: 'Sarah Chen', createdBy: 'Kene Gold', dueDate: '2025-07-15', status: 'Done', projectId: 'proj-1', teamId: 'team-bc', labels: ['Reporting'], product: 'Compliance Reporting' },
+];
 
 // Mock data for Workflows
 export const mockWorkflows = [
@@ -1238,6 +1233,7 @@ export const mockWorkflows = [
             { name: 'Submit to Regulator' },
             { name: 'Track Application Status' },
         ],
+        assignedTo: 'Kene Gold',
     },
     {
         id: 'wf-2',
@@ -1250,6 +1246,7 @@ export const mockWorkflows = [
             { name: 'Compliance Officer Review' },
             { name: 'Submit to Regulator' },
         ],
+        assignedTo: 'Jane Smith',
     },
     {
         id: 'wf-3',
@@ -1262,6 +1259,7 @@ export const mockWorkflows = [
             { name: 'Verify New Documents' },
             { name: 'Update Client Profile' },
         ],
+        assignedTo: 'Mark Davis',
     },
 ];
 
@@ -1412,4 +1410,18 @@ export const mockPartnerTiers = [
         accessLevel: 'Admin Access',
         permissions: ['View All Data', 'Manage Integrations', 'Receive Real-time Alerts'],
     },
+];
+
+export const mockTeams = [
+    { id: 'team-bc', name: 'BCprototyping' }
+];
+
+export const mockProjects = [
+    { id: 'proj-1', name: 'Product V2.0 Launch', teamId: 'team-bc' },
+    { id: 'proj-2', name: 'Annual Compliance Reporting', teamId: 'team-bc' },
+    { id: 'proj-3', name: 'AML/CFT Policy Review', teamId: 'team-bc' },
+    { id: 'proj-4', name: 'Data Privacy Policy & Controls', teamId: 'team-bc' },
+    { id: 'proj-5', name: 'Licensing & Regulatory Filings', teamId: 'team-bc' },
+    { id: 'proj-6', name: 'Staff Training & Awareness', teamId: 'team-bc' },
+    { id: 'proj-7', name: 'Continuous Monitoring Automation', teamId: 'team-bc' },
 ];
