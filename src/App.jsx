@@ -30,9 +30,9 @@ const App = () => {
     const [activeTab, setActiveTab] = useState('Dashboard');
     const [userMode, setUserMode] = useState('Pro');
     const [pageContext, setPageContext] = useState(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State to control sidebar collapse/expand
     const [activeJurisdiction, setActiveJurisdiction] = useState('Global');
-    const [theme, setTheme] = useState('dark'); // Initial theme is dark
+    const [theme, setTheme] = useState('dark'); 
 
     const [libraryEvidence, setLibraryEvidence] = useState([
       { name: 'Q1 Board Meeting Minutes.pdf', status: 'New', id: 'evid-1' }
@@ -42,6 +42,11 @@ const App = () => {
 
     const [isAIAnalysisResultModalOpen, setIsAIAnalysisResultModalOpen] = useState(false);
     const [aiAnalysisResultContent, setAiAnalysisResultContent] = useState({});
+
+    // Effect to apply the data-theme attribute to the body
+    useEffect(() => {
+        document.body.setAttribute('data-theme', theme);
+    }, [theme]); 
 
     const toggleTheme = () => {
         setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
@@ -229,23 +234,26 @@ const App = () => {
     };
 
     return (
-        <div className="flex h-screen overflow-hidden" data-theme={theme}>
-            <Sidebar
+        // Main container: flex-col to stack header and content area vertically
+        <div className="flex flex-col h-screen overflow-hidden" data-theme={theme}>
+            <Header
                 activeTab={activeTab}
-                setActiveTab={handleNavigate}
-                isSidebarOpen={isSidebarOpen}
+                isSidebarOpen={isSidebarOpen} 
+                setIsSidebarOpen={setIsSidebarOpen} 
+                userMode={userMode}
+                setUserMode={setUserMode}
+                activeJurisdiction={activeJurisdiction}
+                setActiveJurisdiction={setActiveJurisdiction}
+                theme={theme}
+                toggleTheme={toggleTheme}
             />
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <Header
+            {/* Content area: flex to arrange sidebar and main content horizontally */}
+            <div className="flex flex-1 overflow-hidden"> {/* flex-1 makes it take remaining vertical space */}
+                <Sidebar
                     activeTab={activeTab}
+                    setActiveTab={handleNavigate}
                     isSidebarOpen={isSidebarOpen}
-                    setIsSidebarOpen={setIsSidebarOpen}
-                    userMode={userMode}
-                    setUserMode={setUserMode}
-                    activeJurisdiction={activeJurisdiction}
-                    setActiveJurisdiction={setActiveJurisdiction}
-                    theme={theme}
-                    toggleTheme={toggleTheme}
+                    setIsSidebarOpen={setIsSidebarOpen} 
                 />
                 <main className="flex-1 overflow-x-hidden overflow-y-auto theme-bg-page">
                     {renderContent()}

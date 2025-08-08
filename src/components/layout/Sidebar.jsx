@@ -12,10 +12,10 @@ import {
     Rss,
     Cpu,
     Settings as SettingsIcon,
-    Bot, // AI Agent icon
-    GanttChart, // Used for Task Management
-    ChevronLeft, // Icon for collapsing sidebar
-    ChevronRight, // Icon for expanding sidebar
+    Bot, // AI Agent icon - ENSURED THIS IS IMPORTED
+    GanttChart, 
+    ChevronLeft, 
+    ChevronRight, 
 } from 'lucide-react';
 
 const NavItem = ({ icon, text, active, onClick, isSidebarOpen, isSeparator = false }) => {
@@ -47,7 +47,7 @@ const NavItem = ({ icon, text, active, onClick, isSidebarOpen, isSeparator = fal
     );
 };
 
-const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
+const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) => { 
     const navItems = [
         { id: 'Dashboard', icon: <LayoutDashboard size={20} />, text: 'Dashboard' },
         { id: 'ComplianceReporting', icon: <FileText size={20} />, text: 'Compliance Reporting' },
@@ -68,9 +68,9 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
                 isSidebarOpen ? 'w-[280px]' : 'w-20'
             }`}
         >
-            <div className="flex items-center justify-start py-4 pl-4"> {/* Removed h-20, changed justify-center to justify-start, added py-4 pl-4 */}
+            <div className="flex items-center justify-start py-4 pl-4"> 
                 <h1
-                    className={`text-lg font-medium uppercase theme-text-secondary whitespace-nowrap`}
+                    className={`text-base font-bold uppercase theme-text-secondary whitespace-nowrap`}
                     style={{ fontFamily: 'var(--sidebar-header-font-family)' }}
                 >
                     Beyond Compliance
@@ -91,16 +91,22 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
                     ))}
                 </ul>
             </nav>
-            {/* The EMTECH branding section remains */}
-            <div className="flex-shrink-0 p-4 border-t theme-border-color flex justify-center items-center">
+            <div className="flex-shrink-0 p-4 border-t theme-border-color flex justify-between items-center"> 
                 {isSidebarOpen ? (
-                    <div>
+                    <div className="flex-1"> 
                         <p className="text-sm theme-text-secondary">Powered by</p>
                         <p className="text-2xl font-bold theme-text-primary">EM<span className="theme-text-highlight-color">TECH</span></p>
                     </div>
                 ) : (
                     <p className="text-2xl font-bold theme-text-primary">E<span className="theme-text-highlight-color">M</span></p>
                 )}
+                <button
+                    onClick={() => setIsSidebarOpen(prevState => !prevState)}
+                    className="w-10 h-10 flex items-center justify-center border theme-border-color theme-bg-card text-gray-800 dark:text-gray-400 rounded-md shadow-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" 
+                    aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                >
+                    {isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+                </button>
             </div>
         </div>
     );

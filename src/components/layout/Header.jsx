@@ -1,7 +1,7 @@
 // src/components/layout/Header.jsx
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, Globe, Sun, Moon, Search as SearchIcon, ChevronLeft, UserCircle, Settings, LogOut, Palette } from 'lucide-react'; // Import new icons
+import { Menu, Globe, Sun, Moon, Search as SearchIcon, ChevronLeft, UserCircle, Settings, LogOut, Palette, Building } from 'lucide-react'; // Import Building icon
 import UserModeToggle from '../ui/UserModeToggle.jsx';
 import { currentUser } from '../../data/mockData'; // Import currentUser mock data
 
@@ -10,6 +10,10 @@ const Header = ({ activeTab, setIsSidebarOpen, isSidebarOpen, activeJurisdiction
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const userButtonRef = useRef(null);
+
+  // NEW: State for company name and logo
+  const [companyName, setCompanyName] = useState(currentUser.companyName || 'InterSystems'); // Default company name
+  const [companyLogo, setCompanyLogo] = useState('https://placehold.co/32x32/E2E8F0/E2E8F0?text='); // Default placeholder logo
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -29,12 +33,38 @@ const Header = ({ activeTab, setIsSidebarOpen, isSidebarOpen, activeJurisdiction
     };
   }, []);
 
+  // NEW: Handle logo file upload
+  const handleLogoUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCompanyLogo(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
   return (
     <header className="flex items-center justify-between p-4 theme-bg-card theme-text-primary sticky top-0 z-10">
       <div className="flex items-center space-x-4">
-        <button onClick={() => setIsSidebarOpen(prevState => !prevState)} className="p-2 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-          {isSidebarOpen ? <ChevronLeft size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Company Logo and Name Section */}
+        <div className="flex items-center space-x-2">
+          {/* Company Logo */}
+          <label htmlFor="company-logo-upload" className="cursor-pointer">
+            <img src={companyLogo} alt="Company Logo" className="h-8 w-8 rounded-full object-cover" />
+            <input id="company-logo-upload" type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} />
+          </label>
+          {/* Company Name Input - Increased width to w-48 */}
+          <input
+            type="text"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            className="bg-transparent border-none text-lg font-semibold theme-text-primary focus:outline-none w-48" /* Changed w-36 to w-48 */
+            aria-label="Company Name"
+          />
+        </div>
       </div>
       <div className="flex items-center space-x-4">
         {/* Theme Toggle Button */}
