@@ -1,130 +1,168 @@
 // src/features/riskAssessment/index.jsx
 
-import React, { useState } from 'react';
-import { Shield, TrendingUp, AlertTriangle, Plus, BarChart2, LayoutGrid } from 'lucide-react';
-import RiskDrilldownModal from './modals/RiskDrilldownModal.jsx';
-import RiskHeatmap from './components/RiskHeatmap.jsx';
-import RiskBarChart from './components/RiskBarChart.jsx';
-import { heatmapData } from '../../data/mockData.js'; // Assuming risk data is in mockData
+import React, { useState, useEffect } from 'react';
+import {
+    Shield,
+    CreditCard,
+    BarChart,
+    Factory,
+    Scale,
+    Activity,
+    ClipboardList,
+    AlertTriangle
+} from 'lucide-react';
+import { calculateAllEntityRisks, getRiskColor, getSeverityColor } from "./riskUtils.js";
+// CORRECTED: Ensure all risk-related data is imported from the new riskData.js file
+import { mockEntities, mockLicenses, mockAlerts } from "./data/riskData.js";
 
-const riskData = {
-    overallScore: 68,
-    breakdown: [
-        { name: 'Credit Risk', score: 75, color: 'bg-yellow-500' },
-        { name: 'Market Risk', score: 60, color: 'bg-yellow-500' },
-        { name: 'Operational Risk', score: 80, color: 'bg-green-500' },
-        { name: 'Compliance Risk', score: 55, color: 'bg-red-500' },
-    ],
-    watchlist: [
-        { id: 'WR-001', item: 'Cross-border transaction velocity', reason: 'Exceeded threshold by 15%', level: 'High' },
-        { id: 'WR-002', item: 'New user account fraud rate', reason: 'Spike in new account closures', level: 'Medium' },
-    ]
-};
+// Import all the detailed view components for the internal risk view
+import CreditRiskTab from "./components/CreditRiskTab.jsx";
+import LiquidityRiskTab from "./components/LiquidityRiskTab.jsx";
+import MarketRiskTab from "./components/MarketRiskTab.jsx";
+import OperationalRiskTab from "./components/OperationalRiskTab.jsx";
+import CapitalAdequacyRiskTab from "./components/CapitalAdequacyRiskTab.jsx";
+import BusinessModelView from './components/BusinessModelView.jsx';
+import SystemAlertsTab from './components/SystemAlertsTab.jsx';
+import OverviewTab from './components/OverviewTab.jsx';
 
-const getScoreColor = (score) => {
-    if (score < 60) return 'text-red-400';
-    if (score < 80) return 'text-yellow-400';
-    return 'text-green-400';
-};
+// NEW: This is the dedicated component for Innovate Inc's internal risk view
+import InternalRiskView from './components/InternalRiskView.jsx';
+
+const riskCategories = [
+    { id: 'internal', name: 'Internal Risk', icon: Factory },
+    { id: 'thirdParty', name: 'Third-Party Risk', icon: Shield },
+    { id: 'systemAlerts', name: 'System Alerts', icon: AlertTriangle },
+];
+
+// NEW: Define sub-tabs for the Third-Party Risk view
+const thirdPartySubTabs = [
+    { id: 'overview', name: 'Overview', icon: ClipboardList },
+    { id: 'credit', name: 'Credit', icon: CreditCard },
+    { id: 'liquidity', name: 'Liquidity', icon: Scale },
+    { id: 'market', name: 'Market', icon: BarChart },
+    { id: 'operational', name: 'Operational', icon: Activity },
+    { id: 'capitalAdequacy', name: 'Capital Adequacy', icon: Shield },
+    { id: 'businessModels', name: 'Business Models', icon: Factory },
+];
 
 const RiskAssessment = () => {
-    const [isDrilldownOpen, setIsDrilldownOpen] = useState(false);
-    const [selectedPillar, setSelectedPillar] = useState(null);
-    const [chartView, setChartView] = useState('heatmap');
+    const [activeTab, setActiveTab] = useState('internal'); // Default to internal risk
+    const [entities, setEntities] = useState([]);
+    const [alerts, setAlerts] = useState(mockAlerts);
 
-    const handleDrilldown = (pillar) => {
-        setSelectedPillar(pillar);
-        setIsDrilldownOpen(true);
+    // We no longer need selectedEntity as the internal view is for Innovate Inc. only
+    // const [selectedEntity, setSelectedEntity] = useState(null);
+    const [thirdPartySubTab, setThirdPartySubTab] = useState('overview');
+
+    useEffect(() => {
+        const enrichedEntities = calculateAllEntityRisks(mockEntities, mockLicenses);
+        setEntities(enrichedEntities);
+    }, []);
+
+    const getRiskColorHex = (score) => {
+        if (score >= 90) return '#9333ea';
+        if (score >= 75) return '#ef4444';
+        if (score >= 60) return '#f97316';
+        if (score >= 40) return '#eab308';
+        return '#22c55e';
+    };
+
+    const getTabComponent = () => {
+        const tabProps = {
+            entities,
+            alerts,
+            getRiskColor,
+            getRiskColorHex,
+            getSeverityColor,
+        };
+
+        switch (activeTab) {
+            case 'internal':
+                return <InternalRiskView {...tabProps} />;
+            case 'thirdParty':
+                // Pass props specific to the Third-Party view, including sub-tab state
+                const thirdPartyProps = { ...tabProps, activeSubTab: thirdPartySubTab, setActiveSubTab: setThirdPartySubTab };
+                switch (thirdPartySubTab) {
+                    case 'overview':
+                        return <OverviewTab {...thirdPartyProps} />;
+                    case 'credit':
+                        return <CreditRiskTab {...thirdPartyProps} />;
+                    case 'liquidity':
+                        return <LiquidityRiskTab {...thirdPartyProps} />;
+                    case 'market':
+                        return <MarketRiskTab {...thirdPartyProps} />;
+                    case 'operational':
+                        return <OperationalRiskTab {...thirdPartyProps} />;
+                    case 'capitalAdequacy':
+                        return <CapitalAdequacyRiskTab {...thirdPartyProps} />;
+                    case 'businessModels':
+                        return <BusinessModelView {...thirdPartyProps} />;
+                    default:
+                        return <OverviewTab {...thirdPartyProps} />;
+                }
+            case 'systemAlerts':
+                return <SystemAlertsTab {...tabProps} />;
+            default:
+                return <InternalRiskView {...tabProps} />;
+        }
     };
 
     return (
-        <div className="p-6 theme-bg-page min-h-screen">
-            <div className="space-y-6 animate-fade-in">
-                {/* Header Section */}
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h2 className="text-3xl font-bold theme-text-primary">Internal Risk Dashboard</h2>
-                        <p className="theme-text-secondary">Monitor and manage your institution's internal risk profile.</p>
-                    </div>
-                    <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center">
-                        <Plus size={20} className="mr-2"/> New Assessment
-                    </button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column: Overall Score and Breakdown */}
-                    <div className="lg:col-span-1 space-y-6">
-                        <div className="theme-bg-card p-6 rounded-xl shadow-lg theme-text-primary text-center">
-                            <h3 className="text-lg font-semibold theme-text-secondary mb-2">Overall Risk Score</h3>
-                            <p className={`text-7xl font-bold ${getScoreColor(riskData.overallScore)}`}>{riskData.overallScore}</p>
-                            <div className="flex items-center justify-center mt-2 text-green-400">
-                               <TrendingUp size={20} className="mr-1"/>
-                               <span className="text-sm">Trending Up</span>
-                            </div>
-                        </div>
-
-                        <div className="theme-bg-card p-6 rounded-xl shadow-lg theme-text-primary">
-                             <h3 className="text-xl font-semibold mb-4 theme-text-highlight-color">Risk Breakdown</h3>
-                             <div className="space-y-4">
-                                {riskData.breakdown.map(item => (
-                                    <button
-                                        key={item.name}
-                                        onClick={() => handleDrilldown(item)}
-                                        className="w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg"
-                                    >
-                                        <div className="flex justify-between items-center mb-1 text-sm">
-                                            <span className="font-semibold theme-text-primary">{item.name}</span>
-                                            <span className={getScoreColor(item.score)}>{item.score} / 100</span>
-                                        </div>
-                                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                                            <div className={item.color} style={{ width: `${item.score}%`, height: '100%', borderRadius: 'inherit'}}></div>
-                                        </div>
-                                    </button>
-                                ))}
-                             </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column: Watchlist and Concentration Chart */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="theme-bg-card p-6 rounded-xl shadow-lg theme-text-primary">
-                            <h3 className="text-xl font-semibold mb-4 theme-text-highlight-color">Risk Watchlist</h3>
-                            <div className="space-y-3">
-                                {riskData.watchlist.map(item => (
-                                    <div key={item.id} className="flex items-start theme-bg-card-alt p-4 rounded-lg"> {/* Updated class here */}
-                                        <AlertTriangle className={`mr-4 mt-1 ${item.level === 'High' ? 'theme-text-danger-color' : 'text-yellow-500'}`} /> {/* Using theme-text-danger-color */}
-                                        <div>
-                                            <p className="font-bold theme-text-primary">{item.item}</p>
-                                            <p className="text-sm theme-text-secondary">{item.reason}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="theme-bg-card p-6 rounded-xl shadow-lg theme-text-primary">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-semibold theme-text-highlight-color">Risk Concentration</h3>
-                                <div className="flex items-center bg-gray-200 dark:bg-gray-800 rounded-lg p-1">
-                                    <button onClick={() => setChartView('heatmap')} className={`p-2 rounded-md ${chartView === 'heatmap' ? 'theme-bg-highlight-color text-black dark:text-white' : 'theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700'}`} title="Heatmap View"><LayoutGrid size={16} /></button>
-                                    <button onClick={() => setChartView('barchart')} className={`p-2 rounded-md ${chartView === 'barchart' ? 'theme-bg-highlight-color text-black dark:text-white' : 'theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700'}`} title="Bar Chart View"><BarChart2 size={16} /></button>
-                                </div>
-                            </div>
-
-                             <div className="h-80">
-                                {chartView === 'heatmap' ? <RiskHeatmap /> : <RiskBarChart />}
-                             </div>
-                        </div>
-                    </div>
+        <div className="p-6 theme-bg-page min-h-screen theme-text-primary">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 className="text-3xl font-bold">Risk Assessment</h2>
+                    <p className="text-theme-text-secondary">Comprehensive analysis of all supervised entities.</p>
                 </div>
             </div>
 
-            {isDrilldownOpen && (
-                <RiskDrilldownModal
-                    riskPillar={selectedPillar}
-                    onClose={() => setIsDrilldownOpen(false)}
-                />
+            <div className="border-b-2 border-theme-border mb-6">
+                <nav className="-mb-0.5 flex flex-wrap space-x-4">
+                    {riskCategories.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => {
+                                setActiveTab(tab.id);
+                                // Reset sub-tab to overview when switching main tabs
+                                setThirdPartySubTab('overview');
+                            }}
+                            className={`flex items-center space-x-2 py-3 px-4 rounded-t-lg font-bold text-sm transition-colors duration-200
+                                ${activeTab === tab.id
+                                ? 'bg-theme-bg-card border-theme-border border-b-0 text-theme-accent'
+                                : 'text-theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700'}`
+                            }
+                        >
+                            <tab.icon size={18} />
+                            <span>{tab.name}</span>
+                        </button>
+                    ))}
+                </nav>
+            </div>
+
+            {/* NEW: Sub-tab navigation for Third-Party Risk */}
+            {activeTab === 'thirdParty' && (
+                <div className="border-b-2 border-theme-border mb-6">
+                    <nav className="-mb-0.5 flex flex-wrap space-x-4 ml-8">
+                        {thirdPartySubTabs.map((subTab) => (
+                            <button
+                                key={subTab.id}
+                                onClick={() => setThirdPartySubTab(subTab.id)}
+                                className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-xs transition-colors duration-200
+                                    ${thirdPartySubTab === subTab.id
+                                    ? 'text-blue-500 border-blue-500'
+                                    : 'text-theme-text-secondary border-transparent hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-theme-text-primary'}` // Added hover styles
+                                }
+                            >
+                                <subTab.icon size={16} />
+                                <span>{subTab.name}</span>
+                            </button>
+                        ))}
+                    </nav>
+                </div>
             )}
+            {/* END NEW SUB-TAB NAV */}
+
+            {getTabComponent()}
         </div>
     );
 };

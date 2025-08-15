@@ -1,7 +1,6 @@
 // src/components/layout/Sidebar.jsx
 
 import React from 'react';
-// Import all necessary icons
 import {
     LayoutDashboard,
     FileText,
@@ -12,7 +11,6 @@ import {
     Rss,
     Cpu,
     Settings as SettingsIcon,
-    Bot, // AI Agent icon - ENSURED THIS IS IMPORTED
     GanttChart, 
     ChevronLeft, 
     ChevronRight, 
@@ -20,7 +18,6 @@ import {
 
 const NavItem = ({ icon, text, active, onClick, isSidebarOpen, isSeparator = false }) => {
     if (isSeparator) {
-        // Render a simple separator line or space
         return (
             <li className="my-4">
                 {isSidebarOpen ? (
@@ -51,7 +48,7 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) =
     const navItems = [
         { id: 'Dashboard', icon: <LayoutDashboard size={20} />, text: 'Dashboard' },
         { id: 'ComplianceReporting', icon: <FileText size={20} />, text: 'Compliance Reporting' },
-        { id: 'AIAgent', icon: <Bot size={20} />, text: 'AI Agent' },
+        { id: 'ComplianceFrameworks', icon: <Shield size={20} />, text: 'Compliance Frameworks' },
         { id: 'TaskManagement', icon: <GanttChart size={20} />, text: 'Task Management' },
         { id: 'DataManagement', icon: <Database size={20} />, text: 'Data Management' },
         { id: 'Library', icon: <Book size={20} />, text: 'Library' },

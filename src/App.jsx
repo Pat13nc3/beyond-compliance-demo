@@ -2,35 +2,37 @@
 
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Sidebar from './components/layout/Sidebar';
-import Header from './components/layout/Header';
+import Sidebar from './components/layout/Sidebar.jsx'; // Added .jsx extension
+import Header from './components/layout/Header.jsx';   // Added .jsx extension
+// import SignInPage from './features/auth/SignInPage'; // Removed SignInPage import
 
 // --- Import all your page components ---
-import ActionOrientedDashboard from './features/dashboard';
-import ComplianceReporting from './features/complianceReporting';
-import DataManagement from './features/dataManagement';
-import Library from './features/library';
-import RiskAssessment from './features/riskAssessment';
-import Licensing from './features/licensing';
-import RegulatoryUpdates from './features/regulatoryUpdates';
-import Manage from './features/manage';
-import Settings from './features/settings';
-
-// AI Agent feature
-import AIAgent from './features/aiAgent';
-// NEW: Task Management Feature
-import TaskManagement from './features/taskManagement';
+import ActionOrientedDashboard from './features/dashboard/index.jsx'; // Added /index.jsx
+import ComplianceReporting from './features/complianceReporting/index.jsx'; // Added /index.jsx
+import DataManagement from './features/dataManagement/index.jsx'; // Added /index.jsx
+import Library from './features/library/index.jsx'; // Added /index.jsx
+import RiskAssessment from './features/riskAssessment/index.jsx'; // Added /index.jsx
+import Licensing from './features/licensing/index.jsx'; // Added /index.jsx
+import RegulatoryUpdates from './features/regulatoryUpdates/index.jsx'; // Added /index.jsx
+import Manage from './features/manage/index.jsx'; // Added /index.jsx
+import Settings from './features/settings/index.jsx'; // Added /index.jsx
+import TaskManagement from './features/taskManagement/index.jsx'; // Added /index.jsx
+import ComplianceFrameworks from './features/complianceFrameworks/index.jsx'; // Confirmed .jsx extension
 
 // Global UI Components
-import Toast from './components/ui/Toast';
-import AIAnalysisResultModal from './features/aiAgent/modals/AIAnalysisResultModal';
-
+import Toast from './components/ui/Toast.jsx'; // Corrected casing and added .jsx extension
+import AIAnalysisResultModal from './features/aiAgent/modals/AIAnalysisResultModal.jsx'; // Added .jsx extension
 
 const App = () => {
+    // Removed: State for authentication and user information
+    // const [user, setUser] = useState(null);
+    // const [db, setDb] = useState(null);
+    // const [auth, setAuth] = useState(null);
+
     const [activeTab, setActiveTab] = useState('Dashboard');
     const [userMode, setUserMode] = useState('Pro');
     const [pageContext, setPageContext] = useState(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State to control sidebar collapse/expand
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [activeJurisdiction, setActiveJurisdiction] = useState('Global');
     const [theme, setTheme] = useState('dark'); 
 
@@ -43,7 +45,6 @@ const App = () => {
     const [isAIAnalysisResultModalOpen, setIsAIAnalysisResultModalOpen] = useState(false);
     const [aiAnalysisResultContent, setAiAnalysisResultContent] = useState({});
 
-    // Effect to apply the data-theme attribute to the body
     useEffect(() => {
         document.body.setAttribute('data-theme', theme);
     }, [theme]); 
@@ -156,7 +157,7 @@ const App = () => {
                 ];
                 break;
             case 'LicenseApplication':
-                summary = `Simulated review of your license application for "${contextData.licenseType || 'General License'}".`;
+                summary = `Simulated review of your license application for "${contextData.licenseType || 'General License'}" for ${contextData.jurisdiction}.`;
                 keyPoints = [
                     "Identified 2 missing required documents.",
                     "Summarized key regulatory requirements for application.",
@@ -166,6 +167,20 @@ const App = () => {
                     "Upload 'Proof of Capital' and 'Business Plan' documents.",
                     "Review Section B for alignment with regulatory definitions.",
                     "Schedule a pre-submission review with legal counsel."
+                ];
+                break;
+            case 'RuleSummary':
+                summary = `Simulated AI summary and analysis of rule "${contextData.ruleName || 'Untitled Rule'}".`;
+                keyPoints = [
+                    `Identified primary trigger condition: ${contextData.conditions[0]?.field} ${contextData.conditions[0]?.operator} "${contextData.conditions[0]?.value}".`,
+                    `Primary action: ${contextData.actions[0]?.type}.`,
+                    `Assessed potential impact on data volume and alert frequency.`,
+                    `Cross-referenced with related rules in the system.`
+                ];
+                recommendedActions = [
+                    `Verify rule conditions against latest regulatory circulars.`,
+                    `Run a simulation with historical data to predict rule impact.`,
+                    `Consider creating a corresponding task in Task Management for ongoing monitoring.`
                 ];
                 break;
             default:
@@ -210,6 +225,8 @@ const App = () => {
                 return <ActionOrientedDashboard {...pageProps} />;
             case 'ComplianceReporting':
                 return <ComplianceReporting {...pageProps} />;
+            case 'ComplianceFrameworks':
+                return <ComplianceFrameworks {...pageProps} />;
             case 'DataManagement':
                 return <DataManagement {...pageProps} onPromoteToLibrary={handlePromoteToLibrary} jurisdiction={activeJurisdiction} onNavigate={handleNavigate} />;
             case 'Library':
@@ -224,8 +241,6 @@ const App = () => {
                 return <Manage {...pageProps} />;
             case 'Settings':
                 return <Settings {...pageProps} />;
-            case 'AIAgent':
-                return <AIAgent {...pageProps} />;
             case 'TaskManagement':
                 return <TaskManagement {...pageProps} />;
             default:
@@ -233,8 +248,12 @@ const App = () => {
         }
     };
 
+    // Removed: Conditional rendering based on user state
+    // if (!user) {
+    //     return <SignInPage onSignInSuccess={(db, auth, user) => { setDb(db); setAuth(auth); setUser(user); }} />;
+    // }
+
     return (
-        // Main container: flex-col to stack header and content area vertically
         <div className="flex flex-col h-screen overflow-hidden" data-theme={theme}>
             <Header
                 activeTab={activeTab}
@@ -247,8 +266,7 @@ const App = () => {
                 theme={theme}
                 toggleTheme={toggleTheme}
             />
-            {/* Content area: flex to arrange sidebar and main content horizontally */}
-            <div className="flex flex-1 overflow-hidden"> {/* flex-1 makes it take remaining vertical space */}
+            <div className="flex flex-1 overflow-hidden">
                 <Sidebar
                     activeTab={activeTab}
                     setActiveTab={handleNavigate}

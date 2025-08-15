@@ -1,9 +1,9 @@
 // src/features/regulatoryUpdates/modals/ViewUpdateModal.jsx
 
 import React from 'react';
-import { X, Lightbulb } from 'lucide-react'; // Import Lightbulb icon
+import { X, Lightbulb } from 'lucide-react';
 
-const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis }) => { // NEW: Add triggerAIAnalysis prop
+const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis }) => {
     if (!update) return null;
 
     const handleAIAnalyzeClick = () => {
@@ -12,10 +12,9 @@ const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis }) => { // NEW: Ad
                 regulationTitle: update.title,
                 regulationSource: update.source,
                 regulationDate: update.publishedDate,
-                fullTextSample: update.fullText ? update.fullText.substring(0, 500) + '...' : 'No full text available.', // Pass a sample or full text
-                // You can pass the entire 'update' object if needed
+                fullTextSample: update.fullText ? update.fullText.substring(0, 500) + '...' : 'No full text available.',
                 fullUpdateObject: update
-            }, 'RegulationReview'); // Analysis type: RegulationReview
+            }, 'RegulationReview');
         } else {
             console.error("triggerAIAnalysis prop is undefined in ViewUpdateModal.");
         }
@@ -34,7 +33,6 @@ const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis }) => { // NEW: Ad
                     <p className="text-sm text-gray-300 whitespace-pre-wrap">{update.fullText}</p>
                 </div>
                 <div className="flex justify-end pt-4 mt-4 border-t border-gray-700 space-x-2">
-                    {/* NEW: AI Analyze Button */}
                     <button
                         onClick={handleAIAnalyzeClick}
                         className="bg-purple-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-purple-500 flex items-center"

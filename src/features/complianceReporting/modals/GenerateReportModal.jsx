@@ -41,13 +41,14 @@ const GenerateReportModal = ({ onClose, onProcessReport, triggerAIAnalysis }) =>
 
   const handleAIAssistClick = () => {
     if (triggerAIAnalysis) {
+      // Calls the central AI analysis function with context for a report draft
       triggerAIAnalysis({
         reportName: reportName || 'Untitled Report',
         templateId: selectedTemplate?.id,
         templateName: selectedTemplate?.name,
         regulator: regulator,
         status: 'Drafting',
-      }, 'ReportDraft');
+      }, 'ReportDraft'); // Specifies the type of AI analysis requested
     }
   };
 

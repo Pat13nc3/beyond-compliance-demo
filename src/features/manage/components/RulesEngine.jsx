@@ -1,10 +1,22 @@
 // src/features/manage/components/RulesEngine.jsx
 
-import React from 'react';
-import { Plus, Edit, ToggleLeft, ToggleRight, Layers, AlertTriangle, Play, Info } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Plus, Edit, ToggleLeft, ToggleRight, Layers, AlertTriangle, Play, Info, Lightbulb } from 'lucide-react';
 
-// RulesEngine now receives actual rules, and callbacks for edit and toggle status
-const RulesEngine = ({ rules, onCreateRule, onEditRule, onToggleRuleStatus, onTestRule }) => {
+const RulesEngine = ({ rules, onCreateRule, onEditRule, onToggleRuleStatus, onTestRule, triggerAIAnalysis }) => {
+  const [filterByContext, setFilterByContext] = useState('All');
+
+  const uniqueContexts = useMemo(() => {
+    const contexts = rules.map(rule => rule.context);
+    return ['All', ...new Set(contexts)];
+  }, [rules]);
+
+  const filteredRules = useMemo(() => {
+    if (filterByContext === 'All') {
+      return rules;
+    }
+    return rules.filter(rule => rule.context === filterByContext);
+  }, [rules, filterByContext]);
 
   const getStatusClasses = (status) => {
     return status === 'Active'
@@ -12,19 +24,43 @@ const RulesEngine = ({ rules, onCreateRule, onEditRule, onToggleRuleStatus, onTe
       : 'bg-gray-600 text-gray-300';
   };
 
+  const handleAIAnalyzeRule = (rule) => {
+    if (triggerAIAnalysis) {
+      triggerAIAnalysis({
+        ruleName: rule.name,
+        ruleDescription: rule.description,
+        ruleType: rule.type,
+        conditions: rule.conditions,
+        actions: rule.actions,
+      }, 'RuleSummary');
+    }
+  };
+
   return (
     <div className="p-6 theme-bg-card rounded-xl shadow-lg theme-text-primary">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold theme-text-highlight-color">Rules Engine</h3>
-        <button
-          onClick={onCreateRule}
-          className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center text-sm"
-        >
-          <Plus size={16} className="mr-2" /> Create New Rule
-        </button>
+        <div className="flex items-center space-x-4">
+          <select
+            value={filterByContext}
+            onChange={(e) => setFilterByContext(e.target.value)}
+            className="p-2 border theme-border-color rounded-md bg-gray-100 dark:bg-gray-800 theme-text-primary focus:ring-blue-500 focus:border-blue-500"
+          >
+            {uniqueContexts.map(context => (
+              <option key={context} value={context}>
+                {context === 'All' ? 'Filter by Context: All' : context}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={onCreateRule}
+            className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center text-sm"
+          >
+            <Plus size={16} className="mr-2" /> Create New Rule
+          </button>
+        </div>
       </div>
 
-      {/* NEW: AI Responsibility Disclaimer */}
       <div className="bg-yellow-100 dark:bg-yellow-900 border border-yellow-700 theme-text-primary p-4 rounded-lg mb-6 flex items-center space-x-3">
           <Info size={24} className="flex-shrink-0 text-yellow-600 dark:text-yellow-200" />
           <p className="text-sm font-bold text-yellow-800 dark:text-yellow-200">
@@ -32,12 +68,11 @@ const RulesEngine = ({ rules, onCreateRule, onEditRule, onToggleRuleStatus, onTe
           </p>
       </div>
 
-
       <div className="space-y-4">
-        {rules.length === 0 ? (
+        {filteredRules.length === 0 ? (
           <p className="theme-text-secondary text-center py-8">No rules defined yet. Click "Create New Rule" to get started.</p>
         ) : (
-          rules.map(rule => (
+          filteredRules.map(rule => (
             <div key={rule.id} className="theme-bg-card-alt p-4 rounded-lg border theme-border-color">
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -57,6 +92,14 @@ const RulesEngine = ({ rules, onCreateRule, onEditRule, onToggleRuleStatus, onTe
                           <Play size={20} />
                       </button>
                   )}
+                  {/* NEW AI Analyze button */}
+                  <button
+                      onClick={() => handleAIAnalyzeRule(rule)}
+                      className="p-1 rounded-full text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-300"
+                      title="AI Analyze Rule"
+                  >
+                      <Lightbulb size={20} />
+                  </button>
                   <button
                     onClick={() => onToggleRuleStatus(rule.id)}
                     className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-theme-text-primary"

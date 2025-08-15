@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Link, Shield, TrendingUp, Zap, Database, Settings, Scale } from 'lucide-react';
+import { Plus, Link, Shield, TrendingUp, Zap, Database, Settings, Scale, Filter, FileText } from 'lucide-react';
 
 import DataSourceCard from './components/DataSourceCard.jsx';
 import FileAnalysisCard from './components/FileAnalysisCard.jsx';
@@ -290,6 +290,9 @@ const DataManagement = ({ onPromoteToLibrary, jurisdiction, onNavigate, context,
         } else if (nodeId === 'system-reporting') {
             onNavigate('ComplianceReporting', { action: 'initiateReportGeneration' });
             setToastMessage(`Navigating to Compliance Reporting to prepare reports.`);
+        } else if (nodeId === 'system-risk-engine') {
+            setDetailedRecordsFilters({ type: 'KYC', status: 'Rejected' });
+            setToastMessage(`Mapped to Detailed Records. Displaying 'Rejected' KYC records for Risk Assessment review.`);
         } else if (nodeId.startsWith('system-')) {
             setActiveTab('Detailed Records');
             if (nodeId === 'system-compliance-db') {

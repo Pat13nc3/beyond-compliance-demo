@@ -25,9 +25,8 @@ import {
 } from '../../data/mockData';
 
 
-// Manage component receives `context` and `onCleanContext` from App.jsx
-const Manage = ({ jurisdiction, context, onCleanContext }) => {
-    const [activeTab, setActiveTab] = useState('integrations'); // Set default to integrations
+const Manage = ({ jurisdiction, context, onCleanContext, triggerAIAnalysis }) => {
+    const [activeTab, setActiveTab] = useState('integrations');
 
     const [integrations, setIntegrations] = useState(initialMockIntegrations);
     const [editingIntegration, setEditingIntegration] = useState(null);
@@ -245,6 +244,8 @@ const Manage = ({ jurisdiction, context, onCleanContext }) => {
                         onEditRule={handleEditRule}
                         onToggleRuleStatus={handleToggleRuleStatus}
                         onTestRule={handleTestRule}
+                        // PASSING DOWN AI ANALYSIS FUNCTION
+                        triggerAIAnalysis={triggerAIAnalysis}
                     />
                 );
             case 'workflows':

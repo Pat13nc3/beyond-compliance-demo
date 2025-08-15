@@ -167,23 +167,23 @@ export const mockTemplates = [
     DATE: [CurrentDate]
 
     1. SUSPECT INFORMATION:
-       Name: [AI-Identified Suspect Name]
-       Account Number: [AI-Identified Account]
-       Nationality: [AI-Identified Nationality]
+        Name: [AI-Identified Suspect Name]
+        Account Number: [AI-Identified Account]
+        Nationality: [AI-Identified Nationality]
 
     2. TRANSACTION DETAILS:
-       Date/Time: [AI-Identified Transaction Timestamp]
-       Amount: [AI-Identified Transaction Amount]
-       Currency: [AI-Identified Transaction Currency]
-       Type: [AI-Identified Transaction Type] (e.g., Wire Transfer, Deposit)
-       Description: [AI-Summarized Transaction Purpose]
-       Reason for Suspicion: [AI-Assessed Reason for Suspicion]
+        Date/Time: [AI-Identified Transaction Timestamp]
+        Amount: [AI-Identified Transaction Amount]
+        Currency: [AI-Identified Transaction Currency]
+        Type: [AI-Identified Transaction Type] (e.g., Wire Transfer, Deposit)
+        Description: [AI-Summarized Transaction Purpose]
+        Reason for Suspicion: [AI-Assessed Reason for Suspicion]
 
     3. NARRATIVE:
-       Based on automated monitoring, a series of transactions involving [AI-Identified Suspect Name] exhibited characteristics consistent with money laundering indicators. Specifically, [AI-Generated Narrative]. Further manual investigation is recommended.
+        Based on automated monitoring, a series of transactions involving [AI-Identified Suspect Name] exhibited characteristics consistent with money laundering indicators. Specifically, [AI-Generated Narrative]. Further manual investigation is recommended.
 
     4. SUPPORTING DOCUMENTATION:
-       [Placeholder for automatically linked transaction records, KYC documents]
+        [Placeholder for automatically linked transaction records, KYC documents]
 
     --- END OF DRAFT ---`
     },
@@ -199,26 +199,26 @@ export const mockTemplates = [
     DATE: [CurrentDate]
 
     1. REPORTING INSTITUTION INFORMATION:
-       Name: Innovate Inc.
-       Regulator: CBN (Simulated)
-       Reporting Year: [CurrentYear]
+        Name: Innovate Inc.
+        Regulator: CBN (Simulated)
+        Reporting Year: [CurrentYear]
 
     2. TRANSACTION DETAILS:
-       Transaction Date: [AI-Identified Transaction Date]
-       Transaction Amount: [AI-Identified Transaction Amount]
-       Currency: [AI-Identified Transaction Currency]
-       Type: [AI-Identified Transaction Type]
-       Branch/Location: [AI-Identified Branch/Location]
+        Transaction Date: [AI-Identified Transaction Date]
+        Transaction Amount: [AI-Identified Transaction Amount]
+        Currency: [AI-Identified Transaction Currency]
+        Type: [AI-Identified Transaction Type]
+        Branch/Location: [AI-Identified Branch/Location]
 
     3. INDIVIDUAL/ENTITY CONDUCTING TRANSACTION:
-       Name: [AI-Identified Customer Name]
-       Account: [AI-Identified Customer Account]
-       Identification: [AI-Identified ID Type & Number]
-       Purpose: [AI-Summarized Purpose of Transaction]
+        Name: [AI-Identified Customer Name]
+        Account: [AI-Identified Customer Account]
+        Identification: [AI-Identified ID Type & Number]
+        Purpose: [AI-Summarized Purpose of Transaction]
 
     4. FUNDS INFORMATION:
-       Source of Funds: [AI-Identified Source of Funds] (e.g., Business Income, Salary, Loan)
-       Destination of Funds: [AI-Identified Destination of Funds]
+        Source of Funds: [AI-Identified Source of Funds] (e.g., Business Income, Salary, Loan)
+        Destination of Funds: [AI-Identified Destination of Funds]
 
     --- END OF DRAFT ---`
     },
@@ -234,29 +234,29 @@ export const mockTemplates = [
     REPORTING PERIOD: January 1, [CurrentYear] - December 31, [CurrentYear]
 
     1. REGISTRATION WITH THE CENTRE (Regulation 5):
-       - Status: [AI-Assessed Status]
-       - Comments: [AI-Assessed Registration Comments]
+        - Status: [AI-Assessed Status]
+        - Comments: [AI-Assessed Registration Comments]
 
     2. RISK ASSESSMENT (Regulation 7):
-       - Status: [AI-Assessed Status]
-       - Comments: [AI-Assessed Risk Assessment Comments]
+        - Status: [AI-Assessed Status]
+        - Comments: [AI-Assessed Risk Assessment Comments]
 
     3. INTERNAL CONTROL OBLIGATIONS (Regulation 11):
-       - Status: [AI-Assessed Status]
-       - Comments: [AI-Assessed Internal Control Comments]
+        - Status: [AI-Assessed Status]
+        - Comments: [AI-Assessed Internal Control Comments]
 
     4. CUSTOMER DUE DILIGENCE (Regulation 14):
-       - Status: [AI-Assessed Status]
-       - Comments: [AI-Assessed CDD Comments]
+        - Status: [AI-Assessed Status]
+        - Comments: [AI-Assessed CDD Comments]
 
     5. REPORTING OF SUSPICIOUS ACTIVITIES (Regulation 38):
-       - Status: [AI-Assessed Status]
-       - Comments: [AI-Assessed Suspicious Activity Comments]
+        - Status: [AI-Assessed Status]
+        - Comments: [AI-Assessed Suspicious Activity Comments]
 
     6. RECORD KEEPING (Regulation 42):
-       - Status: [AI-Assessed Status]
-       - Comments: [AI-Assessed Record Keeping Comments]
-       
+        - Status: [AI-Assessed Status]
+        - Comments: [AI-Assessed Record Keeping Comments]
+        
     --- END OF DRAFT ---`
     }
 ];
@@ -480,41 +480,41 @@ export const transactionMonitoringValidationRule = {
 
 // Mock data for a User Access Review file with more diverse issues
 export const mockUserAccessData = {
-  headers: ['employee_id', 'employee_email', 'system_name', 'access_level', 'last_login_date', 'status', 'department', 'last_activity_days'],
-  rows: [
-    ['EMP001', 'john.doe@example.com', 'Core Banking System', 'User', '2024-07-15', 'Active', 'Finance', 5],
-    ['EMP002', 'jane.smith@example.com', 'CRM', 'User', '2024-07-16', 'Active', 'Sales', 3],
-    ['EMP003', 'admin.user@example.com', 'Core Banking System', 'Admin', '2024-07-16', 'Active', 'IT', 10],
-    ['EMP004', 'guest.user@example.com', 'HRIS', 'Admin', '2024-07-17', 'Active', 'HR', 1],
-    ['EMP005', 'inactive.user@example.com', 'Salesforce', 'User', '2024-07-18', 'Inactive', 'Marketing', 200],
-    ['EMP006', 'missing.email', 'Payroll System', 'User', '2024-07-19', 'Active', 'Finance', 15],
-    ['EMP007', 'auditor.guest@example.com', 'Finance Portal', 'Admin', '2024-07-20', 'Active', 'Audit', 7],
-    ['EMP008', 'sarah.connor@example.com', 'Data Warehouse', 'Viewer', 'invalid-date', 'Active', 'Analytics', 30],
-    ['EMP009', 'linda.hamilton@example.com', 'CRM', 'User', '2024-07-21', 'Active', 'IT', 2],
-    ['EMP010', 'kyle.reese@example.com', 'Core Banking System', 'User', '2024-07-22', 'Active', 'Sales', 1],
-    ['EMP001', 'duplicate.john@example.com', 'HRIS', 'User', '2024-07-15', 'Active', 'Finance', 5],
-    ['EMP011', 'empty@example.com', 'Compliance Tool', 'User', '2024-07-23', 'Active', '', 10],
-    ['EMP012', 'test@example.com', 'Risk System', 'User', '2024-07-24', 'Active', 'IT', 100],
-  ],
+    headers: ['employee_id', 'employee_email', 'system_name', 'access_level', 'last_login_date', 'status', 'department', 'last_activity_days'],
+    rows: [
+        ['EMP001', 'john.doe@example.com', 'Core Banking System', 'User', '2024-07-15', 'Active', 'Finance', 5],
+        ['EMP002', 'jane.smith@example.com', 'CRM', 'User', '2024-07-16', 'Active', 'Sales', 3],
+        ['EMP003', 'admin.user@example.com', 'Core Banking System', 'Admin', '2024-07-16', 'Active', 'IT', 10],
+        ['EMP004', 'guest.user@example.com', 'HRIS', 'Admin', '2024-07-17', 'Active', 'HR', 1],
+        ['EMP005', 'inactive.user@example.com', 'Salesforce', 'User', '2024-07-18', 'Inactive', 'Marketing', 200],
+        ['EMP006', 'missing.email', 'Payroll System', 'User', '2024-07-19', 'Active', 'Finance', 15],
+        ['EMP007', 'auditor.guest@example.com', 'Finance Portal', 'Admin', '2024-07-20', 'Active', 'Audit', 7],
+        ['EMP008', 'sarah.connor@example.com', 'Data Warehouse', 'Viewer', 'invalid-date', 'Active', 'Analytics', 30],
+        ['EMP009', 'linda.hamilton@example.com', 'CRM', 'User', '2024-07-21', 'Active', 'IT', 2],
+        ['EMP010', 'kyle.reese@example.com', 'Core Banking System', 'User', '2024-07-22', 'Active', 'Sales', 1],
+        ['EMP001', 'duplicate.john@example.com', 'HRIS', 'User', '2024-07-15', 'Active', 'Finance', 5],
+        ['EMP011', 'empty@example.com', 'Compliance Tool', 'User', '2024-07-23', 'Active', '', 10],
+        ['EMP012', 'test@example.com', 'Risk System', 'User', '2024-07-24', 'Active', 'IT', 100],
+    ],
 };
 
 // New mock data for transaction logs
 export const mockTransactionData = {
-  headers: ['transaction_id', 'amount', 'currency', 'timestamp', 'transactionType', 'senderAccount', 'receiverAccount', 'senderCountry', 'receiverCountry', 'fraudScore', 'amlFlag'],
-  rows: [
-    ['TXN001', 1200, 'USD', '2025-07-19', 'Payment', 'ACC001', 'ACC002', 'USA', 'CAN', 15.2, false],
-    ['TXN002', 15000, 'USD', '2025-07-19', 'Transfer', 'ACC003', 'ACC004', 'IRN', 'GBR', 95.1, true],
-    ['TXN003', 500, 'EUR', '2025-07-20', 'Withdrawal', 'ACC005', 'N/A', 'DEU', 'DEU', 5.0, false],
-    ['TXN004', 20000, 'NGN', '2025-07-20', 'Deposit', 'N/A', 'ACC006', 'NGA', 'NGA', 22.8, false],
-    ['TXN005', 800, 'USD', '2025-07-21', 'Payment', 'ACC007', 'ACC008', 'USA', 'MEX', 10.1, false],
-    ['TXN006', 7500, 'USD', '2025-07-21', 'Transfer', 'ACC009', 'ACC010', 'USA', 'USA', 30.7, false],
-    ['TXN007', 11000, 'GBP', '2025-07-22', 'Payment', 'ACC011', 'ACC012', 'PRK', 'JPN', 88.3, true],
-    ['TXN008', 300, 'CAD', '2025-07-22', 'Deposit', 'N/A', 'ACC013', 'CAN', 'CAN', 2.1, false],
-    ['TXN009', 9000, 'USD', '2025-07-22', 'Withdrawal', 'ACC014', 'N/A', 'USA', 'USA', 18.9, false],
-    ['TXN010', 10500, 'JPY', '2025-07-23', 'Transfer', 'ACC015', 'ACC016', 'JPN', 'CHN', 70.0, true],
-    ['TXN011', 200, 'CHF', '2025-07-23', 'Payment', 'ACC017', 'ACC018', 'SWI', 'FRA', 8.5, false],
-    ['TXN012', 3000, 'AUD', '2025-07-24', 'Deposit', 'N/A', 'ACC019', 'AUS', 'NZL', 12.3, false],
-  ],
+    headers: ['transaction_id', 'amount', 'currency', 'timestamp', 'transactionType', 'senderAccount', 'receiverAccount', 'senderCountry', 'receiverCountry', 'fraudScore', 'amlFlag'],
+    rows: [
+        ['TXN001', 1200, 'USD', '2025-07-19', 'Payment', 'ACC001', 'ACC002', 'USA', 'CAN', 15.2, false],
+        ['TXN002', 15000, 'USD', '2025-07-19', 'Transfer', 'ACC003', 'ACC004', 'IRN', 'GBR', 95.1, true],
+        ['TXN003', 500, 'EUR', '2025-07-20', 'Withdrawal', 'ACC005', 'N/A', 'DEU', 'DEU', 5.0, false],
+        ['TXN004', 20000, 'NGN', '2025-07-20', 'Deposit', 'N/A', 'ACC006', 'NGA', 'NGA', 22.8, false],
+        ['TXN005', 800, 'USD', '2025-07-21', 'Payment', 'ACC007', 'ACC008', 'USA', 'MEX', 10.1, false],
+        ['TXN006', 7500, 'USD', '2025-07-21', 'Transfer', 'ACC009', 'ACC010', 'USA', 'USA', 30.7, false],
+        ['TXN007', 11000, 'GBP', '2025-07-22', 'Payment', 'ACC011', 'ACC012', 'PRK', 'JPN', 88.3, true],
+        ['TXN008', 300, 'CAD', '2025-07-22', 'Deposit', 'N/A', 'ACC013', 'CAN', 'CAN', 2.1, false],
+        ['TXN009', 9000, 'USD', '2025-07-22', 'Withdrawal', 'ACC014', 'N/A', 'USA', 'USA', 18.9, false],
+        ['TXN010', 10500, 'JPY', '2025-07-23', 'Transfer', 'ACC015', 'ACC016', 'JPN', 'CHN', 70.0, true],
+        ['TXN011', 200, 'CHF', '2025-07-23', 'Payment', 'ACC017', 'ACC018', 'SWI', 'FRA', 8.5, false],
+        ['TXN012', 3000, 'AUD', '2025-07-24', 'Deposit', 'N/A', 'ACC019', 'AUS', 'NZL', 12.3, false],
+    ],
 };
 
 // --- New processed data for KYC Dashboard ---
@@ -527,7 +527,7 @@ export const processedKycDashboardData = {
         { day: 'Tue', count: 135 },
         { day: 'Wed', count: 140 },
         { day: 'Thu', count: 160 },
-        { day: 'Fri', count: 155 },
+        { day: 'Fri', 'count': 155 },
         { day: 'Sat', count: 180 },
         { day: 'Sun', count: 170 },
     ],
@@ -543,7 +543,7 @@ export const processedTransactionDashboardData = {
         { day: 'Tue', count: 3800, flagged: 25 },
         { day: 'Wed', count: 3200, flagged: 18 },
         { day: 'Thu', count: 4100, flagged: 30 },
-        { day: 'Fri', count: 3900, flagged: 28 },
+        { day: 'Fri', 'count': 3900, flagged: 28 },
         { day: 'Sat', count: 3000, flagged: 15 },
         { day: 'Sun', count: 2800, flagged: 12 },
     ],
@@ -844,72 +844,6 @@ export const mockMappingTemplates = [
     },
 ];
 
-// Mock data for alerts
-export const mockAlerts = [
-    {
-        id: 'alert-1',
-        name: 'High-risk transaction detected from unverified source.',
-        type: 'Fraud Alert',
-        status: 'Open',
-        date: '2025-07-24',
-        action: 'Review Transaction',
-        severity: 'Critical',
-        details: 'Transaction TXN98765 valued at $15,000 from IP 192.168.1.10. Associated with customer profile CUST456, which has incomplete KYC. Recommend immediate review and potential suspension.',
-        linkedEntities: [
-            { type: 'Transaction', id: 'TXN98765', link: '/transactions/TXN98765' },
-            { type: 'Customer', id: 'CUST456', link: '/customers/CUST456' }
-        ],
-        eventType: 'Transaction Triggered',
-        messageTemplate: 'High-risk transaction detected from unverified source. Review transaction {{transaction.id}}.'
-    },
-    {
-        id: 'alert-2',
-        name: 'Multiple failed login attempts for administrator account.',
-        type: 'Security Alert',
-        status: 'Acknowledged',
-        date: '2025-07-23',
-        action: 'Investigate Activity',
-        severity: 'High',
-        details: 'Admin user "john.doe" experienced 5 failed login attempts within 10 minutes from various geolocations. Account temporarily locked. Recommend checking audit logs.',
-        linkedEntities: [
-            { type: 'User', id: 'john.doe', link: '/users/john.doe' },
-            { type: 'Audit Log', id: 'log-security-20250723', link: '/audit-logs/security-20250723' }
-        ],
-        eventType: 'Security Breach',
-        messageTemplate: 'Multiple failed login attempts for administrator account {{user.name}}.'
-    },
-    {
-        id: 'alert-3',
-        name: 'Compliance report overdue: Q2 Regulatory Filing.',
-        type: 'Compliance Alert',
-        status: 'Closed',
-        date: '2025-07-20',
-        action: 'View Report',
-        severity: 'Medium',
-        details: 'The Quarterly Regulatory Filing for Q2 2025 was due on 2025-07-15. Report has since been filed and marked as compliant. Investigation into delay initiated.',
-        linkedEntities: [
-            { type: 'Report', id: 'REG2025Q2', link: '/reports/REG2025Q2' }
-        ],
-        eventType: 'Compliance Reporting Deadline',
-        messageTemplate: 'Compliance report overdue: {{report.name}}.'
-    },
-    {
-        id: 'alert-4',
-        name: 'New regulatory guideline published: VASP licensing.',
-        type: 'Regulatory Update',
-        status: 'Open',
-        date: '2025-07-18',
-        action: 'Review Guideline',
-        severity: 'Low',
-        details: 'Central Bank has issued new guidelines concerning Virtual Asset Service Provider (VASP) licensing requirements. Review required to assess impact on current operations.',
-        linkedEntities: [
-            { type: 'Regulation', id: 'REG2025VASP', link: '/regulations/REG2025VASP' }
-        ],
-        eventType: 'Regulatory Circular Publication',
-        messageTemplate: 'New regulatory guideline published: {{circular.title}}.'
-    },
-];
-
 // Mock data for integrations (similar to mockDataSources, but conceptually for 'integrations' page)
 export const mockIntegrations = [
     {
@@ -932,7 +866,6 @@ export const mockIntegrations = [
         lastSync: '2h ago',
         dataQuality: 99.8,
         recordsSynced: 2300,
-        lastSync: '2h ago',
         description: 'Integrates with Chainalysis KYT for crypto transaction risk scoring.',
         configuration: { apiEndpoint: 'https://api.chainalysis.com/kyt', licenseKey: '****' },
         linkedDataSources: ['src-chainalysis-kyt']
@@ -1424,4 +1357,45 @@ export const mockProjects = [
     { id: 'proj-5', name: 'Licensing & Regulatory Filings', teamId: 'team-bc' },
     { id: 'proj-6', name: 'Staff Training & Awareness', teamId: 'team-bc' },
     { id: 'proj-7', name: 'Continuous Monitoring Automation', teamId: 'team-bc' },
+];
+
+// Mock data for regulatory sections
+export const mockRegulatorySections = [
+    {
+        id: 'reg-sec-1',
+        regulation: 'VASP Bill 2024',
+        section: 'Section 3.1',
+        description: 'Obligations for high-value transaction reporting.'
+    },
+    {
+        id: 'reg-sec-2',
+        regulation: 'AML Act 2023',
+        section: 'Article 5',
+        description: 'Customer due diligence requirements for new accounts.'
+    },
+    {
+        id: 'reg-sec-3',
+        regulation: 'VASP Bill 2024',
+        section: 'Section 4.2',
+        description: 'Requirements for digital asset custody.'
+    },
+    {
+        id: 'reg-sec-4',
+        regulation: 'AML Act 2023',
+        section: 'Article 7',
+        description: 'Suspicious activity reporting guidelines.'
+    },
+    {
+        id: 'reg-sec-5',
+        regulation: 'KYC Regulation 2022',
+        section: 'Part 2.1',
+        description: 'Identity verification for all users.'
+    },
+];
+
+export const licenseCategories = [
+    { id: 'banking', name: 'Banking', description: 'Licenses for traditional banking services.' },
+    { id: 'payments', name: 'Payments', description: 'Licenses for payment service providers.' },
+    { id: 'digital-assets', name: 'Digital Assets', description: 'Licenses for virtual asset service providers.' },
+    { id: 'lending', name: 'Lending', description: 'Licenses for credit and lending activities.' },
 ];
