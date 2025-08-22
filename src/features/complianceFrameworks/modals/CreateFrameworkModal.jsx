@@ -1,14 +1,33 @@
 // src/features/complianceFrameworks/modals/CreateFrameworkModal.jsx
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Shield, PlusCircle, MinusCircle, Layers, AlertTriangle } from 'lucide-react';
-import { mockProjects } from "../../../data/mockData";
+import { X, Save, Shield, PlusCircle, MinusCircle, Layers, AlertTriangle, Lightbulb } from 'lucide-react';
+import { mockProjects, mockRegulatorySections } from "../../../data/mockData";
 
-const CreateFrameworkModal = ({ onClose, onSave, initialData }) => {
+const CreateFrameworkModal = ({ onClose, onSave, initialData, regulatorySections }) => {
     const [name, setName] = useState(initialData?.name || '');
     const [status, setStatus] = useState(initialData?.status || 'Not Published');
     const [linkedProducts, setLinkedProducts] = useState(initialData?.linkedProducts || []);
     const [rulesToCreate, setRulesToCreate] = useState(initialData?.rules || [{ name: '', conditions: [{ field: 'Transaction Value', operator: 'exceeds', value: '' }], actions: [{ type: 'Create Alert' }] }]);
+    const [selectedTemplateId, setSelectedTemplateId] = useState('');
+
+    useEffect(() => {
+        if (selectedTemplateId) {
+            const template = regulatorySections.find(reg => reg.id === selectedTemplateId);
+            if (template) {
+                setName(template.regulationName);
+                // Map the clauses from the template into rules
+                const templateRules = template.clauses.map((clause, index) => ({
+                    name: `Rule for ${clause.section}`,
+                    description: clause.description,
+                    conditions: [{ field: 'Custom Field', operator: 'is equal to', value: '' }],
+                    actions: [{ type: 'Create Alert' }],
+                }));
+                setRulesToCreate(templateRules);
+            }
+        }
+    }, [selectedTemplateId, regulatorySections]);
+
 
     const handleProductChange = (e) => {
         const { value, checked } = e.target;
@@ -69,18 +88,19 @@ const CreateFrameworkModal = ({ onClose, onSave, initialData }) => {
             name,
             status,
             totalRequirements: rulesToCreate.length,
-            linkedProducts
+            linkedProducts,
+            source: initialData?.source || 'User-Defined' // Ensure source is preserved
         };
         
         const newRules = rulesToCreate.map(rule => ({
             ...rule,
             id: `rule-${Date.now() + Math.random()}`,
-            context: frameworkData.name, // Link rule to framework by name
+            context: frameworkData.name,
             type: 'Compliance Control',
             status: 'Active',
             description: rule.description || `Rule for ${frameworkData.name}`,
-            actions: rule.actions, // Preserve actions from state
-            conditions: rule.conditions // Preserve conditions from state
+            actions: rule.actions,
+            conditions: rule.conditions
         }));
 
         onSave(frameworkData, newRules);
@@ -96,9 +116,27 @@ const CreateFrameworkModal = ({ onClose, onSave, initialData }) => {
                     </button>
                 </div>
                 <div className="space-y-4">
-                    {/* Framework Details Section */}
                     <div className="p-4 theme-bg-card-alt rounded-lg">
                         <h4 className="text-lg font-bold theme-text-primary mb-2">Framework Details</h4>
+                         {/* NEW: Template Selection Section */}
+                         {!initialData && (
+                            <div className="mt-4">
+                                <label className="block text-sm font-medium theme-text-secondary mb-2 flex items-center">
+                                    <Lightbulb size={16} className="mr-2" /> Start from AI Template
+                                </label>
+                                <select
+                                    value={selectedTemplateId}
+                                    onChange={(e) => setSelectedTemplateId(e.target.value)}
+                                    className="w-full p-2 border theme-border-color rounded-md theme-bg-card theme-text-primary"
+                                >
+                                    <option value="">-- Select an Ingested Regulation --</option>
+                                    {regulatorySections.map(reg => (
+                                        <option key={reg.id} value={reg.id}>{reg.regulationName} ({reg.jurisdiction})</option>
+                                    ))}
+                                </select>
+                                <p className="text-xs theme-text-secondary mt-1">This will pre-fill the framework name and rules based on the selected regulation.</p>
+                            </div>
+                        )}
                         <div>
                             <label className="block text-sm font-medium theme-text-secondary mb-2">Framework Name</label>
                             <input
@@ -139,7 +177,6 @@ const CreateFrameworkModal = ({ onClose, onSave, initialData }) => {
                         </div>
                     </div>
 
-                    {/* Rule Definition Section */}
                     <div className="mt-6 p-4 theme-bg-card-alt rounded-lg">
                         <h4 className="text-lg font-bold theme-text-primary mb-2">Define Associated Rules</h4>
                         <p className="text-sm theme-text-secondary mb-4">These rules will be automatically linked to this framework and added to the Rules Engine.</p>

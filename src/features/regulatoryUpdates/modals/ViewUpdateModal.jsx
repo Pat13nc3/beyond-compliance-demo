@@ -1,9 +1,9 @@
 // src/features/regulatoryUpdates/modals/ViewUpdateModal.jsx
 
 import React from 'react';
-import { X, Lightbulb } from 'lucide-react';
+import { X, Lightbulb, FileText } from 'lucide-react';
 
-const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis }) => {
+const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis, onNavigate }) => {
     if (!update) return null;
 
     const handleAIAnalyzeClick = () => {
@@ -17,6 +17,20 @@ const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis }) => {
             }, 'RegulationReview');
         } else {
             console.error("triggerAIAnalysis prop is undefined in ViewUpdateModal.");
+        }
+    };
+    
+    const handleCreateTask = () => {
+        if (onNavigate) {
+             onNavigate('TaskManagement', {
+                 initialData: {
+                     title: `Action: Review "${update.title}"`,
+                     description: update.summary,
+                     priority: 'High',
+                     labels: ['Regulatory Update', update.jurisdiction],
+                 }
+             });
+             onClose();
         }
     };
 
@@ -38,6 +52,12 @@ const ViewUpdateModal = ({ update, onClose, triggerAIAnalysis }) => {
                         className="bg-purple-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-purple-500 flex items-center"
                     >
                         <Lightbulb size={16} className="mr-2"/> AI Analyze
+                    </button>
+                    <button
+                        onClick={handleCreateTask}
+                        className="bg-green-600 text-white font-bold py-2 px-4 rounded-md text-sm hover:bg-green-500 flex items-center"
+                    >
+                         <FileText size={16} className="mr-2"/> Create Task
                     </button>
                     <button type="button" onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700">
                         Close

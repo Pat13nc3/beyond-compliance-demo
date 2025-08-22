@@ -1,3 +1,5 @@
+// src/features/dashboard/components/KpiCard.jsx
+
 import React from 'react';
 import { ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis } from 'recharts';
 // --- CORRECTED: Import the necessary icons directly into this component. ---
@@ -10,13 +12,14 @@ const iconComponents = {
   CheckCheck,
 };
 
-const KpiCard = ({ title, value, color, icon: iconName, onClick }) => {
+// Modified to accept onDrilldown prop
+const KpiCard = ({ title, value, color, icon: iconName, onClick, onDrilldown, kpiData }) => { // Added kpiData prop
     // Look up the correct icon component from the helper object
     const Icon = iconComponents[iconName] || Target; // Fallback to Target icon
 
     return (
         <button
-            onClick={onClick}
+            onClick={() => onDrilldown(kpiData)} // Call onDrilldown with the full kpiData
             className="bg-gray-800 p-4 rounded-lg flex flex-col items-center justify-center text-center w-full hover:bg-gray-700 transition-colors"
         >
             <div className="relative w-32 h-32">

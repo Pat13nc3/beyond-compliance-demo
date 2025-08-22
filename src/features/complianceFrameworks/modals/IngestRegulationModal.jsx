@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { X, UploadCloud, FileText, PlusCircle, Save, Lightbulb, LoaderCircle } from 'lucide-react';
 import Toast from '../../../components/ui/Toast';
+import { mockRegulatorySections } from '../../../data/mockData';
 
 const IngestRegulationModal = ({ onClose, onSave }) => {
     const [regulationName, setRegulationName] = useState('');
@@ -53,6 +54,7 @@ const IngestRegulationModal = ({ onClose, onSave }) => {
         }
 
         const newRegulation = {
+            id: `reg-${Date.now()}`,
             regulationName,
             source,
             publishedDate,
@@ -62,7 +64,18 @@ const IngestRegulationModal = ({ onClose, onSave }) => {
             fileName: uploadedFile?.name || 'N/A'
         };
 
-        onSave(newRegulation);
+        // Create a new framework from the ingested regulation
+        const newFramework = {
+            id: `fw-${Date.now()}`,
+            name: newRegulation.regulationName,
+            status: 'Not Published',
+            totalRequirements: newRegulation.clauses.length,
+            linkedProducts: [],
+            jurisdiction: newRegulation.jurisdiction,
+            source: 'AI-Ingested' // Set source to AI-Ingested
+        };
+
+        onSave(newRegulation, newFramework);
         onClose();
     };
 

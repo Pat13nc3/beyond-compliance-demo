@@ -1,9 +1,12 @@
 // src/features/regulatoryUpdates/index.jsx
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Newspaper, Eye, PlusCircle, FileText, Link, X, Save, UploadCloud, Loader, Lightbulb, Filter } from 'lucide-react';
 import ViewUpdateModal from './modals/ViewUpdateModal.jsx';
 import CreateRuleModal from '../manage/modals/CreateRuleModal.jsx';
+
+// NEW: Import the InteractiveMap component
+import InteractiveMap from './components/InteractiveMap.jsx'; 
 
 // Import initial mock data for local state management
 import { regulatoryPulseData as initialMockUpdates, mockRegulatorySections as initialMockRegulatorySections } from '../../data/mockData.js';
@@ -16,7 +19,6 @@ const UpdateCard = ({ update, handleViewDetails, handleCreateTask }) => (
             <p className="text-sm theme-text-secondary">
                 <span className="font-semibold">{update.source}</span> - Published: {update.publishedDate} | Jurisdiction: <span className="font-semibold">{update.jurisdiction}</span>
             </p>
-            <p className="text-sm mt-2 theme-text-primary line-clamp-2">{update.summary}</p>
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <button onClick={() => handleViewDetails(update)} className="text-blue-600 flex items-center px-3 py-1 rounded-md hover:bg-blue-100">
@@ -30,7 +32,7 @@ const UpdateCard = ({ update, handleViewDetails, handleCreateTask }) => (
 );
 
 
-const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnalysis }) => {
+const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnalysis, activeProduct, jurisdiction, setActiveJurisdiction }) => {
     const [updates, setUpdates] = useState(initialMockUpdates);
     const [regulatorySections, setRegulatorySections] = useState(initialMockRegulatorySections);
     const [updateToView, setUpdateToView] = useState(null);
@@ -42,6 +44,11 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnaly
       type: 'All',
       status: 'All'
     });
+    
+    // New handler for clicking on the map
+    const handleJurisdictionClick = (newJurisdiction) => {
+        setActiveJurisdiction(newJurisdiction);
+    };
 
     const handleViewDetails = (update) => {
         setUpdateToView(update);
@@ -59,10 +66,39 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnaly
             }
         });
     };
+    
+    // NEW: useEffect to handle context for opening a specific update
+    useEffect(() => {
+        if (context?.initialUpdateId) {
+            const updateItem = updates.find(update => update.id === context.initialUpdateId);
+            if (updateItem) {
+                handleViewDetails(updateItem);
+            }
+            if (onClearContext) {
+                onClearContext();
+            }
+        }
+    }, [context, updates, onClearContext]);
 
-    // NEW: Memoized and filtered updates based on filter state
+    // NEW: Memoized and filtered updates based on filter state and props
     const filteredUpdates = useMemo(() => {
         let filtered = updates;
+        
+        // Filter by global jurisdiction and product props
+        if (jurisdiction !== 'Global') {
+            filtered = filtered.filter(update => update.jurisdiction === jurisdiction);
+        }
+        
+        // NEW: Add filtering by active product
+        if (activeProduct !== 'All Products') {
+             filtered = filtered.filter(update =>
+                (update.jurisdiction === 'Nigeria' && activeProduct === 'Payments') ||
+                (update.jurisdiction === 'Kenya' && (activeProduct === 'Lending' || activeProduct === 'Payments'))
+                // Add more product-specific logic here
+             );
+        }
+
+        // Filter by local component state filters
         if (filters.regulator !== 'All') {
             filtered = filtered.filter(update => update.source === filters.regulator);
         }
@@ -70,11 +106,10 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnaly
             filtered = filtered.filter(update => update.type === filters.type);
         }
         if (filters.status !== 'All') {
-            // For this mock, we can assume 'status' relates to a task status, but
-            // for now, we'll keep it simple or remove it if not relevant to mock data
+            // Placeholder
         }
         return filtered;
-    }, [updates, filters]);
+    }, [updates, filters, jurisdiction, activeProduct]);
 
     // NEW: Extract unique filter options from the data
     const filterOptions = useMemo(() => {
@@ -109,6 +144,13 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnaly
                     </select>
                 </div>
 
+                {/* CORRECTED: Map and updates list are now in separate divs for a vertical stack */}
+                <InteractiveMap
+                    updates={updates}
+                    onJurisdictionClick={handleJurisdictionClick}
+                    activeJurisdiction={jurisdiction}
+                />
+
                 <div className="space-y-4">
                     {filteredUpdates.length > 0 ? (
                         filteredUpdates.map(update => (
@@ -126,7 +168,7 @@ const RegulatoryUpdates = ({ context, onClearContext, onNavigate, triggerAIAnaly
             </div>
 
             {isViewModalOpen && (
-                <ViewUpdateModal update={updateToView} onClose={() => setIsViewModalOpen(false)} triggerAIAnalysis={triggerAIAnalysis} />
+                <ViewUpdateModal update={updateToView} onClose={() => setIsViewModalOpen(false)} triggerAIAnalysis={triggerAIAnalysis} onNavigate={onNavigate} />
             )}
         </div>
     );

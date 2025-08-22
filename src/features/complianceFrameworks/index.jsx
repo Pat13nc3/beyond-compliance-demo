@@ -1,150 +1,36 @@
 // src/features/complianceFrameworks/index.jsx
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Plus, Edit, FileText, UploadCloud, Shield, CheckCheck, Link, Database, Sparkles, Eye, Link2, X, AlertTriangle, Layers, Save, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
-import { mockRules, mockRegulatorySections } from '../../data/mockData';
-import CreateComplianceRuleModal from './modals/CreateComplianceRuleModal';
-import IngestRegulationModal from './modals/IngestRegulationModal';
-import CreateFrameworkModal from './modals/CreateFrameworkModal';
-import LinkFrameworkModal from './modals/LinkFrameworkModal';
-
-const mockFrameworks = [
-    { id: 'fw-1', name: 'AML Act 2023 Compliance', status: 'Published', totalRequirements: 52, linkedProducts: ['Payments', 'Lending'] },
-    { id: 'fw-2', name: 'VASP Bill 2024 Framework', status: 'Published', totalRequirements: 11, linkedProducts: ['Digital Assets'] },
-    { id: 'fw-3', name: 'KYC Regulation 2022', status: 'Published', totalRequirements: 25, linkedProducts: ['All'] },
-    { id: 'fw-4', name: 'Novice Framework', status: 'Not Published', totalRequirements: 2, linkedProducts: [] },
-    { id: 'fw-5', name: 'NEX TAX FRAMEWORK', status: 'Not Published', totalRequirements: 3, linkedProducts: [] },
-];
-
-const FrameworksView = ({ frameworks, onCreateFramework, onViewFramework, onEditFramework, onLinkFramework }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div 
-            className="theme-bg-card p-6 rounded-xl shadow-lg border-2 border-dashed border-gray-500 hover:border-blue-500 transition-colors flex flex-col items-center justify-center text-center cursor-pointer min-h-[200px]"
-            onClick={onCreateFramework}
-        >
-            <Plus size={32} className="theme-text-secondary" />
-            <span className="mt-4 font-semibold theme-text-primary">Create New Framework</span>
-        </div>
-        {frameworks.map(fw => (
-            <div key={fw.id} className="theme-bg-card p-6 rounded-xl shadow-lg border-2 theme-border-color flex flex-col justify-between">
-                <div>
-                    <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-xl font-bold theme-text-primary">{fw.name}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${fw.status === 'Published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                            {fw.status}
-                        </span>
-                    </div>
-                    <p className="text-sm theme-text-secondary">Total Requirements: {fw.totalRequirements}</p>
-                    <p className="text-sm theme-text-secondary">Linked Products: {fw.linkedProducts.join(', ')}</p>
-                </div>
-                <div className="flex justify-between items-center mt-4 pt-4 border-t theme-border-color">
-                    <button onClick={() => onViewFramework(fw)} className="text-blue-500 hover:text-blue-400 flex items-center text-sm font-medium">
-                        <FileText size={16} className="mr-1" /> View Framework
-                    </button>
-                    <div className="flex space-x-2">
-                        <button onClick={() => onEditFramework(fw)} className="text-gray-500 hover:text-gray-400 flex items-center text-sm font-medium">
-                            <Edit size={16} className="mr-1" /> Edit
-                        </button>
-                        <button onClick={() => onLinkFramework(fw)} className="text-purple-500 hover:text-purple-400 flex items-center text-sm font-medium">
-                            <Link2 size={16} className="mr-1" /> Link
-                        </button>
-                    </div>
-                </div>
-            </div>
-        ))}
-    </div>
-);
-
-const ViewFrameworkDetailsModal = ({ framework, onClose, onEdit, rules, onEditRule }) => {
-    const filteredRules = useMemo(() => {
-        return rules.filter(rule => rule.context === framework.name);
-    }, [rules, framework]);
-
-    const getStatusClasses = (status) => {
-        return status === 'Active'
-            ? 'bg-green-700 text-green-200'
-            : 'bg-gray-600 text-gray-300';
-    };
-
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fade-in-fast">
-            <div className="theme-bg-card rounded-2xl shadow-2xl p-6 w-full max-w-3xl theme-text-primary max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-4 border-b theme-border-color pb-3">
-                    <h3 className="text-2xl font-bold theme-text-highlight-color">Framework Details</h3>
-                    <button onClick={onClose} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <X size={24} />
-                    </button>
-                </div>
-                <div className="space-y-4">
-                    <h4 className="text-xl font-bold">{framework.name}</h4>
-                    <p className="text-sm theme-text-secondary">Status: {framework.status}</p>
-                    <p className="text-sm theme-text-secondary">Total Requirements: {framework.totalRequirements}</p>
-                    <p className="text-sm theme-text-secondary">Linked Products: {framework.linkedProducts.join(', ')}</p>
-                </div>
-                
-                <div className="mt-6">
-                    <h4 className="text-xl font-bold theme-text-highlight-color mb-3">Linked Rules ({filteredRules.length})</h4>
-                    <div className="space-y-3">
-                        {filteredRules.length > 0 ? (
-                            filteredRules.map(rule => (
-                                <div key={rule.id} className="theme-bg-card-alt p-4 rounded-lg border theme-border-color">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div>
-                                            <p className="font-bold theme-text-primary">{rule.name} <span className="text-sm theme-text-secondary">({rule.type})</span></p>
-                                            <p className="text-sm theme-text-secondary">{rule.description}</p>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(rule.status)}`}>
-                                                {rule.status}
-                                            </span>
-                                            <button onClick={() => onEditRule(rule)} className="p-1 rounded-full theme-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-theme-text-primary" title="Edit Rule">
-                                                <Edit size={20} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="text-xs theme-text-secondary mt-2 space-y-1">
-                                        <p className="flex items-center">
-                                            <Layers size={14} className="mr-1 inline-block theme-text-secondary" />
-                                            <span className="font-semibold theme-text-primary">IF: </span>
-                                            {rule.conditions && rule.conditions.map((c, i) => (
-                                                <span key={i} className="ml-1 px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded-sm">
-                                                    {c.field} {c.operator} "{c.value}"{i < rule.conditions.length - 1 && <span className="theme-text-secondary"> AND</span>}
-                                                </span>
-                                            ))}
-                                        </p>
-                                        <p className="flex items-center">
-                                            <AlertTriangle size={14} className="mr-1 inline-block theme-text-secondary" />
-                                            <span className="font-semibold theme-text-primary">THEN: </span>
-                                            {rule.actions && rule.actions.map((a, i) => (
-                                                <span key={i} className="ml-1 px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded-sm">
-                                                    {a.type}{i < rule.actions.length - 1 && <span className="theme-text-secondary"> AND</span>}
-                                                </span>
-                                            ))}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="theme-text-secondary text-center py-4">No rules are currently linked to this framework.</p>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex justify-end mt-4 pt-4 border-t theme-border-color">
-                    <button onClick={() => onEdit(framework)} className="bg-blue-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 text-white mr-2">
-                        <Edit size={16} className="mr-2" /> Edit Framework
-                    </button>
-                    <button onClick={onClose} className="bg-gray-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-gray-700 text-white">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
+import { Plus, Edit, FileText, UploadCloud, Shield, CheckCheck, Link, Database, Sparkles, Eye, Link2, X, AlertTriangle, Layers, Save, Trash2, ToggleLeft, ToggleRight, Lightbulb, UserCheck, Book, LayoutDashboard } from 'lucide-react';
+// Import necessary components from dashboard
+import WelcomeSignage from '../dashboard/components/WelcomeSignage.jsx';
+import ComplianceHealthScorecard from '../dashboard/components/ComplianceHealthScorecard.jsx';
+import ActionItem from '../dashboard/components/ActionItem.jsx';
+import PulseItem from '../dashboard/components/PulseItem.jsx';
+import HeadquartersView from '../dashboard/components/HeadquartersView.jsx';
+import BuildTeamCard from '../dashboard/components/BuildTeamCard.jsx';
+import ControlHotspotAnalysis from '../dashboard/components/ControlHotspotAnalysis.jsx';
+// Import mock data needed for the dashboard view
+import {
+    mockRules, // Ensure mockRules is imported
+    mockRegulatorySections,
+    mockFrameworks, // Ensure mockFrameworks is imported
+    currentUser,
+    initialPriorityActions,
+    regulatoryPulseData,
+    companyStructure,
+    controlHotspotData,
+} from '../../data/mockData.js';
+import CreateComplianceRuleModal from './modals/CreateComplianceRuleModal.jsx';
+import IngestRegulationModal from './modals/IngestRegulationModal.jsx';
+import CreateFrameworkModal from './modals/CreateFrameworkModal.jsx';
+import LinkFrameworkModal from './modals/LinkFrameworkModal.jsx';
+import ComplianceOverviewDashboard from './components/ComplianceOverviewDashboard.jsx';
+import FrameworksView from './components/FrameworksView.jsx';
+import EntityComplianceDetailsModal from './modals/EntityComplianceDetailsModal.jsx'; // Import the new modal
 
 
-const ComplianceFrameworks = ({ context, onClearContext }) => {
+const ComplianceFrameworks = ({ activeProduct, jurisdiction, context, onClearContext, selectedEntity, onSelectEntity, onNavigate }) => {
     const [rules, setRules] = useState(mockRules);
     const [isCreateRuleModalOpen, setIsCreateRuleModalOpen] = useState(false);
     const [editingRule, setEditingRule] = useState(null);
@@ -154,12 +40,22 @@ const ComplianceFrameworks = ({ context, onClearContext }) => {
     const [isLinkFrameworkModalOpen, setIsLinkFrameworkModalOpen] = useState(false);
     const [selectedFramework, setSelectedFramework] = useState(null);
 
-    const [isViewFrameworkModalOpen, setIsViewFrameworkModalOpen] = useState(false);
-    const [selectedFrameworkToView, setSelectedFrameworkToView] = useState(null);
-
-    // New state for editing
     const [isEditFrameworkModalOpen, setIsEditFrameworkModalOpen] = useState(false);
     const [editingFramework, setEditingFramework] = useState(null);
+
+    const [regulatorySections, setRegulatorySections] = useState(mockRegulatorySections);
+    const [activeTab, setActiveTab] = useState('overview');
+
+    const filteredFrameworks = useMemo(() => {
+        let filtered = frameworks;
+        if (activeProduct && activeProduct !== 'All Products') {
+            filtered = filtered.filter(fw => fw.linkedProducts.includes(activeProduct) || fw.linkedProducts.includes('All'));
+        }
+        if (jurisdiction && jurisdiction !== 'Global') {
+             filtered = filtered.filter(fw => fw.jurisdiction === jurisdiction || fw.jurisdiction === 'Global');
+        }
+        return filtered;
+    }, [frameworks, activeProduct, jurisdiction]);
 
     useEffect(() => {
         if (context?.initialData) {
@@ -168,29 +64,31 @@ const ComplianceFrameworks = ({ context, onClearContext }) => {
             onClearContext();
         }
     }, [context, onClearContext]);
-    
+
     const handleIngestRegulation = () => {
         setIsIngestModalOpen(true);
     };
 
+    const handleSaveRegulation = (newRegulation, newFramework) => {
+        setRegulatorySections(prev => [...prev, newRegulation]);
+        setFrameworks(prev => [...prev, newFramework]);
+        setIsIngestModalOpen(false);
+    };
+
     const handleCreateFramework = () => {
-        setEditingFramework(null); // Ensure a blank form for new creation
+        setEditingFramework(null);
         setIsCreateFrameworkModalOpen(true);
     };
 
     const handleViewFramework = (framework) => {
-        setSelectedFrameworkToView(framework);
-        setIsViewFrameworkModalOpen(true);
+        console.log("View Framework Details for:", framework.name);
     };
-    
-    // New handler for opening the edit modal
+
     const handleEditFramework = (framework) => {
         setEditingFramework(framework);
         setIsEditFrameworkModalOpen(true);
-        setIsViewFrameworkModalOpen(false); // Close view modal if open
     };
-    
-    // New handler for saving/updating a framework
+
     const handleSaveFramework = (frameworkToSave) => {
         if (frameworkToSave.id) {
             setFrameworks(prev => prev.map(fw => fw.id === frameworkToSave.id ? frameworkToSave : fw));
@@ -217,7 +115,7 @@ const ComplianceFrameworks = ({ context, onClearContext }) => {
         setEditingRule(rule);
         setIsCreateRuleModalOpen(true);
     };
-    
+
     const handleSaveRule = (ruleToSave) => {
         if (ruleToSave.id) {
             setRules(prevRules => prevRules.map(rule =>
@@ -229,7 +127,7 @@ const ComplianceFrameworks = ({ context, onClearContext }) => {
         setIsCreateRuleModalOpen(false);
         setEditingRule(null);
     };
-    
+
     const handleToggleRuleStatus = (ruleId) => {
         setRules(prevRules => prevRules.map(rule =>
             rule.id === ruleId ? { ...rule, status: rule.status === 'Active' ? 'Inactive' : 'Active' } : rule
@@ -239,25 +137,49 @@ const ComplianceFrameworks = ({ context, onClearContext }) => {
     return (
         <div className="p-6 theme-bg-page min-h-screen theme-text-primary">
             <div className="space-y-6 animate-fade-in">
-                <h2 className="text-3xl font-bold theme-text-highlight-color">Compliance Frameworks</h2>
-                <p className="theme-text-secondary">
-                    Create and manage your compliance frameworks, ingest new laws, and define the rules that govern your platform.
-                </p>
-
-                <div className="flex justify-between items-center">
-                     <h3 className="text-xl font-semibold theme-text-primary">Frameworks Library</h3>
-                     <button onClick={handleIngestRegulation} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-500 flex items-center text-sm">
-                        <UploadCloud size={16} className="mr-2" /> Ingest New Regulation
-                     </button>
+                 <div className="flex justify-between items-start">
+                    <div>
+                        <h1 className="text-3xl font-bold theme-text-primary">Compliance Frameworks</h1>
+                        <p className="theme-text-secondary">Manage and create compliance frameworks and their associated rules.</p>
+                    </div>
                 </div>
+
+                {/* Tab Navigation */}
+                <div className="border-b-2 theme-border-color">
+                    <nav className="-mb-0.5 flex space-x-6">
+                        <button onClick={() => setActiveTab('overview')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'overview' ? 'text-blue-600 border-b-2 border-blue-600' : 'theme-text-secondary hover:text-blue-600'}`}>
+                            <LayoutDashboard size={18} className="inline-block mr-2" /> Overview
+                        </button>
+                        <button onClick={() => setActiveTab('frameworks')} className={`py-3 px-1 text-sm font-medium whitespace-nowrap ${activeTab === 'frameworks' ? 'text-blue-600 border-b-2 border-blue-600' : 'theme-text-secondary hover:text-blue-600'}`}>
+                            <Shield size={18} className="inline-block mr-2" /> Frameworks
+                        </button>
+                    </nav>
+                </div>
+
+                {/* Conditional Content Rendering */}
+                {activeTab === 'overview' && (
+                    <ComplianceOverviewDashboard
+                        onNavigate={onNavigate}
+                        jurisdiction={jurisdiction}
+                        activeProduct={activeProduct}
+                        selectedEntity={selectedEntity}
+                        onSelectEntity={onSelectEntity}
+                        // Pass mock data for frameworks and rules
+                        frameworks={frameworks} 
+                        rules={rules} 
+                    />
+                )}
                 
-                <FrameworksView
-                    frameworks={mockFrameworks}
-                    onCreateFramework={handleCreateFramework}
-                    onViewFramework={handleViewFramework}
-                    onEditFramework={handleEditFramework}
-                    onLinkFramework={handleLinkFramework}
-                />
+                {activeTab === 'frameworks' && (
+                    <FrameworksView
+                        frameworks={filteredFrameworks}
+                        onCreateFramework={handleCreateFramework}
+                        onViewFramework={handleViewFramework}
+                        onEditFramework={handleEditFramework}
+                        onLinkFramework={handleLinkFramework}
+                        onIngestRegulation={handleIngestRegulation}
+                    />
+                )}
             </div>
              {isCreateRuleModalOpen && (
                 <CreateComplianceRuleModal
@@ -266,27 +188,17 @@ const ComplianceFrameworks = ({ context, onClearContext }) => {
                     initialData={editingRule}
                 />
             )}
-            {isIngestModalOpen && <IngestRegulationModal onClose={() => setIsIngestModalOpen(false)} onSave={() => {}} />}
+            {isIngestModalOpen && <IngestRegulationModal onClose={() => setIsIngestModalOpen(false)} onSave={handleSaveRegulation} />}
 
             {/* This modal is now used for both creation and editing */}
             {isCreateFrameworkModalOpen && (
-                <CreateFrameworkModal onClose={() => setIsCreateFrameworkModalOpen(false)} onSave={handleSaveFramework} />
+                <CreateFrameworkModal onClose={() => setIsCreateFrameworkModalOpen(false)} onSave={handleSaveFramework} regulatorySections={regulatorySections} />
             )}
             {isEditFrameworkModalOpen && (
-                <CreateFrameworkModal onClose={() => setIsEditFrameworkModalOpen(false)} onSave={handleSaveFramework} initialData={editingFramework} />
+                <CreateFrameworkModal onClose={() => setIsEditFrameworkModalOpen(false)} onSave={handleSaveFramework} initialData={editingFramework} regulatorySections={regulatorySections} />
             )}
 
             {isLinkFrameworkModalOpen && <LinkFrameworkModal framework={selectedFramework} onClose={() => setIsLinkFrameworkModalOpen(false)} />}
-            
-            {isViewFrameworkModalOpen && selectedFrameworkToView && (
-                <ViewFrameworkDetailsModal 
-                    framework={selectedFrameworkToView} 
-                    onClose={() => setIsViewFrameworkModalOpen(false)}
-                    onEdit={handleEditFramework}
-                    rules={rules}
-                    onEditRule={handleEditRule}
-                />
-            )}
         </div>
     );
 };

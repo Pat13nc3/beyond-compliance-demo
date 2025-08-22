@@ -1,11 +1,11 @@
 // src/features/settings/index.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Users, Bell, Shield, Key, Building2, User2, Settings as SettingsIcon } from 'lucide-react';
-import UsersAndRolesView from './components/UsersAndRolesView';
-import NotificationsView from './components/NotificationsView';
-import PasswordManagementView from './components/PasswordManagementView';
-import SystemConfigView from './components/SystemConfigView';
-import OrganizationsView from './components/OrganizationsView';
+import UsersAndRolesView from './components/UsersAndRolesView.jsx';
+import NotificationsView from './components/NotificationsView.jsx';
+import PasswordManagementView from './components/PasswordManagementView.jsx';
+import SystemConfigView from './components/SystemConfigView.jsx';
+import OrganizationsView from './components/OrganizationsView.jsx';
 import EditUserModal from './modals/EditUserModal.jsx';
 import InviteUserModal from './modals/InviteUserModal.jsx';
 import CreateAlertModal from './modals/CreateAlertModal.jsx';
@@ -18,7 +18,7 @@ import { mockUsers as initialMockUsers, mockRoles as initialMockRoles, mockPartn
 import { mockAlerts as initialMockAlerts } from '../riskAssessment/data/riskData.js';
 
 // --- MAIN SETTINGS PAGE ---
-const Settings = () => {
+const Settings = ({ context, onCleanContext }) => { // Receive context and onCleanContext
   const [activeTab, setActiveTab] = useState('users-roles');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
@@ -56,6 +56,20 @@ const Settings = () => {
   const [userForActivityLog, setUserForActivityLog] = useState(null);
 
   const [toastMessage, setToastMessage] = useState('');
+
+  // Effect to handle context for opening modals
+  useEffect(() => {
+    if (context) {
+      if (context.openModal === 'inviteUser') {
+        setActiveTab('users-roles'); // Ensure correct tab is active
+        setIsInviteModalOpen(true);
+      }
+      // Clean the context after it's been used
+      if (onCleanContext) {
+        onCleanContext();
+      }
+    }
+  }, [context, onCleanContext]);
 
   React.useEffect(() => {
     if (toastMessage) {

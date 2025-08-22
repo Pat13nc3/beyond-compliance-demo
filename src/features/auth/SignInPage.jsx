@@ -1,27 +1,24 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+// src/features/auth/SignInPage.jsx
 
-const SignInPage = ({ onSignInSuccess, firebaseConfig, initialAuthToken }) => {
+import React, { useState, useEffect, useMemo } from 'react';
+import { onAuthStateChanged, signInWithEmailAndPassword, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
+
+const SignInPage = ({ onSignInSuccess, auth, db, initialAuthToken }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [authReady, setAuthReady] = useState(false);
 
-    // Initialize Firebase app and auth instance
-    const app = useMemo(() => initializeApp(firebaseConfig), [firebaseConfig]);
-    const auth = useMemo(() => getAuth(app), [app]);
-    const db = useMemo(() => getFirestore(app), [app]);
-
     useEffect(() => {
+        if (!auth) {
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // User is signed in.
                 onSignInSuccess(db, auth, user.uid);
             } else {
-                // No user is signed in. Attempt anonymous sign-in if no token provided.
                 if (!initialAuthToken) {
                     try {
                         await signInAnonymously(auth);
@@ -31,10 +28,9 @@ const SignInPage = ({ onSignInSuccess, firebaseConfig, initialAuthToken }) => {
                     }
                 }
             }
-            setAuthReady(true); // Mark auth as ready after initial check or anonymous sign-in attempt
+            setAuthReady(true);
         });
 
-        // If an initialAuthToken is provided, sign in with it immediately
         const signInWithToken = async () => {
             if (initialAuthToken && !auth.currentUser) {
                 try {
@@ -42,16 +38,15 @@ const SignInPage = ({ onSignInSuccess, firebaseConfig, initialAuthToken }) => {
                 } catch (tokenError) {
                     console.error("Custom token sign-in failed:", tokenError);
                     setError("Session expired or invalid. Please sign in.");
-                    setAuthReady(true); // Mark auth ready even on token error to allow manual sign-in
+                    setAuthReady(true);
                 }
             }
         };
 
         signInWithToken();
 
-        return () => unsubscribe(); // Clean up the listener
-    }, [auth, initialAuthToken, onSignInSuccess]);
-
+        return () => unsubscribe();
+    }, [auth, initialAuthToken, onSignInSuccess, db]);
 
     const handleSignIn = async (e) => {
         e.preventDefault();
@@ -60,7 +55,6 @@ const SignInPage = ({ onSignInSuccess, firebaseConfig, initialAuthToken }) => {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            // onAuthStateChanged will handle the success redirection
         } catch (err) {
             console.error("Login error:", err.code, err.message);
             if (err.code === 'auth/invalid-email' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {

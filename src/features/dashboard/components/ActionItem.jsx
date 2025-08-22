@@ -16,7 +16,10 @@ const ActionItem = ({ action, onActionClick }) => {
     };
 
     return (
-        <div className="flex items-center justify-between theme-bg-card p-4 rounded-lg hover:bg-gray-700 transition-colors">
+        <div 
+            className="flex items-center justify-between theme-bg-card p-4 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
+            onClick={() => onActionClick(action)}
+        >
             <div className="flex items-center space-x-4">
                 <div className="flex-shrink-0">
                     {getIcon()}
@@ -26,8 +29,9 @@ const ActionItem = ({ action, onActionClick }) => {
                     <p className="text-sm theme-text-secondary">{description || `Due in ${dueDate}`}</p>
                 </div>
             </div>
+            {/* The CTA button remains, but the click logic is duplicated for the card */}
             <button
-                onClick={() => onActionClick(action)}
+                onClick={(e) => { e.stopPropagation(); onActionClick(action); }}
                 className="theme-bg-highlight-color text-black font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors"
             >
                 {cta}

@@ -10,7 +10,8 @@ import {
     mockTransactionData,
     mockUserAccessData,
     userAccessValidationRule,
-    mockTemplates
+    mockTemplates,
+    productCategories
 } from '../../data/mockData';
 
 // Component Imports
@@ -26,7 +27,7 @@ import ReportDraftModal from './modals/ReportDraftModal';
 import FilingModal from './modals/FilingModal';
 import ActionChoiceModal from './modals/ActionChoiceModal';
 
-const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext, triggerAIAnalysis }) => {
+const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext, triggerAIAnalysis, selectedEntity, activeProduct }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [reports, setReports] = useState(mockReports);
   const [activeModal, setActiveModal] = useState(null);
@@ -55,8 +56,20 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
 
   const filteredReports = useMemo(() => {
     let filtered = reports;
+
+    // Filter by selected entity
+    if (selectedEntity && selectedEntity !== 'All Entities') {
+        filtered = filtered.filter(report => report.entityId === selectedEntity);
+    }
+
+    // Then, filter by jurisdiction
     if (jurisdiction && jurisdiction !== 'Global') {
       filtered = filtered.filter(report => report.jurisdiction === jurisdiction);
+    }
+    
+    // Filter by product
+    if (activeProduct && activeProduct !== 'All Products') {
+        filtered = filtered.filter(report => report.product === activeProduct);
     }
 
     if (reportingDashboardFilters.regulator !== 'All') {
@@ -70,7 +83,7 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
     }
     return filtered;
 
-  }, [reports, jurisdiction, reportingDashboardFilters]);
+  }, [reports, jurisdiction, reportingDashboardFilters, selectedEntity, activeProduct]);
 
   const filteredEvents = useMemo(() => {
     if (!jurisdiction || jurisdiction === 'Global') {
@@ -211,8 +224,7 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
                   .replace(/\[AI-Assessed Risk Assessment Comments\]/g, 'Risk assessment comments from AI')
                   .replace(/\[AI-Assessed Internal Control Comments\]/g, 'Internal control comments from AI')
                   .replace(/\[AI-Assessed CDD Comments\]/g, 'Customer Due Diligence comments from AI')
-                  .replace(/\[AI-Assessed Suspicious Activity Comments\]/g, 'Suspicious Activity comments from AI')
-                  .replace(/\[AI-Assessed Record Keeping Comments\]/g, 'Record Keeping comments from AI');
+                  .replace(/\[AI-Assessed Suspicious Activity Comments\]/g, 'Suspicious Activity comments from AI');
 
                 linkedDataDescription = `Compliance status derived from user access data analysis.`;
                 linkedDataFilters = { type: 'User Access', status: 'Flagged' };
@@ -231,6 +243,8 @@ const ComplianceReporting = ({ jurisdiction, context, onNavigate, onCleanContext
 
     const newReport = {
       id: `rep-${Date.now()}`,
+      entityId: selectedEntity, // NEW: Associate with the selected entity
+      product: activeProduct, // NEW: Associate with the selected product
       name: newReportData.name,
       status: 'Draft',
       type: reportType,

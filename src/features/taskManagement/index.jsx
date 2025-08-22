@@ -1,6 +1,6 @@
 // src/features/taskManagement/index.jsx
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { GanttChart, ListFilter, Box, Clock, UserCheck, AlertTriangle } from 'lucide-react'; // Added icons for filters
 
 // Component and Modal Imports for Task Management
@@ -11,7 +11,7 @@ import Toast from '../../components/ui/Toast';
 // Data Imports
 import { initialTasks, mockUsers, mockProjects, currentUser } from '../../data/mockData'; // Import mockProjects and currentUser
 
-const TaskManagement = ({ context, onCleanContext }) => {
+const TaskManagement = ({ context, onCleanContext, activeProduct, selectedEntity }) => {
     const [tasks, setTasks] = useState(initialTasks);
     const [editingTask, setEditingTask] = useState(null);
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
@@ -19,7 +19,6 @@ const TaskManagement = ({ context, onCleanContext }) => {
 
     // NEW: State for filters
     const [taskViewFilter, setTaskViewFilter] = useState('all'); // 'all', 'my', 'pending', 'overdue'
-    const [productFilter, setProductFilter] = useState('All'); // 'All' or specific product name
 
     // Get current user's role for permissions
     const userRole = currentUser.userRole; // Assuming currentUser is available globally or passed via props
@@ -48,10 +47,15 @@ const TaskManagement = ({ context, onCleanContext }) => {
         let filtered = [...tasks];
 
         // Apply product filter first
-        if (productFilter !== 'All') {
-            filtered = filtered.filter(task => task.product === productFilter);
+        if (activeProduct !== 'All Products') {
+            filtered = filtered.filter(task => task.product === activeProduct);
         }
 
+        // Apply entity filter
+        if (selectedEntity && selectedEntity !== 'All Entities') {
+            filtered = filtered.filter(task => task.entityId === selectedEntity);
+        }
+        
         // Apply view-specific filters
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
@@ -90,17 +94,18 @@ const TaskManagement = ({ context, onCleanContext }) => {
         // Compliance Admins see all tasks by default, no further filtering needed here based on role
 
         return filtered;
-    }, [tasks, taskViewFilter, productFilter, userRole, currentUserName]);
+    }, [tasks, taskViewFilter, activeProduct, selectedEntity, userRole, currentUserName]);
 
     // Group filtered tasks by status for the board view
     const groupedTasks = useMemo(() => {
+        const initialGroups = {'To Do': [], 'In Progress': [], 'Done': []};
         return filteredTasks.reduce((acc, task) => {
             if (!acc[task.status]) {
                 acc[task.status] = [];
             }
             acc[task.status].push(task);
             return acc;
-        }, {});
+        }, initialGroups);
     }, [filteredTasks]);
 
     const handleSaveTask = (taskToSave) => {
@@ -143,9 +148,8 @@ const TaskManagement = ({ context, onCleanContext }) => {
 
     const allProducts = useMemo(() => {
         const uniqueProducts = new Set(mockProjects.map(p => p.name));
-        return ['All', ...Array.from(uniqueProducts)];
+        return ['All Products', ...Array.from(uniqueProducts)];
     }, [mockProjects]);
-
 
     return (
         <div className="p-6 theme-bg-page h-full theme-text-primary">
@@ -184,16 +188,6 @@ const TaskManagement = ({ context, onCleanContext }) => {
                             Overdue Tasks
                         </button>
                     </div>
-                    <span className="font-semibold theme-text-primary flex items-center ml-auto"><Box size={18} className="mr-2"/> Product:</span>
-                    <select 
-                        value={productFilter} 
-                        onChange={(e) => setProductFilter(e.target.value)}
-                        className="p-2 border theme-border-color rounded-md bg-gray-700 text-white focus:ring-yellow-500 focus:border-yellow-500"
-                    >
-                        {allProducts.map(product => (
-                            <option key={product} value={product}>{product}</option>
-                        ))}
-                    </select>
                 </div>
 
                 <div className="mt-6 flex-1 overflow-y-auto">

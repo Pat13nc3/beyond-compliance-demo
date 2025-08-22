@@ -10,20 +10,26 @@ export const currentUser = {
 };
 
 export const companyStructure = {
-    parent: { id: 'parent-01', name: "Innovate Inc. (Headquarters)", location: "New York, USA", status: "Active" },
+    parent: { 
+        id: 'parent-01', 
+        name: "Innovate Inc. (Headquarters)", 
+        location: "New York, USA", 
+        status: "Active", 
+        products: ['All', 'Payments', 'VASPs', 'Credit Lending', 'RWAs', 'Remittances', 'Crowdfunding'] // Add all products for the parent
+    },
     subsidiaries: [
-        { id: 'sub-01', name: "Innovate Kenya Ltd.", location: "Nairobi, Kenya", status: "Active" },
-        { id: 'sub-02', name: "Innovate UK Services", location: "London, UK", status: "Active" },
-        { id: 'sub-03', name: "Innovate Brazil Tech", location: "São Paulo, Brazil", status: "In Review" },
+        { id: 'sub-01', name: "Innovate Kenya Ltd.", location: "Nairobi, Kenya", status: "Active", products: ['Payments', 'Lending'] },
+        { id: 'sub-02', name: "Innovate Ghana Services", location: "Accra, Ghana", status: "Active", products: ['Payments', 'Remittances'] },
+        { id: 'sub-03', name: "Innovate Nigeria Tech", location: "Lagos, Nigeria", status: "In Review", products: ['Payments', 'Digital Assets'] },
     ],
 };
 
 // --- Data for Dashboard & Core UI ---
 export const initialPriorityActions = [
-    { id: 'act1', type: 'DEADLINE', urgency: 'URGENT', title: 'CBN Bi-Annual AML Report', details: 'Due in 3 days', cta: 'Prepare Report', jurisdiction: 'Nigeria' },
-    { id: 'act2', type: 'ACTION', urgency: 'HIGH', title: 'Incomplete KYC Records', details: '15 records require manual review', cta: 'Review Now', jurisdiction: 'Global' },
-    { id: 'act3', type: 'ACTION', urgency: 'MEDIUM', title: 'VASP License Renewal', details: 'Kenya - CMA license expires in 60 days', cta: 'Start Renewal', jurisdiction: 'Kenya' },
-    { id: 'act4', type: 'DEADLINE', urgency: 'URGENT', title: 'SAR Filing', details: 'Due in 5 days', cta: 'Prepare Report', jurisdiction: 'Ghana' },
+    { id: 'act1', entityId: 'sub-01', type: 'DEADLINE', urgency: 'URGENT', title: 'CBN Bi-Annual AML Report', details: 'Due in 3 days', cta: 'Prepare Report', jurisdiction: 'Nigeria' },
+    { id: 'act2', entityId: 'parent-01', type: 'ACTION', urgency: 'HIGH', title: 'Incomplete KYC Records', details: '15 records require manual review', cta: 'Review Now', jurisdiction: 'Global' },
+    { id: 'act3', entityId: 'sub-01', type: 'ACTION', urgency: 'MEDIUM', title: 'VASP License Renewal', details: 'Kenya - CMA license expires in 60 days', cta: 'Start Renewal', jurisdiction: 'Kenya' },
+    { id: 'act4', entityId: 'sub-03', type: 'DEADLINE', urgency: 'URGENT', title: 'SAR Filing', details: 'Due in 5 days', cta: 'Prepare Report', jurisdiction: 'Ghana' },
 ];
 
 // UPDATED: regulatoryPulseData with fullText property
@@ -85,7 +91,8 @@ Recommended actions from this analysis include:
 Key provisions of the new VASP regulations include:
 1.  **Mandatory Registration/Licensing**: All entities providing VASP services (e.g., crypto exchanges, digital asset custodians, and issuers of stablecoins) must register with the Financial Sector Conduct Authority (FSCA) by [Date - e.g., 2025-12-31].
 2.  **AML/CFT Compliance**: VASPs are now explicitly designated as accountable institutions under the Financial Intelligence Centre Act (FICA). This means they must implement robust Anti-Money Laundering and Counter-Financing of Terrorism (AML/CFT) measures, including customer due diligence (CDD), suspicious transaction reporting (STR), and record-keeping.
-3.  **Risk-Based Approach**: VASPs are required to adopt a risk-based approach to AML/CFT, assessing and mitigating risks specific to their operations and customer base.
+3.  **Risk-Based Approach**: VASPs are required to adopt a risk-based approach to AML/CFT, assessing and mitigating risks specific to their
+    operations and customer base.
 4.  **Operational Resilience**: Guidelines on operational resilience, including cybersecurity standards, business continuity planning, and outsourcing arrangements, are also covered.
 5.  **Consumer Protection**: Requirements related to transparency, disclosure, and dispute resolution mechanisms for consumers engaging with VASPs.
 
@@ -264,6 +271,7 @@ export const mockTemplates = [
 export const mockReports = [
     {
         id: 'rep1',
+        entityId: 'sub-01',
         name: 'SAR-2023-04-12 (NG)',
         status: 'Filed',
         type: 'SAR',
@@ -274,6 +282,7 @@ export const mockReports = [
     },
     {
         id: 'rep2',
+        entityId: 'parent-01',
         name: 'CTR-2023-04-11 (NG)',
         status: 'Filed',
         type: 'CTR',
@@ -284,6 +293,7 @@ export const mockReports = [
     },
     {
         id: 'rep3',
+        entityId: 'sub-02',
         name: 'ACR-2022-Q4 (KE)',
         status: 'Draft',
         type: 'Annual Review',
@@ -554,6 +564,7 @@ export const processedTransactionDashboardData = {
     ],
 };
 
+// NEW: Export reportingEvents
 export const reportingEvents = [
     {
         id: 'evt1',
@@ -1350,13 +1361,41 @@ export const mockTeams = [
 ];
 
 export const mockProjects = [
-    { id: 'proj-1', name: 'Product V2.0 Launch', teamId: 'team-bc' },
-    { id: 'proj-2', name: 'Annual Compliance Reporting', teamId: 'team-bc' },
-    { id: 'proj-3', name: 'AML/CFT Policy Review', teamId: 'team-bc' },
-    { id: 'proj-4', name: 'Data Privacy Policy & Controls', teamId: 'team-bc' },
-    { id: 'proj-5', name: 'Licensing & Regulatory Filings', teamId: 'team-bc' },
-    { id: 'proj-6', name: 'Staff Training & Awareness', teamId: 'team-bc' },
-    { id: 'proj-7', name: 'Continuous Monitoring Automation', teamId: 'team-bc' },
+    { id: 'proj-1', name: 'Payments' },
+    { id: 'proj-2', name: 'VASPs' },
+    { id: 'proj-3', name: 'Credit Lending' },
+    { id: 'proj-4', name: 'RWAs' },
+];
+
+export const productCategories = [
+    'All Products',
+    'Payments',
+    'VASPs',
+    'Credit Lending',
+    'RWAs',
+    'Remittances',
+    'Crowdfunding',
+];
+
+// NEW: Explicit mapping of jurisdictions to their regulators
+export const mockRegulators = {
+    'Nigeria': ['CBN', 'NDIC'],
+    'Kenya': ['CMA', 'ODPC'],
+    'Ghana': ['BOG'],
+    'South Africa': ['SARB', 'FSCA'], // Added FSCA for South Africa
+    'Global': ['FATF', 'BIS'] // Example global regulators
+};
+
+// --- Mock data for frameworks ---
+export const mockFrameworks = [
+    // Existing frameworks are now "User-Defined"
+    { id: 'fw-1', name: 'AML Act 2023 Compliance', status: 'Published', totalRequirements: 52, linkedProducts: ['Payments', 'Lending'], jurisdiction: 'Nigeria', source: 'User-Defined' },
+    { id: 'fw-2', name: 'VASP Bill 2024 Framework', status: 'Published', totalRequirements: 11, linkedProducts: ['Digital Assets'], jurisdiction: 'Kenya', source: 'User-Defined' },
+    { id: 'fw-3', name: 'KYC Regulation 2022', status: 'Published', totalRequirements: 25, linkedProducts: ['All'], jurisdiction: 'Global', source: 'User-Defined' },
+    { id: 'fw-4', name: 'Novice Framework', status: 'Not Published', totalRequirements: 2, linkedProducts: [], jurisdiction: 'Kenya', source: 'User-Defined' },
+    { id: 'fw-5', name: 'NEX TAX FRAMEWORK', status: 'Not Published', totalRequirements: 3, linkedProducts: [], jurisdiction: 'Nigeria', source: 'User-Defined' },
+    // NEW: Add a framework from an AI-Ingested source for demonstration purposes
+    { id: 'fw-6', name: 'ODPC Data Privacy Framework', status: 'Published', totalRequirements: 15, linkedProducts: ['All'], jurisdiction: 'Kenya', source: 'AI-Ingested' }
 ];
 
 // Mock data for regulatory sections
@@ -1391,11 +1430,16 @@ export const mockRegulatorySections = [
         section: 'Part 2.1',
         description: 'Identity verification for all users.'
     },
-];
-
-export const licenseCategories = [
-    { id: 'banking', name: 'Banking', description: 'Licenses for traditional banking services.' },
-    { id: 'payments', name: 'Payments', description: 'Licenses for payment service providers.' },
-    { id: 'digital-assets', name: 'Digital Assets', description: 'Licenses for virtual asset service providers.' },
-    { id: 'lending', name: 'Lending', description: 'Licenses for credit and lending activities.' },
+    {
+      id: 'reg-sec-6',
+      regulationName: 'ODPC Data Privacy Framework', // Use regulationName to match the mock regulation object
+      section: 'Part 1.1',
+      description: 'Definitions of personal and sensitive data under the new framework.'
+    },
+    {
+      id: 'reg-sec-7',
+      regulationName: 'ODPC Data Privacy Framework',
+      section: 'Part 2.2',
+      description: 'Consent requirements for data processing and storage.'
+    },
 ];

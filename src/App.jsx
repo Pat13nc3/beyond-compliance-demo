@@ -2,52 +2,146 @@
 
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Sidebar from './components/layout/Sidebar.jsx'; // Added .jsx extension
-import Header from './components/layout/Header.jsx';   // Added .jsx extension
-// import SignInPage from './features/auth/SignInPage'; // Removed SignInPage import
+import Sidebar from './components/layout/Sidebar.jsx';
+import Header from './components/layout/Header.jsx';
+import SignInPage from './features/auth/SignInPage.jsx';
 
 // --- Import all your page components ---
-import ActionOrientedDashboard from './features/dashboard/index.jsx'; // Added /index.jsx
-import ComplianceReporting from './features/complianceReporting/index.jsx'; // Added /index.jsx
-import DataManagement from './features/dataManagement/index.jsx'; // Added /index.jsx
-import Library from './features/library/index.jsx'; // Added /index.jsx
-import RiskAssessment from './features/riskAssessment/index.jsx'; // Added /index.jsx
-import Licensing from './features/licensing/index.jsx'; // Added /index.jsx
-import RegulatoryUpdates from './features/regulatoryUpdates/index.jsx'; // Added /index.jsx
-import Manage from './features/manage/index.jsx'; // Added /index.jsx
-import Settings from './features/settings/index.jsx'; // Added /index.jsx
-import TaskManagement from './features/taskManagement/index.jsx'; // Added /index.jsx
-import ComplianceFrameworks from './features/complianceFrameworks/index.jsx'; // Confirmed .jsx extension
+import ActionOrientedDashboard from './features/dashboard/index.jsx';
+import ComplianceReporting from './features/complianceReporting/index.jsx';
+import DataManagement from './features/dataManagement/index.jsx';
+import Library from './features/library/index.jsx';
+import RiskAssessment from './features/riskAssessment/index.jsx';
+import Licensing from './features/licensing/index.jsx';
+import RegulatoryUpdates from './features/regulatoryUpdates/index.jsx';
+import Manage from './features/manage/index.jsx';
+import Settings from './features/settings/index.jsx';
+import TaskManagement from './features/taskManagement/index.jsx';
+import ComplianceFrameworks from './features/complianceFrameworks/index.jsx';
 
 // Global UI Components
-import Toast from './components/ui/Toast.jsx'; // Corrected casing and added .jsx extension
-import AIAnalysisResultModal from './features/aiAgent/modals/AIAnalysisResultModal.jsx'; // Added .jsx extension
+import Toast from './components/ui/Toast.jsx';
+import AIAnalysisResultModal from './features/aiAgent/modals/AIAnalysisResultModal.jsx';
+
+// Onboarding Components
+import OnboardingWrapper from './features/onboarding/OnboardingWrapper.jsx';
+import { mockRules as initialMockRules, mockTemplates, mockRegulatorySections } from './data/mockData.js';
+
+// Firebase imports
+import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+
 
 const App = () => {
-    // Removed: State for authentication and user information
-    // const [user, setUser] = useState(null);
-    // const [db, setDb] = useState(null);
-    // const [auth, setAuth] = useState(null);
+    // Firebase related states
+    const [user, setUser] = useState(null);
+    const [db, setDb] = useState(null);
+    const [auth, setAuth] = useState(null);
+    const [isFirebaseInitialized, setIsFirebaseInitialized] = useState(false);
+    const [isMockMode, setIsMockMode] = useState(false); // NEW STATE FOR MOCK MODE
 
+    // Application specific states
     const [activeTab, setActiveTab] = useState('Dashboard');
     const [userMode, setUserMode] = useState('Pro');
     const [pageContext, setPageContext] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [activeJurisdiction, setActiveJurisdiction] = useState('Global');
-    const [theme, setTheme] = useState('dark'); 
+    const [theme, setTheme] = useState('dark');
+    
+    // State to track if the user has completed the onboarding flow
+    const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
 
     const [libraryEvidence, setLibraryEvidence] = useState([
       { name: 'Q1 Board Meeting Minutes.pdf', status: 'New', id: 'evid-1' }
     ]);
 
     const [toastMessage, setToastMessage] = useState('');
-
     const [isAIAnalysisResultModalOpen, setIsAIAnalysisResultModalOpen] = useState(false);
-    const [aiAnalysisResultContent, setAiAnalysisResultContent] = useState({});
+    // FIX: Initialize aiAnalysisResultContent as an object with default empty arrays/strings
+    const [aiAnalysisResultContent, setAiAnalysisResultContent] = useState({
+        title: '',
+        summary: '',
+        keyPoints: [],
+        recommendedActions: [],
+        originalContext: {},
+        analysisType: ''
+    });
+
+    // NEW STATE VARIABLES
+    const [activeProduct, setActiveProduct] = useState('All Products');
+    const [selectedEntity, setSelectedEntity] = useState('parent-01');
+
+    useEffect(() => {
+        const mockFirebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        const firebaseConfig = (typeof __firebase_config !== 'undefined' && Object.keys(JSON.parse(__firebase_config)).length > 0)
+            ? JSON.parse(__firebase_config)
+            : mockFirebaseConfig;
+
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        const isConfigValid = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
+
+        if (!isConfigValid) {
+            console.warn("No valid Firebase config detected. Running in mock user mode.");
+            setIsMockMode(true);
+            setUser({ uid: 'mock-user-123' });
+            // In mock mode, we still want to go through onboarding
+            setIsOnboardingComplete(false); 
+            setIsFirebaseInitialized(true);
+        } else {
+            if (Object.keys(firebaseConfig).length > 0 && !isFirebaseInitialized) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    const authInstance = getAuth(app);
+                    const dbInstance = getFirestore(app);
+
+                    setAuth(authInstance);
+                    setDb(dbInstance);
+                    setIsFirebaseInitialized(true);
+
+                    const unsubscribe = onAuthStateChanged(authInstance, async (currentUser) => {
+                        if (currentUser) {
+                            setUser(currentUser);
+                        } else {
+                            setUser(null);
+                            setIsOnboardingComplete(false);
+                        }
+                    });
+
+                    const signIn = async () => {
+                        if (initialAuthToken) {
+                            try {
+                                await signInWithCustomToken(authInstance, initialAuthToken);
+                            } catch (error) {
+                                console.error("Custom token sign-in failed:", error);
+                                await signInAnonymously(authInstance);
+                            }
+                        } else {
+                            await signInAnonymously(authInstance);
+                        }
+                    };
+                    signIn();
+
+                    return () => unsubscribe();
+                } catch (e) {
+                    console.error("Firebase initialization failed:", e);
+                }
+            }
+        }
+    }, [isFirebaseInitialized]);
 
     useEffect(() => {
         document.body.setAttribute('data-theme', theme);
-    }, [theme]); 
+    }, [theme]);
 
     const toggleTheme = () => {
         setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
@@ -70,6 +164,14 @@ const App = () => {
     const handleCleanContext = () => {
         setPageContext(null);
     };
+
+    const handleOnboardingComplete = (setupConfig) => {
+        console.log("Onboarding complete with config:", setupConfig);
+        setIsOnboardingComplete(true);
+        setActiveTab('Dashboard');
+        setToastMessage(`Welcome! Your platform is configured for ${setupConfig.jurisdiction}.`);
+    };
+
 
     const triggerAIAnalysis = (contextData, analysisType) => {
         console.log(`AI Analysis requested for type: ${analysisType}`, contextData);
@@ -212,6 +314,31 @@ const App = () => {
 
 
     const renderContent = () => {
+        if (!isFirebaseInitialized) {
+            return (
+                <div className="flex items-center justify-center min-h-screen theme-bg-page theme-text-primary">
+                    <p>Initializing application...</p>
+                </div>
+            );
+        }
+
+        if (!user && !isMockMode) {
+            return (
+                <SignInPage 
+                    onSignInSuccess={(dbInstance, authInstance, uid) => {
+                        setDb(dbInstance);
+                        setAuth(authInstance);
+                        setUser({ uid });
+                        setIsOnboardingComplete(false); 
+                    }} 
+                />
+            );
+        }
+
+        if (!isOnboardingComplete) {
+            return <OnboardingWrapper onCompleteOnboarding={handleOnboardingComplete} />;
+        }
+
         const pageProps = {
             onNavigate: handleNavigate,
             context: pageContext,
@@ -222,11 +349,12 @@ const App = () => {
 
         switch (activeTab) {
             case 'Dashboard':
-                return <ActionOrientedDashboard {...pageProps} />;
+                return <ActionOrientedDashboard {...pageProps} activeProduct={activeProduct} setActiveProduct={setActiveProduct} selectedEntity={selectedEntity} onSelectEntity={setSelectedEntity} />;
             case 'ComplianceReporting':
                 return <ComplianceReporting {...pageProps} />;
             case 'ComplianceFrameworks':
-                return <ComplianceFrameworks {...pageProps} />;
+                // Correctly pass all necessary props to the component
+                return <ComplianceFrameworks {...pageProps} activeProduct={activeProduct} selectedEntity={selectedEntity} onSelectEntity={setSelectedEntity} />;
             case 'DataManagement':
                 return <DataManagement {...pageProps} onPromoteToLibrary={handlePromoteToLibrary} jurisdiction={activeJurisdiction} onNavigate={handleNavigate} />;
             case 'Library':
@@ -236,7 +364,8 @@ const App = () => {
             case 'Licensing':
                 return <Licensing {...pageProps} />;
             case 'RegulatoryUpdates':
-                return <RegulatoryUpdates {...pageProps} />;
+                // NEW: Pass activeProduct, jurisdiction, and setActiveJurisdiction
+                return <RegulatoryUpdates {...pageProps} activeProduct={activeProduct} jurisdiction={activeJurisdiction} setActiveJurisdiction={setActiveJurisdiction} />;
             case 'Manage':
                 return <Manage {...pageProps} />;
             case 'Settings':
@@ -244,35 +373,37 @@ const App = () => {
             case 'TaskManagement':
                 return <TaskManagement {...pageProps} />;
             default:
-                return <ActionOrientedDashboard {...pageProps} />;
+                return <ActionOrientedDashboard {...pageProps} activeProduct={activeProduct} setActiveProduct={setActiveProduct} selectedEntity={selectedEntity} onSelectEntity={setSelectedEntity} />;
         }
     };
 
-    // Removed: Conditional rendering based on user state
-    // if (!user) {
-    //     return <SignInPage onSignInSuccess={(db, auth, user) => { setDb(db); setAuth(auth); setUser(user); }} />;
-    // }
-
     return (
         <div className="flex flex-col h-screen overflow-hidden" data-theme={theme}>
-            <Header
-                activeTab={activeTab}
-                isSidebarOpen={isSidebarOpen} 
-                setIsSidebarOpen={setIsSidebarOpen} 
-                userMode={userMode}
-                setUserMode={setUserMode}
-                activeJurisdiction={activeJurisdiction}
-                setActiveJurisdiction={setActiveJurisdiction}
-                theme={theme}
-                toggleTheme={toggleTheme}
-            />
-            <div className="flex flex-1 overflow-hidden">
-                <Sidebar
+            {user && isOnboardingComplete && (
+                <Header
                     activeTab={activeTab}
-                    setActiveTab={handleNavigate}
                     isSidebarOpen={isSidebarOpen}
-                    setIsSidebarOpen={setIsSidebarOpen} 
+                    setIsSidebarOpen={setIsSidebarOpen}
+                    userMode={userMode}
+                    setUserMode={setUserMode}
+                    activeJurisdiction={activeJurisdiction}
+                    setActiveJurisdiction={setActiveJurisdiction}
+                    activeProduct={activeProduct}
+                    setActiveProduct={setActiveProduct}
+                    theme={theme}
+                    toggleTheme={toggleTheme}
+                    isMockMode={isMockMode}
                 />
+            )}
+            <div className="flex flex-1 overflow-hidden">
+                {user && isOnboardingComplete && (
+                    <Sidebar
+                        activeTab={activeTab}
+                        setActiveTab={handleNavigate}
+                        isSidebarOpen={isSidebarOpen}
+                        setIsSidebarOpen={setIsSidebarOpen}
+                    />
+                )}
                 <main className="flex-1 overflow-x-hidden overflow-y-auto theme-bg-page">
                     {renderContent()}
                 </main>
@@ -284,7 +415,7 @@ const App = () => {
                     result={aiAnalysisResultContent}
                     onClose={() => { setIsAIAnalysisResultModalOpen(false); setAiAnalysisResultContent({}); }}
                     onPromote={(actionType, originalContext, aiResult) => {
-                        console.log(`Promote action: ${actionType}`, {originalContext, aiResult});
+                        console.log(`Simulating promotion to ${actionType}...`, {originalContext, aiResult});
                         setToastMessage(`Simulating promotion to ${actionType}...`);
                         setIsAIAnalysisResultModalOpen(false);
                     }}

@@ -45,10 +45,11 @@ const NavItem = ({ icon, text, active, onClick, isSidebarOpen, isSeparator = fal
 };
 
 const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) => { 
+    // UPDATED: Reordered navItems to align with the proposed workflow
     const navItems = [
         { id: 'Dashboard', icon: <LayoutDashboard size={20} />, text: 'Dashboard' },
-        { id: 'ComplianceReporting', icon: <FileText size={20} />, text: 'Compliance Reporting' },
         { id: 'ComplianceFrameworks', icon: <Shield size={20} />, text: 'Compliance Frameworks' },
+        { id: 'ComplianceReporting', icon: <FileText size={20} />, text: 'Compliance Reporting' },
         { id: 'TaskManagement', icon: <GanttChart size={20} />, text: 'Task Management' },
         { id: 'DataManagement', icon: <Database size={20} />, text: 'Data Management' },
         { id: 'Library', icon: <Book size={20} />, text: 'Library' },
